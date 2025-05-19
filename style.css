@@ -1,0 +1,255 @@
+/* --- Global Reset & Base --- */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    background-color: #f0f4f8;
+    color: #333;
+    line-height: 1.6;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+}
+
+.calculator-container {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 700px;
+}
+
+h1 {
+    font-size: 1.8em;
+    color: #1a237e;
+    text-align: center;
+    margin-bottom: 25px;
+    font-weight: 600;
+}
+
+.form-step { /* Renamed from form-section for clarity in multi-step */
+    background-color: #fdfdfd;
+    padding: 20px;
+    margin-bottom: 25px;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    /* display: none; */ /* Initially hide steps, JS will manage this */
+    min-height: 350px; /* Added to stabilize button position */
+}
+
+.form-step.active {
+    display: block;
+}
+
+.form-step h2 {
+    font-size: 1.3em;
+    color: #283593;
+    margin-bottom: 20px; 
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e0e4e8;
+    font-weight: 500;
+}
+
+label {
+    display: block;
+    font-weight: 500;
+    color: #455a64; 
+    margin-bottom: 8px;
+    font-size: 0.95em;
+}
+
+.input-group {
+    margin-bottom: 22px; 
+}
+
+.input-group label.group-title {
+     margin-bottom: 12px; 
+     font-weight: 500;
+}
+
+input[type="number"],
+select { 
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #bcccdc; 
+    border-radius: 6px;
+    font-size: 1em;
+    color: #333;
+    background-color: #fff;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+select {
+    margin-bottom: 5px; 
+}
+input[type="number"]{
+    margin-bottom: 10px; 
+}
+
+
+input[type="number"]:focus,
+select:focus {
+    outline: none;
+    border-color: #3f51b5; 
+    box-shadow: 0 0 0 2px rgba(63, 81, 181, 0.2);
+}
+
+.radio-group-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    background-color: #fff;
+    padding: 12px 15px;
+    border-radius: 6px;
+    border: 1px solid #d0d9e0;
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.radio-group-item:hover { border-color: #a0b0c0; }
+.radio-group-item input[type="radio"] { opacity: 0; width: 0; height: 0; position: absolute; }
+.radio-group-item .radio-custom { width: 20px; height: 20px; border: 2px solid #78909c; border-radius: 50%; margin-right: 12px; display: inline-block; position: relative; transition: border-color 0.2s ease; }
+.radio-group-item .radio-custom::after { content: ''; width: 10px; height: 10px; background-color: #3f51b5; border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); transition: transform 0.2s ease; }
+.radio-group-item input[type="radio"]:checked + .radio-label .radio-custom { border-color: #3f51b5; }
+.radio-group-item input[type="radio"]:checked + .radio-label .radio-custom::after { transform: translate(-50%, -50%) scale(1); }
+.radio-group-item input[type="radio"]:focus + .radio-label .radio-custom { box-shadow: 0 0 0 2px rgba(63, 81, 181, 0.2); }
+.radio-group-item .radio-label { display: flex; align-items: center; cursor: pointer; font-weight: normal; color: #333; font-size: 1em; flex-grow: 1; }
+.service-price { font-size: 0.9em; color: #546e7a; margin-left: auto; padding-left: 10px; }
+
+.variable-info { 
+    font-size: 0.85em; 
+    color: #546e7a; 
+    margin-bottom: 15px; 
+    line-height: 1.4;
+}
+.input-group .variable-info { /* Specific style for explainers under dropdowns */
+     margin-top: 5px; 
+     margin-bottom: 0;
+}
+
+.result-section {
+    margin-top: 30px;
+    padding: 20px;
+    background-color: #e8eaf6;
+    border: 1px solid #c5cae9;
+    border-radius: 8px;
+    text-align: left;
+}
+
+.result-section h3 {
+    margin-top: 0;
+    color: #1a237e;
+    font-size: 1.2em;
+    margin-bottom: 15px;
+}
+
+#costBreakdown {
+    background-color: #f9f9f9;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 15px;
+    margin-bottom: 15px;
+    line-height: 1.6;
+}
+
+.breakdown-line,
+.breakdown-item,
+.breakdown-header,
+.breakdown-total-line {
+    display: block; /* Ensure each takes its own line */
+    margin-bottom: 4px;
+}
+
+.breakdown-header {
+    font-weight: bold;
+    color: #2c3e50; /* Darker, more prominent header color */
+    margin-top: 8px; /* Add some space above headers */
+    margin-bottom: 6px;
+}
+
+.breakdown-header:first-child {
+    margin-top: 0;
+}
+
+.breakdown-item {
+    color: #34495e; /* Slightly softer than black for items */
+}
+
+.breakdown-detail {
+    /* margin-left already handled by &nbsp; in JS, but could add more */
+    color: #7f8c8d; /* Subtler color for details */
+}
+
+.breakdown-total-line {
+    font-weight: bold;
+    color: #16a085; /* A distinct color for total lines */
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed #bdc3c7;
+}
+
+.total-cost-display {
+    font-weight: bold; 
+    font-size: 2em; /* Larger total */
+    color: #d81b60; 
+    text-align: center; 
+    margin-bottom: 10px;
+    padding: 15px 10px;
+    background-color: #e8eaf6;
+    border-radius: 6px;
+    border-top: 2px solid #3f51b5;
+    border-bottom: 2px solid #3f51b5;
+}
+
+.result-section .variable-info {
+    text-align: center;
+    margin-top: 5px;
+}
+
+.navigation-buttons {
+    display: flex;
+    /* justify-content: space-between; */ /* Changed for consistent right alignment of Next */
+    justify-content: flex-end; /* Aligns Next button to the right */
+    margin-top: 25px;
+}
+.navigation-buttons button {
+    padding: 12px 25px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: 500;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+.navigation-buttons button#backButton {
+    background-color: #78909c; /* Blue Grey */
+    color: white;
+    margin-right: auto; /* Pushes Back button to the left, maintaining space */
+}
+.navigation-buttons button#backButton:hover {
+    background-color: #607d8b;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+.navigation-buttons button#nextButton {
+    background-color: #3f51b5; /* Indigo */
+    color: white;
+}
+ .navigation-buttons button#nextButton:hover {
+    background-color: #303f9f;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+.navigation-buttons button:disabled {
+    background-color: #cfd8dc; /* Light Grey */
+    color: #90a4ae;
+    cursor: not-allowed;
+}
+
+
+/* Style for hidden perFootInputs, managed by JS for steps */
+/* #perFootInputs.hidden no longer needed, step logic handles display */ 

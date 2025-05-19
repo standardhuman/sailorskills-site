@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sailor Skills Diving Cost Estimator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="calculator-container">
+        <h1>Sailor Skills Diving Cost Estimator</h1>
+
+        <!-- Step 0: Service Selection -->
+        <div id="step-0" class="form-step active">
+            <h2>Select a Service:</h2>
+            <div class="input-group">
+                <label for="serviceDropdown">Service Type:</label>
+                <select id="serviceDropdown">
+                    <!-- Options will be populated by JS -->
+                </select>
+                <p class="variable-info" id="servicePriceExplainer" style="margin-top: 8px;">Select a service to see its base rate.</p>
+                <p class="variable-info" style="margin-top: 10px; font-size: 0.9em;">Recurring hull cleaning services are available at 1, 2, or 3-month intervals. Please contact us to discuss your preferred schedule after receiving your initial estimate.</p>
+            </div>
+        </div>
+
+        <!-- Step 1: Boat Length -->
+        <div id="step-1" class="form-step" style="display: none;">
+            <h2>Boat Length</h2>
+            <div class="input-group">
+                <label for="boatLength">Boat Length (feet):</label>
+                <input type="number" id="boatLength" value="30" min="1">
+                 <p class="variable-info" id="boatLengthError" style="color: #d32f2f; display: none; margin-top: 5px;">Please enter a valid boat length.</p>
+            </div>
+        </div>
+
+        <!-- Step 2: Boat Type -->
+        <div id="step-2" class="form-step" style="display: none;">
+            <h2>Boat Type</h2>
+            <div class="input-group">
+                <label class="group-title">Select Boat Type:</label>
+                <div class="radio-group-item"><input type="radio" id="boat_type_sailboat" name="boat_type" value="sailboat" checked><label for="boat_type_sailboat" class="radio-label"><span class="radio-custom"></span>Sailboat</label></div>
+                <div class="radio-group-item"><input type="radio" id="boat_type_powerboat" name="boat_type" value="powerboat"><label for="boat_type_powerboat" class="radio-label"><span class="radio-custom"></span>Powerboat</label></div>
+            </div>
+        </div>
+
+        <!-- Step 3: Hull Type -->
+        <div id="step-3" class="form-step" style="display: none;">
+            <h2>Hull Type</h2>
+            <div class="input-group">
+                <label class="group-title">Select Hull Type:</label>
+                <div class="radio-group-item"><input type="radio" id="hull_monohull" name="hull_type" value="monohull" checked><label for="hull_monohull" class="radio-label"><span class="radio-custom"></span>Monohull</label></div>
+                <div class="radio-group-item"><input type="radio" id="hull_catamaran" name="hull_type" value="catamaran"><label for="hull_catamaran" class="radio-label"><span class="radio-custom"></span>Catamaran</label></div>
+                <div class="radio-group-item"><input type="radio" id="hull_trimaran" name="hull_type" value="trimaran"><label for="hull_trimaran" class="radio-label"><span class="radio-custom"></span>Trimaran</label></div>
+            </div>
+        </div>
+        
+        <!-- Step 4: Engine Configuration -->
+        <div id="step-4" class="form-step" style="display: none;">
+            <h2>Engine Configuration</h2>
+            <div class="input-group">
+                <!-- <label class="group-title">Select Engine Configuration:</label> --> <!-- No longer a group title needed for one checkbox -->
+                <!-- <div class="radio-group-item"><input type="radio" id="engine_single" name="engine_config" value="single" checked><label for="engine_single" class="radio-label"><span class="radio-custom"></span>Single Engine</label></div>
+                <div class="radio-group-item"><input type="radio" id="engine_twin" name="engine_config" value="twin"><label for="engine_twin" class="radio-label"><span class="radio-custom"></span>Twin Engines</label></div> -->
+
+                <!-- New Checkbox Implementation -->
+                <div class="checkbox-group-item" style="display: flex; align-items: center; padding: 12px 15px; border: 1px solid #d0d9e0; border-radius: 6px; background-color: #fff;">
+                    <input type="checkbox" id="has_twin_engines" name="has_twin_engines" value="true" style="width: 20px; height: 20px; margin-right: 12px; accent-color: #3f51b5;">
+                    <label for="has_twin_engines" style="margin-bottom: 0; font-weight: normal; cursor:pointer;">Click here if the boat has twin engines, otherwise click Next.</label>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Step 5: Last Painted Time -->
+        <div id="step-5" class="form-step" style="display: none;">
+            <h2>Bottom Paint Age</h2>
+            <div class="input-group">
+                <label for="lastPaintedTime">When was the bottom last painted?</label>
+                <select id="lastPaintedTime">
+                    <option value="0-6_months" selected>Within 6 months</option>
+                    <option value="7-12_months">7-12 months ago</option>
+                    <option value="13-21_months">13-21 months ago</option>
+                    <option value="22-24_months">22-24 months ago</option>
+                    <option value="over_24_months">Over 24 months ago</option>
+                    <option value="unsure_paint">Unsure</option>
+                </select>
+                <p class="variable-info" id="paintExplainerText">The age of your boat's bottom paint helps us estimate its current condition.</p>
+            </div>
+        </div>
+
+        <!-- Step 6: Last Cleaned Time -->
+        <div id="step-6" class="form-step" style="display: none;">
+            <h2>Last Cleaning</h2>
+            <div class="input-group">
+                <label for="lastCleanedTime">When was it last cleaned?</label>
+                <select id="lastCleanedTime">
+                    <option value="0-2_months" selected>Within 2 months</option>
+                    <option value="3-4_months">3-4 months ago</option>
+                    <option value="5-6_months">5-6 months ago</option>
+                    <option value="7-8_months">7-8 months ago</option>
+                    <option value="9-12_months">9-12 months ago</option>
+                    <option value="13-24_months">13-24 months ago</option>
+                    <option value="over_24_months_unsure">Over 24 months ago / Unsure</option>
+                </select>
+                <p class="variable-info" id="growthExplainerText">The time since your last hull cleaning is a key factor in estimating marine growth.</p>
+            </div>
+        </div>
+
+        <!-- Step 7: Anode Installation (was step-2) -->
+        <div id="step-7" class="form-step" style="display: none;">
+            <h2>Anode Check & Optional Installation</h2>
+            <label for="anodesToInstall">If you'd like us to replace anodes, how many should we plan for?</label>
+            <input type="number" id="anodesToInstall" value="0" min="0">
+            <p class="variable-info" style="margin-top:5px;">This is optional. If you want anodes replaced, enter the quantity. We charge $15 per anode for installation (cost of anodes themselves is separate). Leave at 0 if unsure or no replacement needed now.</p>
+        </div>
+        
+        <!-- Step 8: Result (was step-3) -->
+        <div id="step-8" class="result-section form-step" style="display: none;"> <!-- Added form-step for consistency -->
+            <h3>Estimated Cost:</h3>
+            <div id="costBreakdown"></div>
+            <p class="total-cost-display" id="totalCostDisplay">$0.00</p>
+            <p class="variable-info">$100 minimum for all services.</p>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="navigation-buttons">
+            <button id="backButton" type="button">Back</button>
+            <button id="nextButton" type="button">Next</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
