@@ -6,80 +6,78 @@
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
-    background-color: #f0f4f8;
-    color: #333;
+    font-family: 'Helvetica Neue', Arial, sans-serif; /* Cleaner default font */
+    background-color: #ffffff; /* White background */
+    color: #333333; /* Default dark text */
     line-height: 1.6;
-    padding: 20px;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
+    /* Removed padding, display flex, justify-content, align-items from body - container will handle centering if needed */
+    display: flex; /* Re-adding for centering the container */
+    justify-content: center; /* Re-adding for centering the container */
+    align-items: flex-start; /* Re-adding for centering the container */
+    padding: 20px; /* Re-adding for some space around container */
     min-height: 100vh;
 }
 
 .calculator-container {
-    background-color: #ffffff;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    background-color: #ffffff; /* Ensure container is white */
+    padding: 30px 40px; /* Adjusted padding */
+    border-radius: 8px; /* Softer radius */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); /* Softer shadow */
     width: 100%;
     max-width: 700px;
 }
 
-h1 {
-    font-size: 1.8em;
-    color: #1a237e;
+h1 { /* For "Sailor Skills Diving Estimator" title */
+    font-family: 'Montserrat', sans-serif; /* Example: Montserrat for a bold, clean look */
+    font-size: 2em; /* Adjusted size */
+    color: #1A3A5A; /* Dark blue/navy */
     text-align: center;
+    margin-bottom: 30px; /* Increased margin */
+    font-weight: 700;
+}
+
+.form-step {
+    background-color: #ffffff; /* White background for steps */
+    padding: 25px;
     margin-bottom: 25px;
+    border-radius: 6px;
+    /* border: 1px solid #e0e0e0; */ /* Removing border for a cleaner look like the image */
+    border: none; /* Explicitly remove border */
+    min-height: 330px; /* Adjusted min-height slightly */
+}
+
+/* .form-step.active is fine */
+
+.form-step h2 { /* For step titles like "Select a Service:", "Boat Length" */
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.6em; /* Adjusted size */
+    color: #1A3A5A; /* Dark blue/navy */
+    margin-bottom: 25px; 
+    padding-bottom: 10px;
+    border-bottom: 1px solid #D0D0D0; /* Lighter, thinner separator */
     font-weight: 600;
+    text-align: center; /* Center step titles */
 }
 
-.form-step { /* Renamed from form-section for clarity in multi-step */
-    background-color: #fdfdfd;
-    padding: 20px;
-    margin-bottom: 25px;
-    border-radius: 8px;
-    border: 1px solid #e0e0e0;
-    /* display: none; */ /* Initially hide steps, JS will manage this */
-    min-height: 350px; /* Added to stabilize button position */
-}
-
-.form-step.active {
+label, .input-group label.group-title { /* General labels and group titles */
     display: block;
-}
-
-.form-step h2 {
-    font-size: 1.3em;
-    color: #283593;
-    margin-bottom: 20px; 
-    padding-bottom: 8px;
-    border-bottom: 1px solid #e0e4e8;
-    font-weight: 500;
-}
-
-label {
-    display: block;
-    font-weight: 500;
-    color: #455a64; 
-    margin-bottom: 8px;
-    font-size: 0.95em;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-weight: 500; /* Slightly bolder for clarity */
+    color: #2c3e50; /* Darker grey-blue for labels */
+    margin-bottom: 10px;
+    font-size: 1em;
 }
 
 .input-group {
-    margin-bottom: 22px; 
-}
-
-.input-group label.group-title {
-     margin-bottom: 12px; 
-     font-weight: 500;
+    margin-bottom: 25px; 
 }
 
 input[type="number"],
 select { 
     width: 100%;
     padding: 12px 15px;
-    border: 1px solid #bcccdc; 
-    border-radius: 6px;
+    border: 1px solid #B0C4DE; /* Muted blue/grey border */
+    border-radius: 4px; /* Consistent radius */
     font-size: 1em;
     color: #333;
     background-color: #fff;
@@ -97,80 +95,79 @@ input[type="number"]{
 input[type="number"]:focus,
 select:focus {
     outline: none;
-    border-color: #3f51b5; 
-    box-shadow: 0 0 0 2px rgba(63, 81, 181, 0.2);
+    border-color: #5A7D9A; /* Muted blue for focus */
+    box-shadow: 0 0 0 2px rgba(90, 125, 154, 0.2);
 }
 
-.radio-group-item {
-    display: flex;
-    align-items: center;
+/* Radio button and checkbox styling will need significant overhaul later if we want to match a very custom look */
+/* For now, let's simplify their container */
+.radio-group-item, 
+.checkbox-group-item {
     margin-bottom: 12px;
-    background-color: #fff;
-    padding: 12px 15px;
-    border-radius: 6px;
-    border: 1px solid #d0d9e0;
-    cursor: pointer;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    background-color: transparent; /* Remove background */
+    padding: 10px 0; /* Adjust padding */
+    border: none; /* Remove border */
+    /* display: flex; align-items: center; cursor: pointer; transition: none; */ /* Will re-evaluate this */
 }
-.radio-group-item:hover { border-color: #a0b0c0; }
-.radio-group-item input[type="radio"] { opacity: 0; width: 0; height: 0; position: absolute; }
-.radio-group-item .radio-custom { width: 20px; height: 20px; border: 2px solid #78909c; border-radius: 50%; margin-right: 12px; display: inline-block; position: relative; transition: border-color 0.2s ease; }
-.radio-group-item .radio-custom::after { content: ''; width: 10px; height: 10px; background-color: #3f51b5; border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); transition: transform 0.2s ease; }
-.radio-group-item input[type="radio"]:checked + .radio-label .radio-custom { border-color: #3f51b5; }
-.radio-group-item input[type="radio"]:checked + .radio-label .radio-custom::after { transform: translate(-50%, -50%) scale(1); }
-.radio-group-item input[type="radio"]:focus + .radio-label .radio-custom { box-shadow: 0 0 0 2px rgba(63, 81, 181, 0.2); }
-.radio-group-item .radio-label { display: flex; align-items: center; cursor: pointer; font-weight: normal; color: #333; font-size: 1em; flex-grow: 1; }
-.service-price { font-size: 0.9em; color: #546e7a; margin-left: auto; padding-left: 10px; }
+/* Hiding default custom radio/checkbox for now to simplify, can re-add custom later */
+/* .radio-group-item .radio-custom { display: none; } */
+/* .radio-group-item input[type="radio"]:checked + .radio-label .radio-custom { display:none; } */
+/* .radio-group-item .radio-label { font-weight: normal; font-size: 1em; } */
+
 
 .variable-info { 
-    font-size: 0.85em; 
-    color: #546e7a; 
+    font-size: 0.9em; 
+    color: #555555; /* Softer grey */
     margin-bottom: 15px; 
     line-height: 1.4;
+    text-align: center; /* Center align explainer texts */
 }
-.input-group .variable-info { /* Specific style for explainers under dropdowns */
-     margin-top: 5px; 
+.input-group .variable-info {
+     margin-top: 8px; /* Adjusted */
      margin-bottom: 0;
 }
 
 .result-section {
     margin-top: 30px;
     padding: 20px;
-    background-color: #e8eaf6;
-    border: 1px solid #c5cae9;
-    border-radius: 8px;
+    background-color: #ffffff; /* White background */
+    border: none; /* Remove border */
+    border-radius: 8px; 
     text-align: left;
 }
 
-.result-section h3 {
+.result-section h3 { /* "Estimated Cost:" subheading */
+    font-family: 'Montserrat', sans-serif;
     margin-top: 0;
-    color: #1a237e;
-    font-size: 1.2em;
-    margin-bottom: 15px;
+    color: #1A3A5A; /* Dark blue/navy */
+    font-size: 1.3em;
+    margin-bottom: 20px;
+    text-align: center;
 }
 
 #costBreakdown {
-    background-color: #f9f9f9;
-    border: 1px solid #e0e0e0;
+    background-color: #F8F9FA; /* Very light grey for contrast */
+    border: 1px solid #E9ECEF; /* Light border */
     border-radius: 6px;
-    padding: 15px;
-    margin-bottom: 15px;
-    line-height: 1.6;
+    padding: 20px;
+    margin-bottom: 20px;
+    line-height: 1.7; /* Increased line height */
 }
 
 .breakdown-line,
 .breakdown-item,
 .breakdown-header,
 .breakdown-total-line {
-    display: block; /* Ensure each takes its own line */
-    margin-bottom: 4px;
+    display: block;
+    margin-bottom: 6px; /* Increased margin */
 }
 
 .breakdown-header {
-    font-weight: bold;
-    color: #2c3e50; /* Darker, more prominent header color */
-    margin-top: 8px; /* Add some space above headers */
-    margin-bottom: 6px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    color: #1A3A5A; 
+    margin-top: 12px; 
+    margin-bottom: 8px;
 }
 
 .breakdown-header:first-child {
@@ -178,78 +175,184 @@ select:focus {
 }
 
 .breakdown-item {
-    color: #34495e; /* Slightly softer than black for items */
+    color: #333333; 
+    font-size: 0.95em;
 }
 
 .breakdown-detail {
-    /* margin-left already handled by &nbsp; in JS, but could add more */
-    color: #7f8c8d; /* Subtler color for details */
+    color: #555555; 
+    font-size: 0.9em;
+    padding-left: 10px; /* Indent detail slightly */
 }
 
 .breakdown-total-line {
-    font-weight: bold;
-    color: #16a085; /* A distinct color for total lines */
-    margin-top: 10px;
-    padding-top: 10px;
-    border-top: 1px dashed #bdc3c7;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    color: #1A3A5A; 
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #D0D0D0; /* Dashed to solid, lighter color */
+    font-size: 1.1em;
 }
 
-.total-cost-display {
-    font-weight: bold; 
-    font-size: 2em; /* Larger total */
-    color: #d81b60; 
+.total-cost-display { /* The final $XXX amount */
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700; 
+    font-size: 2.8em; 
+    color: #D81B60; /* Keeping existing vibrant pink for emphasis, can change if needed */
     text-align: center; 
-    margin-bottom: 10px;
-    padding: 15px 10px;
-    background-color: #e8eaf6;
-    border-radius: 6px;
-    border-top: 2px solid #3f51b5;
-    border-bottom: 2px solid #3f51b5;
+    margin-bottom: 15px;
+    padding: 20px 10px;
+    background-color: transparent; /* Remove background */
+    border-radius: 0; /* Remove radius */
+    border-top: 1px solid #D0D0D0; /* Add separator lines like in image */
+    border-bottom: 1px solid #D0D0D0;
 }
 
-.result-section .variable-info {
+.result-section .variable-info { /* "$100 minimum for all services." text */
     text-align: center;
-    margin-top: 5px;
+    margin-top: 10px;
+    font-size: 0.85em;
+    color: #777;
 }
 
 .navigation-buttons {
     display: flex;
-    /* justify-content: space-between; */ /* Changed for consistent right alignment of Next */
-    justify-content: flex-end; /* Aligns Next button to the right */
-    margin-top: 25px;
+    justify-content: space-between; /* Space between for Back and Next */
+    margin-top: 30px;
 }
 .navigation-buttons button {
-    padding: 12px 25px;
-    border-radius: 6px;
+    padding: 12px 28px; /* Adjusted padding */
+    border-radius: 4px; /* Site's button radius */
     border: none;
     cursor: pointer;
     font-size: 1em;
     font-weight: 500;
     transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    text-transform: uppercase; /* Match button style from image */
+    letter-spacing: 0.5px; /* Slight letter spacing */
 }
 .navigation-buttons button#backButton {
-    background-color: #78909c; /* Blue Grey */
+    background-color: #78909c; /* Existing grey, can adjust if needed */
     color: white;
-    margin-right: auto; /* Pushes Back button to the left, maintaining space */
+    /* margin-right: auto; Removed as justify-content: space-between handles it */
 }
 .navigation-buttons button#backButton:hover {
     background-color: #607d8b;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 .navigation-buttons button#nextButton {
-    background-color: #3f51b5; /* Indigo */
+    background-color: #5A7D9A; /* Muted blue/grey from image */
     color: white;
 }
  .navigation-buttons button#nextButton:hover {
-    background-color: #303f9f;
+    background-color: #4A6B8A; /* Darker shade for hover */
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 .navigation-buttons button:disabled {
-    background-color: #cfd8dc; /* Light Grey */
-    color: #90a4ae;
+    background-color: #B0BEC5; /* Lighter grey for disabled */
+    color: #CFD8DC;
     cursor: not-allowed;
 }
 
+/* Styles for radio and checkbox to be simpler and fit the new aesthetic */
+.radio-group-item, .checkbox-group-item {
+    display: flex;
+    align-items: center;
+    background-color: #F8F9FA; /* Light background for selection items */
+    padding: 15px; /* More padding */
+    border-radius: 4px;
+    border: 1px solid #E9ECEF; /* Light border */
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    margin-bottom: 10px; /* Space between radio options */
+}
+.radio-group-item:hover, .checkbox-group-item:hover { 
+    border-color: #A0B0C0; 
+}
 
-/* Style for hidden perFootInputs, managed by JS for steps */
-/* #perFootInputs.hidden no longer needed, step logic handles display */ 
+/* Hide original radio/checkbox */
+.radio-group-item input[type="radio"],
+.checkbox-group-item input[type="checkbox"] { 
+    opacity: 0; 
+    width: 0; 
+    height: 0; 
+    position: absolute; 
+}
+
+/* Custom radio button appearance */
+.radio-group-item .radio-custom { 
+    width: 20px; 
+    height: 20px; 
+    border: 2px solid #78909c; 
+    border-radius: 50%; 
+    margin-right: 12px; 
+    display: inline-block; 
+    position: relative; 
+    transition: border-color 0.2s ease; 
+}
+.radio-group-item .radio-custom::after { 
+    content: ''; 
+    width: 10px; 
+    height: 10px; 
+    background-color: #5A7D9A; /* Muted blue for selected */
+    border-radius: 50%; 
+    position: absolute; 
+    top: 50%; 
+    left: 50%; 
+    transform: translate(-50%, -50%) scale(0); 
+    transition: transform 0.2s ease; 
+}
+.radio-group-item input[type="radio"]:checked + .radio-label .radio-custom { 
+    border-color: #5A7D9A; /* Muted blue border for selected */
+}
+.radio-group-item input[type="radio"]:checked + .radio-label .radio-custom::after { 
+    transform: translate(-50%, -50%) scale(1); 
+}
+.radio-group-item input[type="radio"]:focus + .radio-label .radio-custom,
+.checkbox-group-item input[type="checkbox"]:focus + label { /* Focus style for custom checkbox label */
+    box-shadow: 0 0 0 2px rgba(90, 125, 154, 0.2); 
+}
+
+.radio-group-item .radio-label,
+.checkbox-group-item label { /* Label styling for radio and checkbox */
+    display: flex; 
+    align-items: center; 
+    cursor: pointer; 
+    font-weight: normal; 
+    color: #333; 
+    font-size: 1em; 
+    flex-grow: 1; 
+}
+.checkbox-group-item label { /* Specific for checkbox label which is not using .radio-label */
+    margin-bottom: 0 !important; /* Override general label margin */
+}
+
+
+/* Custom checkbox for Twin Engines */
+.checkbox-group-item input[type="checkbox"] + label::before {
+    content: '';
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    border: 2px solid #78909c;
+    border-radius: 3px;
+    margin-right: 12px;
+    vertical-align: middle;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+.checkbox-group-item input[type="checkbox"]:checked + label::before {
+    background-color: #5A7D9A;
+    border-color: #5A7D9A;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 8'%3E%3Cpath fill='white' d='M8.7.3c-.4-.4-1-.4-1.4 0L3.8 3.8 2.7 2.7c-.4-.4-1-.4-1.4 0s-.4 1 0 1.4l1.8 1.8c.2.2.4.3.7.3s.5-.1.7-.3l4.2-4.2c.4-.4.4-1 0-1.4z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 60%;
+}
+
+.service-price { /* If this class is used, style it */
+    font-size: 0.9em; 
+    color: #5A7D9A; /* Muted blue */
+    margin-left: auto; 
+    padding-left: 10px; 
+} 
