@@ -55,6 +55,21 @@ let backButton, nextButton;
 let anodesToInstallInput;
 let twinEnginesCheckbox; // Added for the new checkbox
 
+// Checkout flow elements
+let checkoutSection;
+let selectedServiceInterval = null;
+let stripe = null;
+let elements = null;
+let cardElement = null;
+
+// Store order data
+let orderData = {
+    estimate: 0,
+    service: '',
+    boatLength: 0,
+    serviceDetails: {}
+};
+
 
 document.addEventListener('DOMContentLoaded', function() {
     // Cache DOM elements
@@ -72,6 +87,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     backButton = document.getElementById('backButton');
     nextButton = document.getElementById('nextButton');
+    
+    // Checkout elements
+    checkoutSection = document.getElementById('checkout-section');
 
     // Populate stepElements array
     stepElements.push(document.getElementById('step-0'));
@@ -89,6 +107,12 @@ document.addEventListener('DOMContentLoaded', function() {
     serviceDropdown.addEventListener('change', updateServicePriceExplainer);
     nextButton.addEventListener('click', handleNextClick);
     backButton.addEventListener('click', handleBackClick);
+    
+    // Initialize Stripe
+    initializeStripe();
+    
+    // Setup checkout event listeners
+    setupCheckoutListeners();
 
     renderCurrentStep(); // Initial render
 });
@@ -279,6 +303,38 @@ function resetForm() {
     paintExplainerEl.innerHTML = "The age of your boat's bottom paint helps us estimate its current condition."; // Reset explainer
     growthExplainerEl.innerHTML = "The time since your last hull cleaning is a key factor in estimating marine growth."; // Reset explainer
 
+    // Remove checkout button if it exists
+    const checkoutButton = document.getElementById('checkout-button');
+    if (checkoutButton) {
+        checkoutButton.remove();
+    }
+    
+    // Hide checkout section
+    if (checkoutSection) {
+        checkoutSection.style.display = 'none';
+    }
+    
+    // Reset checkout form
+    selectedServiceInterval = null;
+    const intervalOptions = document.querySelectorAll('.interval-option');
+    intervalOptions.forEach(opt => opt.classList.remove('selected'));
+    
+    // Clear checkout form fields
+    const checkoutInputs = document.querySelectorAll('#checkout-section input:not([type="checkbox"])');
+    checkoutInputs.forEach(input => input.value = '');
+    document.getElementById('service-agreement').checked = false;
+    
+    // Reset order data
+    orderData = {
+        estimate: 0,
+        service: '',
+        boatLength: 0,
+        serviceDetails: {}
+    };
+    
+    // Show navigation and service info
+    document.querySelector('.navigation-buttons').style.display = 'flex';
+    document.querySelector('.service-info-section').style.display = 'block';
 
     currentStep = 0;
     renderCurrentStep();
@@ -333,6 +389,7 @@ function calculateCost() {
     growthExplainerEl.innerHTML = growthExplainerMsg;
 
     // --- Main Calculation Logic ---
+    let hullType = 'monohull'; // Default
     if (currentServiceData.type === 'per_foot') {
         boatLength = parseFloat(document.getElementById('boatLength').value) || 0;
         if (boatLength <= 0) {
@@ -341,7 +398,7 @@ function calculateCost() {
             return; 
         }
         isPowerboat = document.querySelector('input[name="boat_type"]:checked').value === 'powerboat';
-        const hullType = document.querySelector('input[name="hull_type"]:checked').value;
+        hullType = document.querySelector('input[name="hull_type"]:checked').value;
         if (hullType === 'catamaran') additionalHulls = 1;
         else if (hullType === 'trimaran') additionalHulls = 2;
         if (twinEnginesCheckbox && twinEnginesCheckbox.checked) {
@@ -468,6 +525,34 @@ function calculateCost() {
     } else {
         totalCostDisplayEl.innerText = `$${finalCost.toFixed(2)}`;
     }
+    
+    // Store order data
+    orderData.estimate = finalCost;
+    orderData.service = currentServiceData.name;
+    orderData.boatLength = boatLength;
+    orderData.serviceDetails = {
+        baseRate: currentServiceData.rate,
+        serviceType: currentServiceData.type,
+        anodes: anodesToInstall,
+        boatType: isPowerboat ? 'powerboat' : 'sailboat',
+        hullType: hullType,
+        twinEngines: additionalProps > 0,
+        paintCondition: estimatedPaintConditionBaseLabel,
+        growthLevel: estimatedGrowthLevelBaseLabel
+    };
+    
+    // Add checkout button if not already present
+    if (!document.getElementById('checkout-button')) {
+        const checkoutButton = document.createElement('button');
+        checkoutButton.id = 'checkout-button';
+        checkoutButton.className = 'submit-button';
+        checkoutButton.textContent = 'Proceed to Checkout';
+        checkoutButton.style.marginTop = '20px';
+        checkoutButton.addEventListener('click', showCheckout);
+        
+        const resultSection = document.getElementById('step-8');
+        resultSection.appendChild(checkoutButton);
+    }
 }
 
 // Helper function to determine paint condition
@@ -576,4 +661,173 @@ function getSpecificGrowthSurchargePercent(paintCondition, lastCleanedValue) {
             break;
     }
     return 1.00; // Default fallback to highest surcharge if combo not matched
+}
+
+// Initialize Stripe
+function initializeStripe() {
+    // Replace with your Stripe publishable key
+    stripe = Stripe('pk_test_51234567890'); // You'll need to replace this with your actual key
+    elements = stripe.elements();
+    
+    // Create card element
+    const style = {
+        base: {
+            fontSize: '16px',
+            color: '#000',
+            fontFamily: 'Arial, sans-serif',
+            '::placeholder': {
+                color: '#999'
+            }
+        }
+    };
+    
+    cardElement = elements.create('card', { style: style });
+    cardElement.mount('#card-element');
+    
+    // Handle errors
+    cardElement.on('change', function(event) {
+        const displayError = document.getElementById('card-errors');
+        if (event.error) {
+            displayError.textContent = event.error.message;
+        } else {
+            displayError.textContent = '';
+        }
+        validateCheckoutForm();
+    });
+}
+
+// Setup checkout event listeners
+function setupCheckoutListeners() {
+    // Service interval selection
+    const intervalOptions = document.querySelectorAll('.interval-option');
+    intervalOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            intervalOptions.forEach(opt => opt.classList.remove('selected'));
+            this.classList.add('selected');
+            selectedServiceInterval = this.getAttribute('data-interval');
+            validateCheckoutForm();
+        });
+    });
+    
+    // Form validation on input
+    const checkoutInputs = document.querySelectorAll('#checkout-section input[required], #checkout-section select[required]');
+    checkoutInputs.forEach(input => {
+        input.addEventListener('input', validateCheckoutForm);
+        input.addEventListener('change', validateCheckoutForm);
+    });
+    
+    // Agreement checkbox
+    const agreementCheckbox = document.getElementById('service-agreement');
+    agreementCheckbox.addEventListener('change', validateCheckoutForm);
+    
+    // Submit button
+    const submitButton = document.getElementById('submit-order');
+    submitButton.addEventListener('click', handleOrderSubmission);
+    
+    // Back to calculator button
+    const backToCalcButton = document.getElementById('back-to-calculator');
+    backToCalcButton.addEventListener('click', function() {
+        checkoutSection.style.display = 'none';
+        stepElements[stepElements.length - 1].style.display = 'block'; // Show results
+        document.querySelector('.navigation-buttons').style.display = 'flex';
+        document.querySelector('.service-info-section').style.display = 'block';
+    });
+}
+
+// Validate checkout form
+function validateCheckoutForm() {
+    const submitButton = document.getElementById('submit-order');
+    const requiredInputs = document.querySelectorAll('#checkout-section input[required]:not([type="checkbox"]), #checkout-section select[required]');
+    const agreementCheckbox = document.getElementById('service-agreement');
+    
+    let allFieldsFilled = true;
+    requiredInputs.forEach(input => {
+        if (!input.value.trim()) {
+            allFieldsFilled = false;
+        }
+    });
+    
+    const intervalSelected = selectedServiceInterval !== null;
+    const agreementChecked = agreementCheckbox.checked;
+    const cardComplete = cardElement && cardElement._complete;
+    
+    if (allFieldsFilled && intervalSelected && agreementChecked && cardComplete) {
+        submitButton.disabled = false;
+    } else {
+        submitButton.disabled = true;
+    }
+}
+
+// Handle order submission
+async function handleOrderSubmission() {
+    const submitButton = document.getElementById('submit-order');
+    submitButton.disabled = true;
+    submitButton.textContent = 'Processing...';
+    
+    // Collect form data
+    const formData = {
+        boatName: document.getElementById('boat-name').value,
+        boatLength: document.getElementById('boat-length-checkout').value,
+        boatMake: document.getElementById('boat-make').value,
+        boatModel: document.getElementById('boat-model').value,
+        marinaName: document.getElementById('marina-name').value,
+        dock: document.getElementById('dock').value,
+        slipNumber: document.getElementById('slip-number').value,
+        serviceInterval: selectedServiceInterval,
+        customerName: document.getElementById('customer-name').value,
+        customerEmail: document.getElementById('customer-email').value,
+        customerPhone: document.getElementById('customer-phone').value,
+        estimate: orderData.estimate,
+        service: orderData.service,
+        serviceDetails: orderData.serviceDetails
+    };
+    
+    try {
+        // Create payment method
+        const { error, paymentMethod } = await stripe.createPaymentMethod({
+            type: 'card',
+            card: cardElement,
+            billing_details: {
+                name: formData.customerName,
+                email: formData.customerEmail,
+                phone: formData.customerPhone
+            }
+        });
+        
+        if (error) {
+            throw error;
+        }
+        
+        // Here you would normally send the payment method and form data to your server
+        // For now, we'll just show a success message
+        alert('Order submitted successfully! We will contact you shortly to confirm your service appointment.');
+        
+        // Reset form
+        resetForm();
+        checkoutSection.style.display = 'none';
+        
+    } catch (error) {
+        console.error('Error:', error);
+        alert('There was an error processing your order. Please try again.');
+        submitButton.disabled = false;
+        submitButton.textContent = 'Complete Order';
+    }
+}
+
+// Show checkout section
+function showCheckout() {
+    // Hide calculator, show checkout
+    stepElements.forEach(el => el.style.display = 'none');
+    document.querySelector('.navigation-buttons').style.display = 'none';
+    document.querySelector('.service-info-section').style.display = 'none';
+    checkoutSection.style.display = 'block';
+    
+    // Pre-fill boat length
+    const boatLengthCheckout = document.getElementById('boat-length-checkout');
+    if (orderData.boatLength > 0) {
+        boatLengthCheckout.value = orderData.boatLength;
+    }
+    
+    // Scroll to top
+    window.scrollTo(0, 0);
 } 
