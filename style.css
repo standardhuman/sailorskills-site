@@ -6,9 +6,9 @@
 }
 
 body {
-    font-family: Arial, 'Helvetica Neue', sans-serif; /* Match SailorSkills body font */
+    font-family: 'Montserrat', Arial, sans-serif; /* Montserrat primary, Arial fallback */
     background-color: #ffffff; /* White background */
-    color: #000000; /* Black text to match site */
+    color: #181818; /* Dark gray text to match site */
     line-height: 1.6;
     margin: 0;
     padding: 0;
@@ -38,8 +38,8 @@ body {
 .nav-logo {
     font-family: 'Montserrat', sans-serif;
     font-size: 24px;
-    font-weight: 700;
-    color: #116DFF;
+    font-weight: 400;
+    color: #345475; /* Dark blue-gray */
     text-decoration: none;
 }
 
@@ -52,18 +52,19 @@ body {
 .nav-links a {
     font-family: 'Montserrat', sans-serif;
     font-size: 20px;
-    color: #000000;
+    color: #0000ee; /* Blue links like services page */
     text-decoration: none;
-    transition: color 0.3s ease;
+    transition: color 0.2s ease;
+    font-weight: 400;
 }
 
 .nav-links a:hover {
-    color: #116DFF;
+    color: #345475; /* Dark blue-gray on hover */
 }
 
 .nav-links a.active {
-    color: #116DFF;
-    font-weight: 600;
+    color: #345475;
+    font-weight: 400;
 }
 
 /* Main Content Container */
@@ -81,44 +82,43 @@ body {
 
 h1 { /* For "Sailor Skills Diving Cost Estimator" title */
     font-family: 'Montserrat', sans-serif;
-    font-size: 2.5em;
+    font-size: 3.125em; /* 50px like h3 on services page */
     color: #181818; /* Match SailorSkills heading color */
     text-align: center;
     margin-bottom: 40px;
-    font-weight: 700;
-    line-height: 1.2;
+    font-weight: 400; /* Normal weight like services page */
+    line-height: 1.34; /* 67px/50px ratio */
 }
 
 .form-step {
     background-color: #ffffff; /* White background for steps */
-    padding: 25px;
-    margin-bottom: 25px;
-    border-radius: 6px;
-    /* border: 1px solid #e0e0e0; */ /* Removing border for a cleaner look like the image */
-    border: none; /* Explicitly remove border */
-    min-height: 330px; /* Adjusted min-height slightly */
+    padding: 30px;
+    margin-bottom: 30px;
+    border-radius: 0px; /* Sharp corners */
+    border: none;
+    min-height: 350px;
 }
 
 /* .form-step.active is fine */
 
 .form-step h2 { /* For step titles */
     font-family: 'Montserrat', sans-serif;
-    font-size: 1.8em;
+    font-size: 1.25em; /* 20px like h2 on services page */
     color: #181818; /* Match SailorSkills heading color */
     margin-bottom: 25px; 
     padding-bottom: 15px;
-    border-bottom: 2px solid #116DFF; /* Blue underline */
-    font-weight: 600;
+    border-bottom: none; /* Remove underline for cleaner look */
+    font-weight: 400; /* Normal weight */
     text-align: center;
 }
 
 label, .input-group label.group-title { /* General labels and group titles */
     display: block;
-    font-family: Arial, sans-serif;
-    font-weight: 500;
-    color: #000000; /* Black text */
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 400;
+    color: #181818; /* Dark gray text */
     margin-bottom: 10px;
-    font-size: 1.1em;
+    font-size: 1em;
 }
 
 .input-group {
@@ -131,14 +131,15 @@ input[type="text"],
 input[type="email"],
 input[type="tel"] { 
     width: 100%;
-    padding: 12px 15px;
-    border: 2px solid #e0e0e0;
-    border-radius: 4px;
-    font-size: 1em;
-    color: #000;
+    padding: 14px 16px;
+    border: 1px solid #d0d0d0;
+    border-radius: 0px; /* Sharp corners */
+    font-size: 0.875em;
+    color: #181818;
     background-color: #fff;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    font-family: Arial, sans-serif;
+    transition: border-color 0.2s ease;
+    font-family: 'Montserrat', sans-serif;
+    min-height: 48px;
 }
 
 select {
@@ -155,8 +156,8 @@ input[type="text"]:focus,
 input[type="email"]:focus,
 input[type="tel"]:focus {
     outline: none;
-    border-color: #116DFF; /* SailorSkills blue for focus */
-    box-shadow: 0 0 0 3px rgba(17, 109, 255, 0.1);
+    border-color: #345475; /* Dark blue-gray for focus */
+    box-shadow: none; /* No shadow for flat design */
 }
 
 /* Radio button and checkbox styling will need significant overhaul later if we want to match a very custom look */
@@ -176,12 +177,12 @@ input[type="tel"]:focus {
 
 
 .variable-info { 
-    font-size: 0.95em; 
-    color: #666666;
+    font-size: 0.875em; /* 14px */
+    color: #6d7b89; /* Gray text like services page */
     margin-bottom: 15px; 
-    line-height: 1.5;
+    line-height: 1.8;
     text-align: center;
-    font-family: Arial, sans-serif;
+    font-family: 'Montserrat', sans-serif;
 }
 .input-group .variable-info {
      margin-top: 8px; /* Adjusted */
@@ -208,12 +209,13 @@ input[type="tel"]:focus {
 }
 
 #costBreakdown {
-    background-color: #F8F9FA; /* Very light grey for contrast */
-    border: 1px solid #E9ECEF; /* Light border */
-    border-radius: 6px;
-    padding: 20px;
-    margin-bottom: 20px;
-    line-height: 1.7; /* Increased line height */
+    background-color: #fafafa; /* Very light grey */
+    border: none;
+    border-radius: 0px; /* Sharp corners */
+    padding: 24px;
+    margin-bottom: 24px;
+    line-height: 1.8;
+    font-family: 'Montserrat', sans-serif;
 }
 
 .breakdown-line,
@@ -237,14 +239,16 @@ input[type="tel"]:focus {
 }
 
 .breakdown-item {
-    color: #333333; 
-    font-size: 0.95em;
+    color: #181818; 
+    font-size: 0.875em;
+    font-family: 'Montserrat', sans-serif;
 }
 
 .breakdown-detail {
-    color: #555555; 
-    font-size: 0.9em;
-    padding-left: 10px; /* Indent detail slightly */
+    color: #6d7b89; /* Gray like services page */
+    font-size: 0.8125em;
+    padding-left: 16px;
+    font-family: 'Montserrat', sans-serif;
 }
 
 .breakdown-total-line {
@@ -259,15 +263,17 @@ input[type="tel"]:focus {
 
 .total-cost-display { /* The final $XXX amount */
     font-family: 'Montserrat', sans-serif;
-    font-weight: 700; 
-    font-size: 3.2em; 
-    color: #116DFF; /* SailorSkills blue */
+    font-weight: 400; 
+    font-size: 4em; /* Larger for impact */
+    color: #345475; /* Dark blue-gray */
     text-align: center; 
-    margin: 30px 0;
-    padding: 25px 10px;
-    background-color: #f8f9fa;
-    border-radius: 8px;
-    border: 2px solid #116DFF;
+    margin: 40px 0;
+    padding: 30px 10px;
+    background-color: transparent;
+    border-radius: 0px;
+    border: none;
+    border-top: 1px solid #e0e0e0;
+    border-bottom: 1px solid #e0e0e0;
 }
 
 .result-section .variable-info { /* "$100 minimum for all services." text */
@@ -283,57 +289,56 @@ input[type="tel"]:focus {
     margin-top: 30px;
 }
 .navigation-buttons button {
-    padding: 12px 28px; /* Adjusted padding */
-    border-radius: 4px; /* Site's button radius */
+    padding: 16px 40px;
+    border-radius: 0px; /* Sharp corners like services page */
     border: none;
     cursor: pointer;
-    font-size: 1em;
-    font-weight: 500;
-    transition: background-color 0.2s ease, box-shadow 0.2s ease;
-    text-transform: uppercase; /* Match button style from image */
-    letter-spacing: 0.5px; /* Slight letter spacing */
+    font-size: 0.875em; /* Slightly smaller */
+    font-weight: 400;
+    font-family: 'Montserrat', sans-serif;
+    transition: filter 0.2s ease;
+    text-transform: none; /* No uppercase */
+    letter-spacing: normal;
+    min-height: 53px; /* Match services page button height */
 }
 .navigation-buttons button#backButton {
-    background-color: #ffffff;
-    color: #5B6F95;
-    border: 2px solid #5B6F95;
+    background-color: #f5f5f5;
+    color: #345475; /* Dark blue-gray */
+    border: none;
 }
 .navigation-buttons button#backButton:hover {
-    background-color: #5B6F95;
-    color: white;
-    box-shadow: 0 4px 10px rgba(91, 111, 149, 0.3);
+    filter: brightness(0.9);
 }
 .navigation-buttons button#nextButton {
-    background-color: #5B6F95; /* SailorSkills button color */
-    color: white;
-    border: 2px solid #5B6F95;
+    background-color: #345475; /* Dark blue-gray from services page */
+    color: #ffffff;
+    border: none;
 }
 .navigation-buttons button#nextButton:hover {
-    background-color: #4A5E82;
-    border-color: #4A5E82;
-    box-shadow: 0 4px 10px rgba(91, 111, 149, 0.3);
+    filter: brightness(0.9);
 }
 .navigation-buttons button:disabled {
     background-color: #e0e0e0;
     color: #999999;
-    border-color: #e0e0e0;
     cursor: not-allowed;
+    opacity: 0.6;
 }
 
 /* Styles for radio and checkbox to be simpler and fit the new aesthetic */
 .radio-group-item, .checkbox-group-item {
     display: flex;
     align-items: center;
-    background-color: #F8F9FA; /* Light background for selection items */
-    padding: 15px; /* More padding */
-    border-radius: 4px;
-    border: 1px solid #E9ECEF; /* Light border */
+    background-color: #f8f9fa;
+    padding: 16px 20px;
+    border-radius: 0px; /* Sharp corners */
+    border: 1px solid #e0e0e0;
     cursor: pointer;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    margin-bottom: 10px; /* Space between radio options */
+    transition: background-color 0.2s ease;
+    margin-bottom: 12px;
+    min-height: 53px; /* Match button height */
 }
 .radio-group-item:hover, .checkbox-group-item:hover { 
-    border-color: #A0B0C0; 
+    background-color: #f0f0f0;
 }
 
 /* Hide original radio/checkbox */
@@ -349,9 +354,9 @@ input[type="tel"]:focus {
 .radio-group-item .radio-custom { 
     width: 20px; 
     height: 20px; 
-    border: 2px solid #5B6F95; 
+    border: 2px solid #345475; /* Dark blue-gray */
     border-radius: 50%; 
-    margin-right: 12px; 
+    margin-right: 14px; 
     display: inline-block; 
     position: relative; 
     transition: border-color 0.2s ease; 
@@ -360,7 +365,7 @@ input[type="tel"]:focus {
     content: ''; 
     width: 10px; 
     height: 10px; 
-    background-color: #116DFF; /* SailorSkills blue for selected */
+    background-color: #345475; /* Dark blue-gray for selected */
     border-radius: 50%; 
     position: absolute; 
     top: 50%; 
@@ -369,7 +374,7 @@ input[type="tel"]:focus {
     transition: transform 0.2s ease; 
 }
 .radio-group-item input[type="radio"]:checked + .radio-label .radio-custom { 
-    border-color: #116DFF; /* SailorSkills blue border for selected */
+    border-color: #345475; /* Dark blue-gray border for selected */
 }
 .radio-group-item input[type="radio"]:checked + .radio-label .radio-custom::after { 
     transform: translate(-50%, -50%) scale(1); 
@@ -400,15 +405,15 @@ input[type="tel"]:focus {
     display: inline-block;
     width: 18px;
     height: 18px;
-    border: 2px solid #78909c;
-    border-radius: 3px;
-    margin-right: 12px;
+    border: 2px solid #345475; /* Dark blue-gray */
+    border-radius: 0px; /* Sharp corners */
+    margin-right: 14px;
     vertical-align: middle;
     transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 .checkbox-group-item input[type="checkbox"]:checked + label::before {
-    background-color: #116DFF;
-    border-color: #116DFF;
+    background-color: #345475;
+    border-color: #345475;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 8'%3E%3Cpath fill='white' d='M8.7.3c-.4-.4-1-.4-1.4 0L3.8 3.8 2.7 2.7c-.4-.4-1-.4-1.4 0s-.4 1 0 1.4l1.8 1.8c.2.2.4.3.7.3s.5-.1.7-.3l4.2-4.2c.4-.4.4-1 0-1.4z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: center;
@@ -477,42 +482,48 @@ input[type="tel"]:focus {
 }
 
 .interval-option {
-    padding: 15px;
-    border: 2px solid #e0e0e0;
-    border-radius: 8px;
+    padding: 20px;
+    border: 1px solid #e0e0e0;
+    border-radius: 0px; /* Sharp corners */
     text-align: center;
     cursor: pointer;
-    transition: all 0.3s ease;
-    background-color: white;
+    transition: background-color 0.2s ease;
+    background-color: #f8f9fa;
+    min-height: 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .interval-option:hover {
-    border-color: #116DFF;
-    background-color: #f0f7ff;
+    background-color: #e8e8e8;
 }
 
 .interval-option.selected {
-    border-color: #116DFF;
-    background-color: #116DFF;
+    background-color: #345475; /* Dark blue-gray */
     color: white;
+    border-color: #345475;
 }
 
 .interval-option.recommended {
     position: relative;
+    padding-top: 25px; /* Add extra padding for the badge */
 }
 
 .interval-option.recommended::before {
     content: "Most Popular";
     position: absolute;
-    top: -10px;
+    top: -12px;
     left: 50%;
     transform: translateX(-50%);
-    background-color: #116DFF;
+    background-color: #67a9ea; /* Light blue accent */
     color: white;
-    padding: 2px 10px;
-    border-radius: 12px;
+    padding: 3px 12px;
+    border-radius: 0px; /* Sharp corners */
     font-size: 0.75em;
-    font-weight: 600;
+    font-weight: 400;
+    white-space: nowrap;
+    font-family: 'Montserrat', sans-serif;
 }
 
 /* Stripe Elements Container */
@@ -574,31 +585,32 @@ input[type="tel"]:focus {
 
 /* Submit Button */
 .submit-button {
-    background-color: #5B6F95;
+    background-color: #345475; /* Dark blue-gray */
     color: white;
-    padding: 15px 40px;
+    padding: 16px 48px;
     border: none;
-    border-radius: 4px;
-    font-size: 1.1em;
-    font-weight: 600;
+    border-radius: 0px; /* Sharp corners */
+    font-size: 1em;
+    font-weight: 400;
     font-family: 'Montserrat', sans-serif;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: filter 0.2s ease;
     display: block;
     margin: 30px auto 0;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    text-transform: none;
+    letter-spacing: normal;
+    min-height: 53px;
 }
 
 .submit-button:hover:not(:disabled) {
-    background-color: #4A5E82;
-    box-shadow: 0 4px 10px rgba(91, 111, 149, 0.3);
+    filter: brightness(0.9);
 }
 
 .submit-button:disabled {
     background-color: #e0e0e0;
     color: #999;
     cursor: not-allowed;
+    opacity: 0.6;
 }
 
 /* Service Info Section */
@@ -610,10 +622,12 @@ input[type="tel"]:focus {
 
 .service-info-section h2 {
     font-family: 'Montserrat', sans-serif;
-    font-size: 2.2em;
+    font-size: 2.5em; /* 40px */
     color: #181818;
     text-align: center;
-    margin-bottom: 40px;
+    margin-bottom: 50px;
+    font-weight: 400;
+    line-height: 1.3;
 }
 
 .service-features {
@@ -630,14 +644,17 @@ input[type="tel"]:focus {
 
 .feature-item h3 {
     font-family: 'Montserrat', sans-serif;
-    color: #116DFF;
-    font-size: 1.3em;
-    margin-bottom: 10px;
+    color: #345475; /* Dark blue-gray */
+    font-size: 1.25em; /* 20px */
+    margin-bottom: 12px;
+    font-weight: 400;
 }
 
 .feature-item p {
-    color: #666;
-    line-height: 1.5;
+    color: #6d7b89; /* Gray text */
+    line-height: 1.8;
+    font-size: 0.875em;
+    font-family: 'Montserrat', sans-serif;
 }
 
 /* Responsive Design */
