@@ -665,8 +665,8 @@ function getSpecificGrowthSurchargePercent(paintCondition, lastCleanedValue) {
 
 // Initialize Stripe
 function initializeStripe() {
-    // Replace with your Stripe publishable key
-    stripe = Stripe('pk_test_51234567890'); // You'll need to replace this with your actual key
+    // Stripe publishable key for Sailor Skills
+    stripe = Stripe('pk_live_pri1IepedMvGQmLCFrV4kVzF');
     elements = stripe.elements();
     
     // Create card element
