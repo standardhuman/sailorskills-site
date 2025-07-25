@@ -69,15 +69,65 @@ body {
 
 /* Main Content Container */
 .main-content {
-    padding: 40px 20px;
+    padding: 0;
+}
+
+/* Hero Header */
+.hero-header {
+    text-align: center;
+    padding: 60px 20px;
+    background-color: #ffffff;
+}
+
+.hero-title {
+    margin: 0;
+    line-height: 1;
+}
+
+.hero-brand {
+    display: block;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 3.125em; /* 50px */
+    font-weight: 400;
+    color: #181818;
+    margin-bottom: 10px;
+}
+
+.hero-service {
+    display: block;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 6.25em; /* 100px */
+    font-weight: 400;
+    color: #181818;
+    letter-spacing: 0.05em;
+    margin-bottom: 20px;
+}
+
+.hero-tagline {
+    display: block;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.25em; /* 20px */
+    font-weight: 400;
+    color: #6d7b89;
+    line-height: 1.5;
 }
 
 .calculator-container {
     background-color: #ffffff;
-    padding: 40px;
+    padding: 20px 40px 40px;
     width: 100%;
     max-width: 800px;
     margin: 0 auto;
+}
+
+.calculator-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 2.5em; /* 40px */
+    color: #181818;
+    text-align: center;
+    margin-bottom: 40px;
+    font-weight: 400;
+    line-height: 1.2;
 }
 
 h1 { /* For "Sailor Skills Diving Cost Estimator" title */
@@ -667,8 +717,31 @@ input[type="tel"]:focus {
         font-size: 16px;
     }
     
+    .hero-header {
+        padding: 40px 20px;
+    }
+    
+    .hero-brand {
+        font-size: 2em; /* 32px */
+        margin-bottom: 8px;
+    }
+    
+    .hero-service {
+        font-size: 3.5em; /* 56px */
+        margin-bottom: 12px;
+    }
+    
+    .hero-tagline {
+        font-size: 1em; /* 16px */
+    }
+    
     .calculator-container {
         padding: 20px;
+    }
+    
+    .calculator-title {
+        font-size: 1.75em; /* 28px */
+        margin-bottom: 30px;
     }
     
     .form-row {
