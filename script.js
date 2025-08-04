@@ -980,12 +980,30 @@ function showCheckout() {
     
     // Show/hide service interval section based on service type
     const intervalSection = document.getElementById('service-interval-section');
+    const oneTimeOption = document.querySelector('[data-interval="one-time"]');
+    
     if (selectedServiceKey === 'recurring_cleaning') {
         intervalSection.style.display = 'block';
+        // Hide the one-time option for recurring service
+        if (oneTimeOption) {
+            oneTimeOption.style.display = 'none';
+        }
+        // If one-time was previously selected, select bi-monthly (recommended) instead
+        if (orderData.interval === 'one-time' || !orderData.interval) {
+            const biMonthlyOption = document.querySelector('[data-interval="2"]');
+            if (biMonthlyOption) {
+                document.querySelectorAll('.interval-option').forEach(opt => opt.classList.remove('selected'));
+                biMonthlyOption.classList.add('selected');
+                orderData.interval = '2';
+            }
+        }
     } else {
         intervalSection.style.display = 'none';
+        // Show the one-time option for non-recurring services
+        if (oneTimeOption) {
+            oneTimeOption.style.display = 'flex';
+        }
         // For non-recurring services, automatically select "one-time"
-        const oneTimeOption = document.querySelector('[data-interval="one-time"]');
         if (oneTimeOption) {
             document.querySelectorAll('.interval-option').forEach(opt => opt.classList.remove('selected'));
             oneTimeOption.classList.add('selected');
