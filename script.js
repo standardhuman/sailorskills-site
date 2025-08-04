@@ -1,9 +1,28 @@
 const serviceData = {
-    recurring_cleaning: { rate: 4.50, name: "Recurring Cleaning & Anodes", type: 'per_foot' },
-    onetime_cleaning: { rate: 6.00, name: "One-time Cleaning & Anodes", type: 'per_foot' },
-    haul_out_prep: { rate: 6.50, name: "Haul-out Prep", type: 'per_foot' },
-    item_recovery: { rate: 150, name: "Item Recovery", type: 'flat' },
-    underwater_inspection: { rate: 150, name: "Underwater Inspection", type: 'flat' }
+    recurring_cleaning: { 
+        rate: 4.50, 
+        name: "Recurring Cleaning & Anodes", 
+        type: 'per_foot',
+        description: "Regular hull cleaning keeps your boat performing at its best. Service includes cleaning and zinc anode inspection. Available at 1, 2, 3, or 6-month intervals."
+    },
+    onetime_cleaning: { 
+        rate: 6.00, 
+        name: "One-time Cleaning & Anodes", 
+        type: 'per_foot',
+        description: "Complete hull cleaning and zinc anode inspection. Perfect for pre-haul out, pre-survey, or when your regular diver is unavailable."
+    },
+    item_recovery: { 
+        rate: 150, 
+        name: "Item Recovery", 
+        type: 'flat',
+        description: "Professional recovery of dropped items like phones, keys, tools, or dinghies. Quick response to minimize water damage."
+    },
+    underwater_inspection: { 
+        rate: 150, 
+        name: "Underwater Inspection", 
+        type: 'flat',
+        description: "Thorough underwater inspection with detailed photo/video documentation. Ideal for insurance claims, pre-purchase surveys, or damage assessment."
+    }
 };
 const minimumCharge = 100;
 
@@ -47,7 +66,8 @@ let currentStep = 0;
 const stepElements = []; // Will be populated with DOM elements
 
 // DOM Elements (cache them for performance and clarity)
-let serviceDropdown, servicePriceExplainer;
+let serviceButtons, servicePriceExplainer;
+let selectedServiceKey = null; // Track selected service
 let boatLengthInput, boatLengthError;
 let costBreakdownEl, totalCostDisplayEl;
 let paintExplainerEl, growthExplainerEl;
@@ -55,10 +75,25 @@ let backButton, nextButton;
 let anodesToInstallInput;
 let twinEnginesCheckbox; // Added for the new checkbox
 
+// Checkout flow elements
+let checkoutSection;
+let selectedServiceInterval = null;
+let stripe = null;
+let elements = null;
+let cardElement = null;
+
+// Store order data
+let orderData = {
+    estimate: 0,
+    service: '',
+    boatLength: 0,
+    serviceDetails: {}
+};
+
 
 document.addEventListener('DOMContentLoaded', function() {
     // Cache DOM elements
-    serviceDropdown = document.getElementById('serviceDropdown');
+    serviceButtons = document.getElementById('serviceButtons');
     servicePriceExplainer = document.getElementById('servicePriceExplainer');
     boatLengthInput = document.getElementById('boatLength');
     boatLengthError = document.getElementById('boatLengthError');
@@ -72,6 +107,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     backButton = document.getElementById('backButton');
     nextButton = document.getElementById('nextButton');
+    
+    // Checkout elements
+    checkoutSection = document.getElementById('checkout-section');
 
     // Populate stepElements array
     stepElements.push(document.getElementById('step-0'));
@@ -84,56 +122,105 @@ document.addEventListener('DOMContentLoaded', function() {
     stepElements.push(document.getElementById('step-7'));
     stepElements.push(document.getElementById('step-8'));
 
-    populateServiceDropdown();
+    populateServiceButtons();
     
-    serviceDropdown.addEventListener('change', updateServicePriceExplainer);
     nextButton.addEventListener('click', handleNextClick);
     backButton.addEventListener('click', handleBackClick);
+    
+    // Initialize Stripe
+    initializeStripe();
+    
+    // Setup checkout event listeners
+    setupCheckoutListeners();
 
     renderCurrentStep(); // Initial render
 });
 
-function populateServiceDropdown() {
-    // Clear existing options if any (e.g., if this function is called multiple times)
-    serviceDropdown.innerHTML = '';
+function populateServiceButtons() {
+    // Clear existing buttons if any
+    serviceButtons.innerHTML = '';
     
-    // Add a default, non-selectable option
-    const defaultOption = document.createElement('option');
-    defaultOption.value = "";
-    defaultOption.textContent = "Please select a service...";
-    defaultOption.disabled = true;
-    defaultOption.selected = true;
-    serviceDropdown.appendChild(defaultOption);
-
-    for (const key in serviceData) {
-        const option = document.createElement('option');
-        option.value = key;
+    // Define the order to display services
+    const serviceOrder = ['onetime_cleaning', 'recurring_cleaning', 'item_recovery', 'underwater_inspection'];
+    
+    for (const key of serviceOrder) {
         const service = serviceData[key];
-        option.textContent = service.name;
-        serviceDropdown.appendChild(option);
+        const button = document.createElement('div');
+        button.className = 'service-option';
+        // Add special class for cleaning services
+        if (key === 'recurring_cleaning' || key === 'onetime_cleaning') {
+            button.className += ' cleaning-service';
+        }
+        button.dataset.serviceKey = key;
+        
+        const nameDiv = document.createElement('div');
+        nameDiv.className = 'service-name';
+        nameDiv.textContent = service.name;
+        button.appendChild(nameDiv);
+        
+        const priceDiv = document.createElement('div');
+        priceDiv.className = 'service-price';
+        if (service.type === 'per_foot') {
+            priceDiv.textContent = `$${service.rate} per foot`;
+        } else {
+            priceDiv.textContent = `$${service.rate} flat rate`;
+        }
+        button.appendChild(priceDiv);
+        
+        // Add "Save 25%" badge to recurring cleaning option
+        if (key === 'recurring_cleaning') {
+            const saveBadge = document.createElement('div');
+            saveBadge.className = 'save-badge';
+            saveBadge.textContent = 'Save 25%';
+            button.appendChild(saveBadge);
+        }
+        
+        button.addEventListener('click', function() {
+            selectService(key);
+        });
+        
+        serviceButtons.appendChild(button);
     }
-    updateServicePriceExplainer(); // Update explainer after populating
+}
+
+function selectService(serviceKey) {
+    // Remove selected class from all buttons
+    document.querySelectorAll('.service-option').forEach(btn => {
+        btn.classList.remove('selected');
+    });
+    
+    // Add selected class to clicked button
+    const selectedButton = document.querySelector(`[data-service-key="${serviceKey}"]`);
+    if (selectedButton) {
+        selectedButton.classList.add('selected');
+    }
+    
+    // Update selected service
+    selectedServiceKey = serviceKey;
+    
+    // Update service price explainer
+    updateServicePriceExplainer();
 }
 
 function updateServicePriceExplainer() {
-    const selectedServiceValue = serviceDropdown.value;
-    if (selectedServiceValue && serviceData[selectedServiceValue]) {
-        const service = serviceData[selectedServiceValue];
-        if (service.type === 'flat') {
-            servicePriceExplainer.textContent = `This is a flat rate service: $${service.rate.toFixed(2)}.`;
-        } else if (service.type === 'per_foot') {
-            servicePriceExplainer.textContent = `Base rate for this service: $${service.rate.toFixed(2)} per foot.`;
-        } else {
-             servicePriceExplainer.textContent = "Select a service to see its base rate.";
-        }
+    if (selectedServiceKey && serviceData[selectedServiceKey]) {
+        const service = serviceData[selectedServiceKey];
+        servicePriceExplainer.textContent = service.description || "Select a service to see its description.";
     } else {
-        servicePriceExplainer.textContent = "Select a service to see its base rate.";
+        servicePriceExplainer.textContent = "Select a service to see its description.";
     }
     renderCurrentStep(); // Add this call to update button states
 }
 
 function renderCurrentStep() {
+    // console.log('renderCurrentStep - currentStep:', currentStep);
+    // console.log('renderCurrentStep - stepElements.length:', stepElements.length);
+    
     stepElements.forEach((stepEl, index) => {
+        if (!stepEl) {
+            console.error(`Step element at index ${index} is null!`);
+            return;
+        }
         stepEl.style.display = (index === currentStep) ? 'block' : 'none';
     });
 
@@ -142,7 +229,6 @@ function renderCurrentStep() {
     
     const totalSteps = stepElements.length;
     const perFootServiceSteps = [1, 2, 3, 4, 5, 6]; // Indices of per-foot only steps
-    const selectedServiceKey = serviceDropdown.value;
     const isPerFootService = selectedServiceKey && serviceData[selectedServiceKey] && serviceData[selectedServiceKey].type === 'per_foot';
 
     if (currentStep === totalSteps - 1) { // Last step (Results)
@@ -194,7 +280,6 @@ function validateStep1Inputs() {
 
 function handleNextClick() {
     // console.log('handleNextClick - currentStep at start:', currentStep);
-    const selectedServiceKey = serviceDropdown.value;
     
     const serviceType = serviceData[selectedServiceKey]?.type;
     const totalSteps = stepElements.length;
@@ -231,7 +316,11 @@ function handleNextClick() {
 
     if (currentStep === totalSteps -1) { // If new currentStep is the Results step
         // console.log('handleNextClick - Calculating cost for results step');
-        calculateCost();
+        try {
+            calculateCost();
+        } catch (error) {
+            console.error('Error in calculateCost:', error);
+        }
     }
     renderCurrentStep();
 }
@@ -239,7 +328,6 @@ function handleNextClick() {
 function handleBackClick() {
     if (currentStep === 0) return; // Should not happen if button is hidden
 
-    const selectedServiceKey = serviceDropdown.value;
     const serviceType = serviceData[selectedServiceKey]?.type;
     const totalSteps = stepElements.length;
 
@@ -256,7 +344,10 @@ function handleBackClick() {
 
 function resetForm() {
     // Reset input fields to their initial values
-    if (serviceDropdown.options.length > 0) serviceDropdown.selectedIndex = 0; // Select "Please select..."
+    selectedServiceKey = null;
+    document.querySelectorAll('.service-option').forEach(btn => {
+        btn.classList.remove('selected');
+    });
     updateServicePriceExplainer();
 
     boatLengthInput.value = "30";
@@ -276,9 +367,45 @@ function resetForm() {
     // Clear results
     costBreakdownEl.innerText = "";
     totalCostDisplayEl.innerText = "$0.00";
-    paintExplainerEl.innerHTML = "The age of your boat's bottom paint helps us estimate its current condition."; // Reset explainer
-    growthExplainerEl.innerHTML = "The time since your last hull cleaning is a key factor in estimating marine growth."; // Reset explainer
+    if (paintExplainerEl) {
+        paintExplainerEl.innerHTML = "The age of your boat's bottom paint helps us estimate its current condition."; // Reset explainer
+    }
+    if (growthExplainerEl) {
+        growthExplainerEl.innerHTML = "The time since your last hull cleaning is a key factor in estimating marine growth."; // Reset explainer
+    }
 
+    // Remove checkout button if it exists
+    const checkoutButton = document.getElementById('checkout-button');
+    if (checkoutButton) {
+        checkoutButton.remove();
+    }
+    
+    // Hide checkout section
+    if (checkoutSection) {
+        checkoutSection.style.display = 'none';
+    }
+    
+    // Reset checkout form
+    selectedServiceInterval = null;
+    const intervalOptions = document.querySelectorAll('.interval-option');
+    intervalOptions.forEach(opt => opt.classList.remove('selected'));
+    
+    // Clear checkout form fields
+    const checkoutInputs = document.querySelectorAll('#checkout-section input:not([type="checkbox"])');
+    checkoutInputs.forEach(input => input.value = '');
+    document.getElementById('service-agreement').checked = false;
+    
+    // Reset order data
+    orderData = {
+        estimate: 0,
+        service: '',
+        boatLength: 0,
+        serviceDetails: {}
+    };
+    
+    // Show navigation and service info
+    document.querySelector('.navigation-buttons').style.display = 'flex';
+    document.querySelector('.service-info-section').style.display = 'block';
 
     currentStep = 0;
     renderCurrentStep();
@@ -286,13 +413,13 @@ function resetForm() {
 
 
 function calculateCost() {
-    const selectedServiceValue = serviceDropdown.value;
-    if (!selectedServiceValue) {
+    // console.log('calculateCost - starting');
+    if (!selectedServiceKey) {
         costBreakdownEl.innerText = "Please select a service first.";
         totalCostDisplayEl.innerText = "$0.00";
         return;
     }
-    const currentServiceData = serviceData[selectedServiceValue];
+    const currentServiceData = serviceData[selectedServiceKey];
     
     let boatLength = 0;
     let isPowerboat = false;
@@ -308,14 +435,19 @@ function calculateCost() {
     totalCostDisplayEl.innerText = "$0.00"; 
 
     // --- Determine Paint Condition & Surcharge ---
-    const lastPaintedValue = document.getElementById('lastPaintedTime').value;
-    estimatedPaintConditionBaseLabel = getPaintCondition(lastPaintedValue);
-    paintSurchargePercent = getSpecificPaintSurchargePercent(estimatedPaintConditionBaseLabel, lastPaintedValue);
-    paintExplainerEl.innerHTML = `Est. Paint Condition: <strong>${estimatedPaintConditionBaseLabel}</strong>. Potential surcharge: <strong>+${(paintSurchargePercent * 100).toFixed(1)}%</strong>.`;
+    const lastPaintedValue = document.getElementById('lastPaintedTime')?.value;
+    if (lastPaintedValue) {
+        estimatedPaintConditionBaseLabel = getPaintCondition(lastPaintedValue);
+        paintSurchargePercent = getSpecificPaintSurchargePercent(estimatedPaintConditionBaseLabel, lastPaintedValue);
+        if (paintExplainerEl) {
+            paintExplainerEl.innerHTML = `Est. Paint Condition: <strong>${estimatedPaintConditionBaseLabel}</strong>. Potential surcharge: <strong>+${(paintSurchargePercent * 100).toFixed(1)}%</strong>.`;
+        }
+    }
 
     // --- Determine Growth & Surcharge ---
-    const lastCleanedValue = document.getElementById('lastCleanedTime').value;
-    estimatedGrowthLevelBaseLabel = getGrowthLevel(estimatedPaintConditionBaseLabel, lastCleanedValue);
+    const lastCleanedValue = document.getElementById('lastCleanedTime')?.value;
+    if (lastCleanedValue) {
+        estimatedGrowthLevelBaseLabel = getGrowthLevel(estimatedPaintConditionBaseLabel, lastCleanedValue);
     growthSurchargePercent = getSpecificGrowthSurchargePercent(estimatedPaintConditionBaseLabel, lastCleanedValue);
     
     let growthExplainerMsg = `Est. Growth Level: <strong>${estimatedGrowthLevelBaseLabel}</strong>. `;
@@ -327,12 +459,13 @@ function calculateCost() {
         growthExplainerMsg += `Potential surcharge: <strong>+50-100%</strong>.`;
     }
 
-    if (selectedServiceValue === 'haul_out_prep') {
-        growthExplainerMsg += ` (Growth surcharge N/A for Haul-out Prep).`;
+    if (growthExplainerEl) {
+        growthExplainerEl.innerHTML = growthExplainerMsg;
     }
-    growthExplainerEl.innerHTML = growthExplainerMsg;
+    }
 
     // --- Main Calculation Logic ---
+    let hullType = 'monohull'; // Default
     if (currentServiceData.type === 'per_foot') {
         boatLength = parseFloat(document.getElementById('boatLength').value) || 0;
         if (boatLength <= 0) {
@@ -341,7 +474,7 @@ function calculateCost() {
             return; 
         }
         isPowerboat = document.querySelector('input[name="boat_type"]:checked').value === 'powerboat';
-        const hullType = document.querySelector('input[name="hull_type"]:checked').value;
+        hullType = document.querySelector('input[name="hull_type"]:checked').value;
         if (hullType === 'catamaran') additionalHulls = 1;
         else if (hullType === 'trimaran') additionalHulls = 2;
         if (twinEnginesCheckbox && twinEnginesCheckbox.checked) {
@@ -394,13 +527,9 @@ function calculateCost() {
         variableSurchargeTotal += actualPaintSurchargeAmount;
         variableDetails += `  - Est. Paint (${estimatedPaintConditionBaseLabel}): +${(paintSurchargePercent * 100).toFixed(2)}% ($${actualPaintSurchargeAmount.toFixed(2)})\n`;
         
-        if (selectedServiceValue !== 'haul_out_prep') {
-            let actualGrowthSurchargeAmount = baseServiceCost * growthSurchargePercent;
-            variableSurchargeTotal += actualGrowthSurchargeAmount;
-            variableDetails += `  - Est. Growth (${estimatedGrowthLevelBaseLabel}): +${(growthSurchargePercent * 100).toFixed(0)}% ($${actualGrowthSurchargeAmount.toFixed(2)})\n`;
-        } else {
-            variableDetails += `  - Growth Surcharge: N/A for Haul-out Prep\n`;
-        }
+        let actualGrowthSurchargeAmount = baseServiceCost * growthSurchargePercent;
+        variableSurchargeTotal += actualGrowthSurchargeAmount;
+        variableDetails += `  - Est. Growth (${estimatedGrowthLevelBaseLabel}): +${(growthSurchargePercent * 100).toFixed(0)}% ($${actualGrowthSurchargeAmount.toFixed(2)})\n`;
         
         calculatedSubtotal = baseServiceCost + variableSurchargeTotal;
         if (variableDetails) {
@@ -430,9 +559,15 @@ function calculateCost() {
     if (anodeInstallationCost > 0) serviceOrAnodesPriced = true;
 
     if (serviceOrAnodesPriced) {
-        breakdown += `\nTotal Estimate: $${totalBeforeMinimum.toFixed(2)}\n`; // Intentionally adding a blank line before this
-        if (totalBeforeMinimum < minimumCharge && totalBeforeMinimum > 0) {
+        // Apply rounding before showing in breakdown
+        if (totalBeforeMinimum > 0 && totalBeforeMinimum >= minimumCharge) {
+            finalCost = Math.round(totalBeforeMinimum / 10) * 10;
+        } else if (totalBeforeMinimum < minimumCharge && totalBeforeMinimum > 0) {
             finalCost = minimumCharge;
+        }
+        
+        breakdown += `\nTotal Estimate: $${finalCost.toFixed(2)}\n`; // Show rounded/minimum amount
+        if (totalBeforeMinimum < minimumCharge && totalBeforeMinimum > 0) {
             breakdown += `Applied Minimum Charge: $${minimumCharge.toFixed(2)}\n`;
         }
     } else {
@@ -442,10 +577,6 @@ function calculateCost() {
         } else {
             breakdown = ""; 
         }
-    }
-    
-    if (finalCost > 0) {
-        finalCost = Math.round(finalCost / 10) * 10;
     }
 
     const lines = breakdown.trim().split('\n');
@@ -467,6 +598,34 @@ function calculateCost() {
         totalCostDisplayEl.innerText = `$${finalCost}`;
     } else {
         totalCostDisplayEl.innerText = `$${finalCost.toFixed(2)}`;
+    }
+    
+    // Store order data
+    orderData.estimate = finalCost;
+    orderData.service = currentServiceData.name;
+    orderData.boatLength = boatLength;
+    orderData.serviceDetails = {
+        baseRate: currentServiceData.rate,
+        serviceType: currentServiceData.type,
+        anodes: anodesToInstall,
+        boatType: isPowerboat ? 'powerboat' : 'sailboat',
+        hullType: hullType,
+        twinEngines: additionalProps > 0,
+        paintCondition: estimatedPaintConditionBaseLabel,
+        growthLevel: estimatedGrowthLevelBaseLabel
+    };
+    
+    // Add checkout button if not already present
+    if (!document.getElementById('checkout-button')) {
+        const checkoutButton = document.createElement('button');
+        checkoutButton.id = 'checkout-button';
+        checkoutButton.className = 'submit-button';
+        checkoutButton.textContent = 'Proceed to Checkout';
+        checkoutButton.style.marginTop = '20px';
+        checkoutButton.addEventListener('click', showCheckout);
+        
+        const resultSection = document.getElementById('step-8');
+        resultSection.appendChild(checkoutButton);
     }
 }
 
@@ -576,4 +735,270 @@ function getSpecificGrowthSurchargePercent(paintCondition, lastCleanedValue) {
             break;
     }
     return 1.00; // Default fallback to highest surcharge if combo not matched
+}
+
+// Initialize Stripe
+function initializeStripe() {
+    // Stripe publishable key for Sailor Skills
+    stripe = Stripe('pk_live_pri1IepedMvGQmLCFrV4kVzF');
+    elements = stripe.elements();
+    
+    // Create card element
+    const style = {
+        base: {
+            fontSize: '16px',
+            color: '#000',
+            fontFamily: 'Arial, sans-serif',
+            '::placeholder': {
+                color: '#999'
+            }
+        }
+    };
+    
+    cardElement = elements.create('card', { style: style });
+    cardElement.mount('#card-element');
+    
+    // Handle errors
+    cardElement.on('change', function(event) {
+        const displayError = document.getElementById('card-errors');
+        if (event.error) {
+            displayError.textContent = event.error.message;
+        } else {
+            displayError.textContent = '';
+        }
+        validateCheckoutForm();
+    });
+}
+
+// Setup checkout event listeners
+function setupCheckoutListeners() {
+    // Service interval selection
+    const intervalOptions = document.querySelectorAll('.interval-option');
+    intervalOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            intervalOptions.forEach(opt => opt.classList.remove('selected'));
+            this.classList.add('selected');
+            selectedServiceInterval = this.getAttribute('data-interval');
+            validateCheckoutForm();
+        });
+    });
+    
+    // Form validation on input
+    const checkoutInputs = document.querySelectorAll('#checkout-section input[required], #checkout-section select[required]');
+    checkoutInputs.forEach(input => {
+        input.addEventListener('input', validateCheckoutForm);
+        input.addEventListener('change', validateCheckoutForm);
+    });
+    
+    // Agreement checkbox
+    const agreementCheckbox = document.getElementById('service-agreement');
+    agreementCheckbox.addEventListener('change', validateCheckoutForm);
+    
+    // Submit button
+    const submitButton = document.getElementById('submit-order');
+    submitButton.addEventListener('click', handleOrderSubmission);
+    
+    // Back to calculator button
+    const backToCalcButton = document.getElementById('back-to-calculator');
+    backToCalcButton.addEventListener('click', function() {
+        checkoutSection.style.display = 'none';
+        stepElements[stepElements.length - 1].style.display = 'block'; // Show results
+        document.querySelector('.navigation-buttons').style.display = 'flex';
+        document.querySelector('.service-info-section').style.display = 'block';
+    });
+}
+
+// Validate checkout form
+function validateCheckoutForm() {
+    const submitButton = document.getElementById('submit-order');
+    const requiredInputs = document.querySelectorAll('#checkout-section input[required]:not([type="checkbox"]), #checkout-section select[required]');
+    const agreementCheckbox = document.getElementById('service-agreement');
+    
+    let allFieldsFilled = true;
+    requiredInputs.forEach(input => {
+        if (!input.value.trim()) {
+            allFieldsFilled = false;
+        }
+    });
+    
+    const intervalSelected = selectedServiceInterval !== null;
+    const agreementChecked = agreementCheckbox.checked;
+    const cardComplete = cardElement && cardElement._complete;
+    
+    if (allFieldsFilled && intervalSelected && agreementChecked && cardComplete) {
+        submitButton.disabled = false;
+    } else {
+        submitButton.disabled = true;
+    }
+}
+
+// Supabase configuration
+const SUPABASE_URL = 'https://fzygakldvvzxmahkdylq.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ6eWdha2xkdnZ6eG1haGtkeWxxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQwODM4OTgsImV4cCI6MjA2OTY1OTg5OH0.8BNDF5zmpk2HFdprTjsdOWTDh_XkAPdTnGo7omtiVIk';
+const SUPABASE_FUNCTIONS_URL = `${SUPABASE_URL}/functions/v1`;
+
+// Handle order submission
+async function handleOrderSubmission() {
+    const submitButton = document.getElementById('submit-order');
+    submitButton.disabled = true;
+    submitButton.textContent = 'Processing...';
+    
+    // Collect form data
+    const formData = {
+        boatName: document.getElementById('boat-name').value,
+        boatLength: document.getElementById('boat-length-checkout').value,
+        boatMake: document.getElementById('boat-make').value,
+        boatModel: document.getElementById('boat-model').value,
+        marinaName: document.getElementById('marina-name').value,
+        dock: document.getElementById('dock').value,
+        slipNumber: document.getElementById('slip-number').value,
+        serviceInterval: selectedServiceInterval,
+        customerName: document.getElementById('customer-name').value,
+        customerEmail: document.getElementById('customer-email').value,
+        customerPhone: document.getElementById('customer-phone').value,
+        billingAddress: document.getElementById('billing-address').value,
+        billingCity: document.getElementById('billing-city').value,
+        billingState: document.getElementById('billing-state').value,
+        billingZip: document.getElementById('billing-zip').value,
+        customerBirthday: document.getElementById('customer-birthday').value,
+        estimate: orderData.estimate,
+        service: orderData.service,
+        serviceDetails: orderData.serviceDetails
+    };
+    
+    try {
+        // Call Supabase Edge Function to create payment intent
+        const response = await fetch(`${SUPABASE_FUNCTIONS_URL}/create-payment-intent`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+            },
+            body: JSON.stringify({ formData })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to create payment intent');
+        }
+
+        const { clientSecret, intentType, orderId, orderNumber } = await response.json();
+
+        // Handle based on intent type
+        let error;
+        if (intentType === 'setup') {
+            // For recurring: Save payment method without charging
+            const result = await stripe.confirmCardSetup(clientSecret, {
+                payment_method: {
+                    card: cardElement,
+                    billing_details: {
+                        name: formData.customerName,
+                        email: formData.customerEmail,
+                        phone: formData.customerPhone,
+                        address: {
+                            line1: formData.billingAddress,
+                            city: formData.billingCity,
+                            state: formData.billingState,
+                            postal_code: formData.billingZip,
+                            country: 'US'
+                        }
+                    }
+                }
+            });
+            error = result.error;
+        } else {
+            // For one-time: Charge immediately
+            const result = await stripe.confirmCardPayment(clientSecret, {
+                payment_method: {
+                    card: cardElement,
+                    billing_details: {
+                        name: formData.customerName,
+                        email: formData.customerEmail,
+                        phone: formData.customerPhone,
+                        address: {
+                            line1: formData.billingAddress,
+                            city: formData.billingCity,
+                            state: formData.billingState,
+                            postal_code: formData.billingZip,
+                            country: 'US'
+                        }
+                    }
+                }
+            });
+            error = result.error;
+        }
+
+        if (error) {
+            throw error;
+        }
+
+        // Success! Show confirmation
+        showOrderConfirmation(orderNumber);
+        
+    } catch (error) {
+        console.error('Error:', error);
+        alert('There was an error processing your order. Please try again.');
+        submitButton.disabled = false;
+        submitButton.textContent = 'Complete Order';
+    }
+}
+
+// Show order confirmation
+function showOrderConfirmation(orderNumber) {
+    const checkoutSection = document.getElementById('checkout-section');
+    const isRecurring = selectedServiceInterval !== 'one-time';
+    
+    const paymentMessage = isRecurring 
+        ? `<p style="margin: 20px 0; color: #345475;"><strong>Payment Method Saved!</strong><br>
+           Your card is securely saved and will be charged after each service completion.</p>`
+        : `<p style="margin: 20px 0; color: #345475;"><strong>Payment Processed!</strong><br>
+           Your card has been charged for this one-time service.</p>`;
+    
+    checkoutSection.innerHTML = `
+        <div class="confirmation-message" style="text-align: center; padding: 40px;">
+            <h2 style="color: #4CAF50;">✅ Order Confirmed!</h2>
+            <p style="font-size: 1.2em; margin: 20px 0;">Thank you for your order.</p>
+            <p style="font-size: 1.1em;"><strong>Order Number:</strong> ${orderNumber}</p>
+            ${paymentMessage}
+            <p style="margin: 20px 0;">We'll contact you within 24 hours to schedule your service.</p>
+            <p>You'll receive a confirmation email shortly.</p>
+            <button onclick="location.reload()" class="submit-button" style="margin-top: 30px;">Start New Estimate</button>
+        </div>
+    `;
+    
+    // Scroll to top
+    window.scrollTo(0, 0);
+}
+
+// Show checkout section
+function showCheckout() {
+    // Hide calculator, show checkout
+    stepElements.forEach(el => el.style.display = 'none');
+    document.querySelector('.navigation-buttons').style.display = 'none';
+    document.querySelector('.service-info-section').style.display = 'none';
+    checkoutSection.style.display = 'block';
+    
+    // Show/hide service interval section based on service type
+    const intervalSection = document.getElementById('service-interval-section');
+    if (selectedServiceKey === 'recurring_cleaning') {
+        intervalSection.style.display = 'block';
+    } else {
+        intervalSection.style.display = 'none';
+        // For non-recurring services, automatically select "one-time"
+        const oneTimeOption = document.querySelector('[data-interval="one-time"]');
+        if (oneTimeOption) {
+            document.querySelectorAll('.interval-option').forEach(opt => opt.classList.remove('selected'));
+            oneTimeOption.classList.add('selected');
+            orderData.interval = 'one-time';
+        }
+    }
+    
+    // Pre-fill boat length
+    const boatLengthCheckout = document.getElementById('boat-length-checkout');
+    if (orderData.boatLength > 0) {
+        boatLengthCheckout.value = orderData.boatLength;
+    }
+    
+    // Scroll to top
+    window.scrollTo(0, 0);
 } 

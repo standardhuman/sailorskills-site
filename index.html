@@ -3,24 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sailor Skills Diving Cost Estimator</title>
+    <title>Diving Services | Sailor Skills</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <script src="https://js.stripe.com/v3/"></script>
 </head>
 <body>
-    <!-- Test comment to trigger Pages rebuild v1 -->
-    <div class="calculator-container">
-        <h1>Sailor Skills Diving Cost Estimator</h1>
+    <!-- Navigation Header -->
+    <header class="navigation-header">
+        <div class="nav-container">
+            <a href="https://www.sailorskills.com/" class="nav-logo">SAILOR SKILLS</a>
+            <nav class="nav-links">
+                <a href="https://www.sailorskills.com/">HOME</a>
+                <a href="https://www.sailorskills.com/training">TRAINING</a>
+                <a href="https://www.sailorskills.com/diving" class="active">DIVING</a>
+                <a href="https://www.sailorskills.com/detailing">DETAILING</a>
+                <a href="https://www.sailorskills.com/deliveries">DELIVERIES</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Hero Header -->
+        <div class="hero-header">
+            <div class="hero-content">
+                <div class="hero-brand">SAILOR SKILLS</div>
+                <h1 class="hero-service">DIVING</h1>
+                <div class="hero-tagline">UNDERWATER VESSEL CARE</div>
+                <div class="hero-subtitle">Formerly Bottom Service</div>
+            </div>
+        </div>
+        
+        <div class="calculator-container">
+        <h2 class="calculator-title">Cost Estimator</h2>
 
         <!-- Step 0: Service Selection -->
         <div id="step-0" class="form-step active">
             <h2>Select a Service:</h2>
             <div class="input-group">
-                <label for="serviceDropdown">Service Type:</label>
-                <select id="serviceDropdown">
-                    <!-- Options will be populated by JS -->
-                </select>
-                <p class="variable-info" id="servicePriceExplainer" style="margin-top: 8px;">Select a service to see its base rate.</p>
-                <p class="variable-info" style="margin-top: 10px; font-size: 0.9em;">Recurring hull cleaning services are available at 1, 2, or 3-month intervals. Please contact us to discuss your preferred schedule after receiving your initial estimate.</p>
+                <div class="service-selection-grid" id="serviceButtons">
+                    <!-- Service buttons will be populated by JS -->
+                </div>
+                <p class="variable-info" id="servicePriceExplainer" style="margin-top: 15px;">Select a service to see its description.</p>
             </div>
         </div>
 
@@ -124,10 +151,207 @@
 
         <!-- Navigation Buttons -->
         <div class="navigation-buttons">
-            <button id="backButton" type="button">Back</button>
             <button id="nextButton" type="button">Next</button>
+            <button id="backButton" type="button">Back</button>
+        </div>
+
+        <!-- Checkout Section (hidden by default) -->
+        <div id="checkout-section" class="checkout-section" style="display: none;">
+            <h2>Complete Your Service Order</h2>
+            
+            <!-- Boat Information -->
+            <div class="checkout-form">
+                <h3>Boat Information</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="boat-name">Boat Name*</label>
+                        <input type="text" id="boat-name" name="boat-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="boat-length-checkout">Boat Length (feet)*</label>
+                        <input type="text" id="boat-length-checkout" name="boat-length-checkout" readonly>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="boat-make">Boat Make*</label>
+                        <input type="text" id="boat-make" name="boat-make" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="boat-model">Boat Model*</label>
+                        <input type="text" id="boat-model" name="boat-model" required>
+                    </div>
+                </div>
+                
+                <h3>Marina Information</h3>
+                <div class="form-group">
+                    <label for="marina-name">Marina Name*</label>
+                    <input type="text" id="marina-name" name="marina-name" required>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="dock">Dock*</label>
+                        <input type="text" id="dock" name="dock" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="slip-number">Slip Number*</label>
+                        <input type="text" id="slip-number" name="slip-number" required>
+                    </div>
+                </div>
+                
+                <div id="service-interval-section">
+                    <h3>Service Interval</h3>
+                    <div class="form-group">
+                        <label>Select your preferred service interval:</label>
+                        <div class="service-interval-grid">
+                        <div class="interval-option" data-interval="1">
+                            <strong>Monthly</strong>
+                            <div>Every month</div>
+                        </div>
+                        <div class="interval-option recommended" data-interval="2">
+                            <strong>Bi-Monthly</strong>
+                            <div>Every 2 months</div>
+                        </div>
+                        <div class="interval-option" data-interval="3">
+                            <strong>Quarterly</strong>
+                            <div>Every 3 months</div>
+                        </div>
+                        <div class="interval-option" data-interval="6">
+                            <strong>Semi-Annual</strong>
+                            <div>Every 6 months</div>
+                        </div>
+                        <div class="interval-option" data-interval="one-time">
+                            <strong>One-Time</strong>
+                            <div>Single service</div>
+                        </div>
+                    </div>
+                </div>
+                </div>
+                
+                <h3>Contact Information</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="customer-name">Full Name*</label>
+                        <input type="text" id="customer-name" name="customer-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="customer-email">Email*</label>
+                        <input type="email" id="customer-email" name="customer-email" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="customer-phone">Phone Number*</label>
+                    <input type="tel" id="customer-phone" name="customer-phone" required>
+                </div>
+                
+                <h3>Billing Address</h3>
+                <div class="form-group">
+                    <label for="billing-address">Street Address*</label>
+                    <input type="text" id="billing-address" name="billing-address" required>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="billing-city">City*</label>
+                        <input type="text" id="billing-city" name="billing-city" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="billing-state">State*</label>
+                        <select id="billing-state" name="billing-state" required>
+                            <option value="">Select State</option>
+                            <option value="CA">California</option>
+                            <option value="WA">Washington</option>
+                            <option value="OR">Oregon</option>
+                            <option value="AZ">Arizona</option>
+                            <option value="NV">Nevada</option>
+                            <option value="FL">Florida</option>
+                            <option value="TX">Texas</option>
+                            <option value="NY">New York</option>
+                            <option value="Other">Other State</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="billing-zip">ZIP Code*</label>
+                        <input type="text" id="billing-zip" name="billing-zip" pattern="[0-9]{5}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="customer-birthday">Birthday (Optional)</label>
+                        <input type="date" id="customer-birthday" name="customer-birthday" placeholder="MM/DD/YYYY">
+                    </div>
+                </div>
+                
+                <h3>Payment Information</h3>
+                <div class="form-group">
+                    <label for="card-element">Credit or Debit Card</label>
+                    <div id="card-element"></div>
+                    <div id="card-errors" role="alert"></div>
+                </div>
+                
+                <!-- Service Agreement -->
+                <div class="agreement-section">
+                    <h4>Important Service Agreement</h4>
+                    <p><strong>Billing:</strong> Your card will be charged only after service completion.</p>
+                    <p><strong>Estimate Notice:</strong> The final amount may vary from the provided estimate based on actual conditions found during service. Common variations include:</p>
+                    <ul>
+                        <li>Unexpected marine growth levels</li>
+                        <li>Additional anode replacements needed</li>
+                    </ul>
+                    <p>We will notify you of any significant changes before completing the service.</p>
+                    
+                    <div class="agreement-checkbox">
+                        <input type="checkbox" id="service-agreement" name="service-agreement" required>
+                        <label for="service-agreement">
+                            I understand and agree to be billed for the service at time of completion, and that the final amount may vary from the estimate provided.
+                        </label>
+                    </div>
+                </div>
+                
+                <button type="button" id="submit-order" class="submit-button" disabled>Complete Order</button>
+                
+                <div style="text-align: center; margin-top: 20px;">
+                    <button type="button" id="back-to-calculator" style="background: none; border: none; color: #116DFF; text-decoration: underline; cursor: pointer; font-size: 1em;">← Back to Calculator</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Service Information Section -->
+        <div class="service-info-section">
+            <h2>Why Choose Sailor Skills Diving?</h2>
+            <div class="service-features">
+                <div class="feature-item">
+                    <h3>100% Satisfaction Guarantee</h3>
+                    <p>We stand behind our work with a complete satisfaction guarantee on all services.</p>
+                </div>
+                <div class="feature-item">
+                    <h3>Dependable Communication</h3>
+                    <p>Stay informed with regular updates before, during, and after each service.</p>
+                </div>
+                <div class="feature-item">
+                    <h3>Easy Account Management</h3>
+                    <p>Manage your service schedule and history through our convenient online portal.</p>
+                </div>
+                <div class="feature-item">
+                    <h3>Predictable Scheduling</h3>
+                    <p>Set it and forget it - we'll maintain your boat on a reliable schedule.</p>
+                </div>
+                <div class="feature-item">
+                    <h3>4K Underwater Video</h3>
+                    <p>Receive detailed video documentation of your hull's condition with each service.</p>
+                </div>
+                <div class="feature-item">
+                    <h3>Online Service Logs</h3>
+                    <p>Access complete service history and reports anytime through your account.</p>
+                </div>
+            </div>
         </div>
     </div>
+    </main>
 
     <script src="script.js"></script>
 </body>

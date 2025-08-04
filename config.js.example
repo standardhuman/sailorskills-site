@@ -1,0 +1,12 @@
+// Rename this file to config.js and update with your actual values
+
+// Supabase Configuration
+const SUPABASE_CONFIG = {
+    url: 'https://YOUR_PROJECT_ID.supabase.co',
+    anonKey: 'YOUR_ANON_KEY_HERE'
+};
+
+// Stripe Configuration  
+const STRIPE_CONFIG = {
+    publishableKey: 'pk_live_YOUR_STRIPE_PUBLISHABLE_KEY'
+};

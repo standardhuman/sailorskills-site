@@ -1,0 +1,389 @@
+{
+  "navigation": {
+    "styles": {
+      "background-color": "rgba(0, 0, 0, 0)",
+      "color": "rgb(0, 0, 0)",
+      "height": "50px",
+      "padding": "0px",
+      "margin": "0px",
+      "position": "absolute",
+      "z-index": "auto",
+      "font-family": "Arial, Helvetica, sans-serif",
+      "font-size": "10px",
+      "font-weight": "400"
+    },
+    "boundingBox": {
+      "x": 470,
+      "y": 9,
+      "width": 980,
+      "height": 50,
+      "top": 9,
+      "right": 1450,
+      "bottom": 59,
+      "left": 470
+    },
+    "links": [
+      {
+        "text": "HOME",
+        "href": "https://www.sailorskills.com/",
+        "styles": {
+          "color": "rgb(0, 0, 238)",
+          "font-size": "20px",
+          "font-weight": "400",
+          "text-decoration": "none solid rgb(0, 0, 238)",
+          "padding": "0px",
+          "margin": "0px",
+          "background-color": "rgba(0, 0, 0, 0)"
+        }
+      },
+      {
+        "text": "TRAINING",
+        "href": "https://www.sailorskills.com/training",
+        "styles": {
+          "color": "rgb(0, 0, 238)",
+          "font-size": "20px",
+          "font-weight": "400",
+          "text-decoration": "none solid rgb(0, 0, 238)",
+          "padding": "0px",
+          "margin": "0px",
+          "background-color": "rgba(0, 0, 0, 0)"
+        }
+      },
+      {
+        "text": "TRAINING F.A.Q.",
+        "href": "https://www.sailorskills.com/training/faq",
+        "styles": {
+          "color": "rgb(0, 0, 238)",
+          "font-size": "20px",
+          "font-weight": "400",
+          "text-decoration": "none solid rgb(0, 0, 238)",
+          "padding": "0px",
+          "margin": "0px",
+          "background-color": "rgba(0, 0, 0, 0)"
+        }
+      },
+      {
+        "text": "Guarantee",
+        "href": "https://www.sailorskills.com/training/faq",
+        "styles": {
+          "color": "rgb(0, 0, 238)",
+          "font-size": "20px",
+          "font-weight": "400",
+          "text-decoration": "none solid rgb(0, 0, 238)",
+          "padding": "0px",
+          "margin": "0px",
+          "background-color": "rgba(0, 0, 0, 0)"
+        }
+      },
+      {
+        "text": "Booking",
+        "href": "https://www.sailorskills.com/training/faq",
+        "styles": {
+          "color": "rgb(0, 0, 238)",
+          "font-size": "20px",
+          "font-weight": "400",
+          "text-decoration": "none solid rgb(0, 0, 238)",
+          "padding": "0px",
+          "margin": "0px",
+          "background-color": "rgba(0, 0, 0, 0)"
+        }
+      },
+      {
+        "text": "Insurance",
+        "href": "https://www.sailorskills.com/training/faq",
+        "styles": {
+          "color": "rgb(0, 0, 238)",
+          "font-size": "20px",
+          "font-weight": "400",
+          "text-decoration": "none solid rgb(0, 0, 238)",
+          "padding": "0px",
+          "margin": "0px",
+          "background-color": "rgba(0, 0, 0, 0)"
+        }
+      },
+      {
+        "text": "Cancellations",
+        "href": "https://www.sailorskills.com/training/faq",
+        "styles": {
+          "color": "rgb(0, 0, 238)",
+          "font-size": "20px",
+          "font-weight": "400",
+          "text-decoration": "none solid rgb(0, 0, 238)",
+          "padding": "0px",
+          "margin": "0px",
+          "background-color": "rgba(0, 0, 0, 0)"
+        }
+      },
+      {
+        "text": "Pricing",
+        "href": "https://www.sailorskills.com/training/faq",
+        "styles": {
+          "color": "rgb(0, 0, 238)",
+          "font-size": "20px",
+          "font-weight": "400",
+          "text-decoration": "none solid rgb(0, 0, 238)",
+          "padding": "0px",
+          "margin": "0px",
+          "background-color": "rgba(0, 0, 0, 0)"
+        }
+      },
+      {
+        "text": "Payment",
+        "href": "https://www.sailorskills.com/training/faq",
+        "styles": {
+          "color": "rgb(0, 0, 238)",
+          "font-size": "20px",
+          "font-weight": "400",
+          "text-decoration": "none solid rgb(0, 0, 238)",
+          "padding": "0px",
+          "margin": "0px",
+          "background-color": "rgba(0, 0, 0, 0)"
+        }
+      },
+      {
+        "text": "DIVING",
+        "href": "https://www.sailorskills.com/diving",
+        "styles": {
+          "color": "rgb(0, 0, 238)",
+          "font-size": "20px",
+          "font-weight": "400",
+          "text-decoration": "none solid rgb(0, 0, 238)",
+          "padding": "0px",
+          "margin": "0px",
+          "background-color": "rgba(0, 0, 0, 0)"
+        }
+      },
+      {
+        "text": "SERVICES",
+        "href": "https://www.sailorskills.com/diving/services",
+        "styles": {
+          "color": "rgb(0, 0, 238)",
+          "font-size": "20px",
+          "font-weight": "400",
+          "text-decoration": "none solid rgb(0, 0, 238)",
+          "padding": "0px",
+          "margin": "0px",
+          "background-color": "rgba(0, 0, 0, 0)"
+        }
+      },
+      {
+        "text": "DETAILING",
+        "href": "https://www.sailorskills.com/detailing",
+        "styles": {
+          "color": "rgb(0, 0, 238)",
+          "font-size": "20px",
+          "font-weight": "400",
+          "text-decoration": "none solid rgb(0, 0, 238)",
+          "padding": "0px",
+          "margin": "0px",
+          "background-color": "rgba(0, 0, 0, 0)"
+        }
+      },
+      {
+        "text": "Quote Request",
+        "href": "https://www.sailorskills.com/detailing-quote",
+        "styles": {
+          "color": "rgb(0, 0, 238)",
+          "font-size": "20px",
+          "font-weight": "400",
+          "text-decoration": "none solid rgb(0, 0, 238)",
+          "padding": "0px",
+          "margin": "0px",
+          "background-color": "rgba(0, 0, 0, 0)"
+        }
+      },
+      {
+        "text": "DELIVERIES",
+        "href": "https://www.sailorskills.com/deliveries",
+        "styles": {
+          "color": "rgb(0, 0, 238)",
+          "font-size": "20px",
+          "font-weight": "400",
+          "text-decoration": "none solid rgb(0, 0, 238)",
+          "padding": "0px",
+          "margin": "0px",
+          "background-color": "rgba(0, 0, 0, 0)"
+        }
+      },
+      {
+        "text": "DELIVERY F.A.Q.",
+        "href": "https://www.sailorskills.com/delivery-faq",
+        "styles": {
+          "color": "rgb(0, 0, 238)",
+          "font-size": "20px",
+          "font-weight": "400",
+          "text-decoration": "none solid rgb(0, 0, 238)",
+          "padding": "0px",
+          "margin": "0px",
+          "background-color": "rgba(0, 0, 0, 0)"
+        }
+      },
+      {
+        "text": "First Step",
+        "href": "https://www.sailorskills.com/delivery-faq",
+        "styles": {
+          "color": "rgb(0, 0, 238)",
+          "font-size": "20px",
+          "font-weight": "400",
+          "text-decoration": "none solid rgb(0, 0, 238)",
+          "padding": "0px",
+          "margin": "0px",
+          "background-color": "rgba(0, 0, 0, 0)"
+        }
+      },
+      {
+        "text": "Duration",
+        "href": "https://www.sailorskills.com/delivery-faq",
+        "styles": {
+          "color": "rgb(0, 0, 238)",
+          "font-size": "20px",
+          "font-weight": "400",
+          "text-decoration": "none solid rgb(0, 0, 238)",
+          "padding": "0px",
+          "margin": "0px",
+          "background-color": "rgba(0, 0, 0, 0)"
+        }
+      },
+      {
+        "text": "Weather",
+        "href": "https://www.sailorskills.com/delivery-faq",
+        "styles": {
+          "color": "rgb(0, 0, 238)",
+          "font-size": "20px",
+          "font-weight": "400",
+          "text-decoration": "none solid rgb(0, 0, 238)",
+          "padding": "0px",
+          "margin": "0px",
+          "background-color": "rgba(0, 0, 0, 0)"
+        }
+      },
+      {
+        "text": "Passengers",
+        "href": "https://www.sailorskills.com/delivery-faq",
+        "styles": {
+          "color": "rgb(0, 0, 238)",
+          "font-size": "20px",
+          "font-weight": "400",
+          "text-decoration": "none solid rgb(0, 0, 238)",
+          "padding": "0px",
+          "margin": "0px",
+          "background-color": "rgba(0, 0, 0, 0)"
+        }
+      },
+      {
+        "text": "Safety",
+        "href": "https://www.sailorskills.com/delivery-faq",
+        "styles": {
+          "color": "rgb(0, 0, 238)",
+          "font-size": "20px",
+          "font-weight": "400",
+          "text-decoration": "none solid rgb(0, 0, 238)",
+          "padding": "0px",
+          "margin": "0px",
+          "background-color": "rgba(0, 0, 0, 0)"
+        }
+      },
+      {
+        "text": "Insurance",
+        "href": "https://www.sailorskills.com/delivery-faq",
+        "styles": {
+          "color": "rgb(0, 0, 238)",
+          "font-size": "20px",
+          "font-weight": "400",
+          "text-decoration": "none solid rgb(0, 0, 238)",
+          "padding": "0px",
+          "margin": "0px",
+          "background-color": "rgba(0, 0, 0, 0)"
+        }
+      },
+      {
+        "text": "Rates",
+        "href": "https://www.sailorskills.com/delivery-faq",
+        "styles": {
+          "color": "rgb(0, 0, 238)",
+          "font-size": "20px",
+          "font-weight": "400",
+          "text-decoration": "none solid rgb(0, 0, 238)",
+          "padding": "0px",
+          "margin": "0px",
+          "background-color": "rgba(0, 0, 0, 0)"
+        }
+      },
+      {
+        "text": "Payment",
+        "href": "https://www.sailorskills.com/delivery-faq",
+        "styles": {
+          "color": "rgb(0, 0, 238)",
+          "font-size": "20px",
+          "font-weight": "400",
+          "text-decoration": "none solid rgb(0, 0, 238)",
+          "padding": "0px",
+          "margin": "0px",
+          "background-color": "rgba(0, 0, 0, 0)"
+        }
+      }
+    ]
+  },
+  "hero": {
+    "styles": {
+      "background-color": "rgba(0, 0, 0, 0)",
+      "background-image": "none",
+      "background-size": "auto",
+      "background-position": "0% 0%",
+      "height": "160px",
+      "min-height": "auto",
+      "padding": "0px",
+      "margin": "0px",
+      "position": "relative",
+      "overflow": "visible"
+    },
+    "boundingBox": {
+      "x": 0,
+      "y": 69,
+      "width": 1920,
+      "height": 160,
+      "top": 69,
+      "right": 1920,
+      "bottom": 229,
+      "left": 0
+    },
+    "headings": [
+      {
+        "tag": "h4",
+        "text": "DIVING",
+        "styles": {
+          "color": "rgb(24, 24, 24)",
+          "font-size": "100px",
+          "font-weight": "400",
+          "font-family": "montserrat, sans-serif",
+          "line-height": "140px",
+          "text-align": "center",
+          "margin": "0px",
+          "padding": "0px",
+          "text-transform": "none",
+          "letter-spacing": "normal"
+        }
+      }
+    ]
+  },
+  "colors": [
+    "rgb(0, 0, 0)",
+    "rgb(255, 255, 255)",
+    "rgb(0, 0, 238)",
+    "rgb(109, 123, 137)",
+    "rgb(103, 169, 234)",
+    "rgb(24, 24, 24)",
+    "rgb(52, 84, 117)"
+  ],
+  "fonts": [
+    "Arial, Helvetica, sans-serif",
+    "montserrat, sans-serif",
+    "Arial",
+    "avenir-lt-w01_35-light1475496",
+    "avenir-lt-w01_35-light1475496, avenir-lt-w05_35-light, sans-serif",
+    "oswald-medium",
+    "assistant-light, sans-serif"
+  ],
+  "spacing": [],
+  "backgroundImages": []
+}
