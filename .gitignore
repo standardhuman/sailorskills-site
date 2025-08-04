@@ -1,0 +1,24 @@
+# Test files
+test_*.py
+*.png
+playwright-report/
+
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# Supabase
+supabase/.branches
+supabase/.temp
+
+# Config with secrets
+config.js
+
+# macOS
+.DS_Store
+
+# Test outputs
+tests/debug-*.spec.js
+tests/test-*.spec.js
+sandbox.sb

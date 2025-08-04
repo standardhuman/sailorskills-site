@@ -26,6 +26,7 @@ body {
     height: 69px;
     display: flex;
     align-items: center;
+    border-bottom: 1px solid rgba(224, 224, 224, 0.3); /* Subtle line */
 }
 
 .nav-container {
@@ -34,7 +35,7 @@ body {
     margin: 0 auto;
     padding: 0 20px;
     display: flex;
-    justify-content: space-between;
+    justify-content: center; /* Center the nav links */
     align-items: center;
     height: 50px;
 }
@@ -45,7 +46,7 @@ body {
 
 .nav-links {
     display: flex;
-    gap: 30px;
+    gap: 40px; /* Slightly wider gap between links */
     align-items: center;
 }
 
@@ -82,6 +83,8 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
+    border-bottom: 1px solid #345475; /* Dark blue-gray border */
 }
 
 .hero-content {
@@ -95,7 +98,7 @@ body {
     font-weight: 400;
     color: #181818;
     letter-spacing: 0.2em;
-    margin-bottom: 5px;
+    margin-bottom: -10px; /* Tighter spacing */
     text-transform: uppercase;
 }
 
@@ -104,8 +107,8 @@ body {
     font-size: 100px;
     font-weight: 400;
     color: #181818;
-    line-height: 1.4;
-    margin: 0 0 10px 0;
+    line-height: 1;
+    margin: 0 0 -5px 0; /* Tighter spacing */
     padding: 0;
     letter-spacing: normal;
 }
@@ -129,6 +132,7 @@ body {
     margin-top: 5px;
 }
 
+
 .calculator-container {
     background-color: #ffffff;
     padding: 20px 40px 40px;
@@ -140,7 +144,7 @@ body {
 .calculator-title {
     font-family: 'Montserrat', sans-serif;
     font-size: 40px;
-    color: #181818;
+    color: #345475; /* Dark blue-gray */
     text-align: center;
     margin-bottom: 40px;
     font-weight: 400;
@@ -171,7 +175,7 @@ h1 { /* For "Sailor Skills Diving Cost Estimator" title */
 .form-step h2 { /* For step titles */
     font-family: 'Montserrat', sans-serif;
     font-size: 1.25em; /* 20px like h2 on services page */
-    color: #181818; /* Match SailorSkills heading color */
+    color: #345475; /* Dark blue-gray */
     margin-bottom: 25px; 
     padding-bottom: 15px;
     border-bottom: none; /* Remove underline for cleaner look */
@@ -250,6 +254,14 @@ input[type="tel"]:focus {
     line-height: 1.8;
     text-align: center;
     font-family: 'Montserrat', sans-serif;
+}
+
+/* Specific styling for service description */
+#servicePriceExplainer {
+    font-size: 1em; /* 16px - larger than default */
+    color: #4a5568; /* Darker gray */
+    line-height: 1.6;
+    margin-top: 20px;
 }
 .input-group .variable-info {
      margin-top: 8px; /* Adjusted */
@@ -352,8 +364,12 @@ input[type="tel"]:focus {
 
 .navigation-buttons {
     display: flex;
-    justify-content: space-between; /* Space between for Back and Next */
-    margin-top: 30px;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    margin: 30px auto 0;
+    width: 100%;
+    max-width: 400px; /* Constrain the button container width */
 }
 .navigation-buttons button {
     padding: 16px 40px;
@@ -367,6 +383,7 @@ input[type="tel"]:focus {
     text-transform: none; /* No uppercase */
     letter-spacing: normal;
     min-height: 53px; /* Match services page button height */
+    width: 200px; /* Fixed width for consistency */
 }
 .navigation-buttons button#backButton {
     background-color: #f5f5f5;
@@ -546,6 +563,86 @@ input[type="tel"]:focus {
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 15px;
     margin-top: 10px;
+}
+
+.service-selection-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-top: 10px;
+}
+
+/* Make cleaning services span full width */
+.service-option.cleaning-service {
+    grid-column: 1 / -1;
+}
+
+/* On mobile, stack all services in single column */
+@media (max-width: 768px) {
+    .service-selection-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.service-option {
+    padding: 20px;
+    border: 1px solid #e0e0e0;
+    border-radius: 0px; /* Sharp corners */
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    background-color: #f8f9fa;
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center; /* Center all child elements horizontally */
+}
+
+.service-option:hover {
+    background-color: #e8e8e8;
+}
+
+.service-option.selected {
+    background-color: #345475; /* Dark blue-gray */
+    color: white;
+    border-color: #345475;
+}
+
+.service-option .service-name {
+    font-weight: 500;
+    font-size: 1em;
+    margin-bottom: 5px;
+    text-align: center;
+    width: 100%;
+    display: block;
+}
+
+.service-option .service-price {
+    font-size: 0.9em;
+    color: #6d7b89;
+    text-align: center;
+    width: 100%;
+    display: block;
+    margin-left: 0;
+    padding-left: 0;
+    padding-right: 0;
+    font-weight: normal;
+}
+
+.service-option.selected .service-price {
+    color: white;
+}
+
+.service-option .save-badge {
+    background-color: #67a9ea;
+    color: white;
+    padding: 3px 10px;
+    font-size: 0.75em;
+    margin-top: 8px;
+    display: block;
+    text-align: center;
+    width: auto;
 }
 
 .interval-option {
