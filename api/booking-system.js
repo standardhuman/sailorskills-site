@@ -1,3 +1,6 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import { google } from 'googleapis';
 import sgMail from '@sendgrid/mail';
 import twilio from 'twilio';
@@ -11,10 +14,17 @@ const supabase = createClient(
 );
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-// Initialize Twilio
-const twilioClient = process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN
+// Initialize SendGrid only if API key is provided
+if (process.env.SENDGRID_API_KEY && process.env.SENDGRID_API_KEY !== 'placeholder') {
+  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+}
+
+// Initialize Twilio only if credentials are provided
+const twilioClient = (process.env.TWILIO_ACCOUNT_SID && 
+                      process.env.TWILIO_AUTH_TOKEN && 
+                      process.env.TWILIO_ACCOUNT_SID !== 'placeholder' &&
+                      process.env.TWILIO_AUTH_TOKEN !== 'placeholder')
   ? twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN)
   : null;
 
@@ -171,7 +181,12 @@ export async function sendEmailConfirmation(booking, serviceType) {
   };
 
   try {
-    await sgMail.send(msg);
+    if (process.env.SENDGRID_API_KEY && process.env.SENDGRID_API_KEY !== 'placeholder') {
+      await sgMail.send(msg);
+    } else {
+      console.log('SendGrid not configured - Email would be sent to:', booking.customer_email);
+      console.log('Subject:', msg.subject);
+    }
     
     // Update booking confirmation sent timestamp
     await supabase
@@ -269,7 +284,11 @@ export async function sendReminder(booking, serviceType) {
   };
 
   try {
-    await sgMail.send(emailMsg);
+    if (process.env.SENDGRID_API_KEY && process.env.SENDGRID_API_KEY !== 'placeholder') {
+      await sgMail.send(emailMsg);
+    } else {
+      console.log('SendGrid not configured - Reminder email would be sent to:', booking.customer_email);
+    }
     
     // Send SMS reminder if phone number exists
     if (twilioClient && booking.customer_phone) {

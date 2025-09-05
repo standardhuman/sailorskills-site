@@ -22,3 +22,22 @@ config.js
 tests/debug-*.spec.js
 tests/test-*.spec.js
 sandbox.sb
+
+# Environment variables
+.env
+.env.local
+.env.development
+.env.test
+.env.production.local
+
+# Production build
+dist/
+
+# Node modules
+node_modules/
+
+# Vercel
+.vercel
+
+# Temporary files
+run-migration.js
