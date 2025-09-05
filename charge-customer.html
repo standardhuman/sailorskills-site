@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Charge Customer | Sailor Skills</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .admin-header {
+            background: #ff4444;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .customer-selector {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .customer-selector h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .customer-search {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .customer-search input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .customer-search button {
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .customer-list {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .customer-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .customer-item:hover {
+            background: #f5f5f5;
+        }
+        .customer-item.selected {
+            background: #007bff;
+            color: white;
+        }
+        .customer-info {
+            font-size: 12px;
+            color: #666;
+        }
+        .customer-item.selected .customer-info {
+            color: #ddd;
+        }
+        .charge-summary {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .charge-button {
+            background: #28a745;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .charge-button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        .charge-result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+        }
+        .charge-result.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .charge-result.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-header">
+        ADMIN MODE - Charge Existing Customer
+    </div>
+    <div class="container">
+        <h1>Charge Customer for Diving Services</h1>
+        
+        <!-- Customer Selector -->
+        <div class="customer-selector">
+            <h3>Select Customer</h3>
+            <div class="customer-search">
+                <input type="text" id="customerSearch" placeholder="Search by name or email...">
+                <button onclick="searchCustomers()">Search</button>
+                <button onclick="loadRecentCustomers()">Load Recent</button>
+            </div>
+            <div id="customerList" class="customer-list"></div>
+            <div id="selectedCustomer" style="margin-top: 10px; display: none;">
+                <strong>Selected:</strong> <span id="selectedCustomerName"></span>
+            </div>
+        </div>
+
+        <!-- Service Calculator (same as customer version) -->
+        <div class="service-selector">
+            <h3>Select Service Type</h3>
+            <div class="service-options">
+                <label class="service-option">
+                    <input type="radio" name="service" value="recurring" checked>
+                    <span class="service-content">
+                        <span class="service-title">⚡ Recurring Cleaning</span>
+                        <span class="service-description">Regular maintenance keeps your boat performing at its best</span>
+                    </span>
+                </label>
+                <label class="service-option">
+                    <input type="radio" name="service" value="one_time">
+                    <span class="service-content">
+                        <span class="service-title">🧽 One-Time Cleaning</span>
+                        <span class="service-description">Thorough cleaning to restore your hull's condition</span>
+                    </span>
+                </label>
+                <label class="service-option">
+                    <input type="radio" name="service" value="recovery">
+                    <span class="service-content">
+                        <span class="service-title">🔍 Item Recovery</span>
+                        <span class="service-description">Lost something overboard? We'll find it</span>
+                    </span>
+                </label>
+                <label class="service-option">
+                    <input type="radio" name="service" value="inspection">
+                    <span class="service-content">
+                        <span class="service-title">📋 Underwater Inspection</span>
+                        <span class="service-description">Comprehensive assessment with photo documentation</span>
+                    </span>
+                </label>
+            </div>
+        </div>
+
+        <div class="boat-details">
+            <h3>Boat Details</h3>
+            <div class="input-group">
+                <label for="boatLength">Boat Length (feet)</label>
+                <input type="number" id="boatLength" min="20" max="100" value="35" required>
+            </div>
+            
+            <div id="cleaningOptions">
+                <div class="input-group">
+                    <label for="paintCondition">Paint Condition</label>
+                    <select id="paintCondition">
+                        <option value="good">Good - Smooth surface</option>
+                        <option value="fair">Fair - Some roughness</option>
+                        <option value="poor">Poor - Very rough/ablative</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label for="growthLevel">Growth Level</label>
+                    <select id="growthLevel">
+                        <option value="light">Light - Thin film</option>
+                        <option value="moderate">Moderate - Visible growth</option>
+                        <option value="heavy">Heavy - Thick growth/barnacles</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="pricing-display" id="pricingDisplay">
+            <h3>Service Estimate</h3>
+            <div class="price-breakdown" id="priceBreakdown"></div>
+        </div>
+
+        <!-- Charge Summary -->
+        <div class="charge-summary">
+            <h3>Charge Summary</h3>
+            <div id="chargeSummary">Select a customer and configure service details</div>
+            <button id="chargeButton" class="charge-button" onclick="chargeCustomer()" disabled>
+                Charge Customer
+            </button>
+        </div>
+
+        <!-- Result Display -->
+        <div id="chargeResult" class="charge-result"></div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        let selectedCustomer = null;
+        let customers = [];
+
+        // Initialize the calculator
+        document.addEventListener('DOMContentLoaded', function() {
+            // Use existing calculator event listeners
+            document.querySelectorAll('input[name="service"]').forEach(radio => {
+                radio.addEventListener('change', handleServiceChange);
+            });
+            
+            document.getElementById('boatLength').addEventListener('input', calculatePrice);
+            document.getElementById('paintCondition').addEventListener('change', calculatePrice);
+            document.getElementById('growthLevel').addEventListener('change', calculatePrice);
+            
+            calculatePrice();
+            loadRecentCustomers();
+        });
+
+        // Load recent customers on page load
+        async function loadRecentCustomers() {
+            try {
+                const response = await fetch('/api/stripe-customers?limit=10');
+                const data = await response.json();
+                customers = data.customers || [];
+                displayCustomers(customers);
+            } catch (error) {
+                console.error('Error loading customers:', error);
+                document.getElementById('customerList').innerHTML = 
+                    '<div style="padding: 10px; color: #666;">Error loading customers</div>';
+            }
+        }
+
+        // Search customers
+        async function searchCustomers() {
+            const query = document.getElementById('customerSearch').value;
+            if (!query) {
+                loadRecentCustomers();
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/stripe-customers?search=${encodeURIComponent(query)}`);
+                const data = await response.json();
+                customers = data.customers || [];
+                displayCustomers(customers);
+            } catch (error) {
+                console.error('Error searching customers:', error);
+            }
+        }
+
+        // Display customer list
+        function displayCustomers(customerList) {
+            const listEl = document.getElementById('customerList');
+            if (customerList.length === 0) {
+                listEl.innerHTML = '<div style="padding: 10px; color: #666;">No customers found</div>';
+                return;
+            }
+
+            listEl.innerHTML = customerList.map(customer => `
+                <div class="customer-item" onclick="selectCustomer('${customer.id}')">
+                    <div><strong>${customer.name || 'No name'}</strong></div>
+                    <div class="customer-info">${customer.email}</div>
+                    <div class="customer-info">Payment: ${customer.payment_method ? '✓ On file' : '✗ None'}</div>
+                </div>
+            `).join('');
+        }
+
+        // Select a customer
+        function selectCustomer(customerId) {
+            selectedCustomer = customers.find(c => c.id === customerId);
+            
+            // Update UI
+            document.querySelectorAll('.customer-item').forEach(el => {
+                el.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+            
+            // Show selected customer
+            document.getElementById('selectedCustomer').style.display = 'block';
+            document.getElementById('selectedCustomerName').textContent = 
+                `${selectedCustomer.name || 'No name'} (${selectedCustomer.email})`;
+            
+            updateChargeSummary();
+        }
+
+        // Update charge summary
+        function updateChargeSummary() {
+            if (!selectedCustomer) {
+                document.getElementById('chargeSummary').innerHTML = 'Select a customer and configure service details';
+                document.getElementById('chargeButton').disabled = true;
+                return;
+            }
+
+            const price = parseFloat(document.querySelector('.total-price')?.textContent.replace('$', '') || '0');
+            const service = document.querySelector('input[name="service"]:checked').value;
+            
+            document.getElementById('chargeSummary').innerHTML = `
+                <div><strong>Customer:</strong> ${selectedCustomer.name || 'No name'} (${selectedCustomer.email})</div>
+                <div><strong>Service:</strong> ${service.replace('_', ' ').toUpperCase()}</div>
+                <div><strong>Amount:</strong> $${price.toFixed(2)}</div>
+                <div style="margin-top: 10px; color: ${selectedCustomer.payment_method ? 'green' : 'red'}">
+                    ${selectedCustomer.payment_method ? '✓ Payment method on file' : '✗ No payment method on file'}
+                </div>
+            `;
+            
+            document.getElementById('chargeButton').disabled = !selectedCustomer.payment_method || price === 0;
+        }
+
+        // Override the calculatePrice function to also update charge summary
+        const originalCalculatePrice = calculatePrice;
+        calculatePrice = function() {
+            originalCalculatePrice();
+            updateChargeSummary();
+        };
+
+        // Charge the customer
+        async function chargeCustomer() {
+            if (!selectedCustomer || !selectedCustomer.payment_method) {
+                alert('Please select a customer with a payment method on file');
+                return;
+            }
+
+            const button = document.getElementById('chargeButton');
+            const originalText = button.innerHTML;
+            button.innerHTML = 'Processing... <span class="loading"></span>';
+            button.disabled = true;
+
+            const price = parseFloat(document.querySelector('.total-price')?.textContent.replace('$', '') || '0');
+            const service = document.querySelector('input[name="service"]:checked').value;
+            const boatLength = document.getElementById('boatLength').value;
+
+            try {
+                const response = await fetch('/api/charge-customer', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        customerId: selectedCustomer.id,
+                        amount: Math.round(price * 100), // Convert to cents
+                        description: `${service.replace('_', ' ')} - ${boatLength}ft boat`,
+                        metadata: {
+                            service: service,
+                            boat_length: boatLength,
+                            paint_condition: document.getElementById('paintCondition')?.value,
+                            growth_level: document.getElementById('growthLevel')?.value
+                        }
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    showResult('success', `Successfully charged $${price.toFixed(2)} to ${selectedCustomer.name || selectedCustomer.email}. Payment ID: ${result.paymentIntent.id}`);
+                    
+                    // Reset form
+                    setTimeout(() => {
+                        selectedCustomer = null;
+                        document.getElementById('selectedCustomer').style.display = 'none';
+                        document.querySelectorAll('.customer-item').forEach(el => el.classList.remove('selected'));
+                        updateChargeSummary();
+                    }, 3000);
+                } else {
+                    showResult('error', `Payment failed: ${result.error}`);
+                }
+            } catch (error) {
+                showResult('error', `Error processing payment: ${error.message}`);
+            } finally {
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }
+        }
+
+        // Show result message
+        function showResult(type, message) {
+            const resultEl = document.getElementById('chargeResult');
+            resultEl.className = `charge-result ${type}`;
+            resultEl.innerHTML = message;
+            resultEl.style.display = 'block';
+            
+            setTimeout(() => {
+                resultEl.style.display = 'none';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
