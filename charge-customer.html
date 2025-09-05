@@ -6,145 +6,309 @@
     <title>Admin - Charge Customer | Sailor Skills</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        .admin-header {
-            background: #ff4444;
+        /* Admin specific styles */
+        .admin-badge {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
             color: white;
-            padding: 10px;
-            text-align: center;
+            padding: 8px 16px;
             font-weight: bold;
+            text-align: center;
+            position: fixed;
+            top: 0;
+            right: 20px;
+            z-index: 1000;
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 2px 10px rgba(231, 76, 60, 0.3);
+        }
+
+        /* Customer selector styles matching the main design */
+        .customer-section {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .customer-section h3 {
+            color: #1e3a5f;
+            margin-bottom: 20px;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .customer-section h3::before {
+            content: '👥';
+            font-size: 24px;
+        }
+
+        .customer-controls {
+            display: flex;
+            gap: 10px;
             margin-bottom: 20px;
         }
-        .customer-selector {
+
+        .customer-search-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .customer-search-input:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .customer-btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .customer-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .customer-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 2px solid #f0f0f0;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+
+        .customer-item {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .customer-item:last-child {
+            border-bottom: none;
+        }
+
+        .customer-item:hover {
+            background: linear-gradient(to right, rgba(52, 152, 219, 0.05), rgba(52, 152, 219, 0.02));
+        }
+
+        .customer-item.selected {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+        }
+
+        .customer-name {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .customer-email {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .customer-payment {
+            display: inline-block;
+            margin-top: 5px;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .customer-payment.has-card {
+            background: rgba(46, 204, 113, 0.2);
+            color: #27ae60;
+        }
+
+        .customer-payment.no-card {
+            background: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+        }
+
+        .customer-item.selected .customer-payment {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+
+        .selected-customer-display {
+            margin-top: 20px;
+            padding: 15px;
+            background: linear-gradient(to right, rgba(52, 152, 219, 0.1), rgba(52, 152, 219, 0.05));
+            border-radius: 8px;
+            border: 2px solid #3498db;
+            display: none;
+        }
+
+        .selected-customer-display.active {
+            display: block;
+        }
+
+        /* Charge summary matching the price display style */
+        .charge-summary {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            padding: 25px;
+            border-radius: 12px;
+            margin-top: 30px;
+            border: 2px solid #dee2e6;
+        }
+
+        .charge-summary h3 {
+            color: #1e3a5f;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+
+        .charge-details {
             background: white;
             padding: 20px;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             margin-bottom: 20px;
         }
-        .customer-selector h3 {
-            margin-top: 0;
-            color: #333;
-        }
-        .customer-search {
+
+        .charge-detail-row {
             display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e0e0e0;
         }
-        .customer-search input {
-            flex: 1;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+
+        .charge-detail-row:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-top: 10px;
+            font-size: 20px;
+            font-weight: bold;
+            color: #1e3a5f;
         }
-        .customer-search button {
-            padding: 10px 20px;
-            background: #007bff;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        .customer-list {
-            max-height: 200px;
-            overflow-y: auto;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        .customer-item {
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .customer-item:hover {
-            background: #f5f5f5;
-        }
-        .customer-item.selected {
-            background: #007bff;
-            color: white;
-        }
-        .customer-info {
-            font-size: 12px;
-            color: #666;
-        }
-        .customer-item.selected .customer-info {
-            color: #ddd;
-        }
-        .charge-summary {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 20px;
-        }
+
         .charge-button {
-            background: #28a745;
-            color: white;
-            padding: 12px 30px;
-            border: none;
-            border-radius: 4px;
-            font-size: 16px;
-            cursor: pointer;
             width: 100%;
-            margin-top: 10px;
+            padding: 18px;
+            background: linear-gradient(135deg, #27ae60, #229954);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
+
+        .charge-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(39, 174, 96, 0.3);
+        }
+
         .charge-button:disabled {
-            background: #6c757d;
+            background: #95a5a6;
             cursor: not-allowed;
+            transform: none;
         }
+
+        .charge-button.processing {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+        }
+
+        /* Result messages */
         .charge-result {
             margin-top: 20px;
-            padding: 15px;
-            border-radius: 8px;
+            padding: 20px;
+            border-radius: 12px;
             display: none;
+            animation: slideIn 0.3s ease;
         }
+
         .charge-result.success {
-            background: #d4edda;
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            border: 2px solid #28a745;
             color: #155724;
-            border: 1px solid #c3e6cb;
         }
+
         .charge-result.error {
-            background: #f8d7da;
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            border: 2px solid #dc3545;
             color: #721c24;
-            border: 1px solid #f5c6cb;
         }
-        .loading {
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-10px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .loading-spinner {
             display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #007bff;
+            width: 16px;
+            height: 16px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
             border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-left: 10px;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
         }
+
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .no-customers {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
         }
     </style>
 </head>
 <body>
-    <div class="admin-header">
-        ADMIN MODE - Charge Existing Customer
-    </div>
+    <div class="admin-badge">ADMIN MODE</div>
+    
     <div class="container">
-        <h1>Charge Customer for Diving Services</h1>
+        <h1>⚓ Charge Customer for Diving Services</h1>
+        <p class="subtitle">Use the same pricing calculator to charge existing customers</p>
         
-        <!-- Customer Selector -->
-        <div class="customer-selector">
+        <!-- Customer Selector Section -->
+        <div class="customer-section">
             <h3>Select Customer</h3>
-            <div class="customer-search">
-                <input type="text" id="customerSearch" placeholder="Search by name or email...">
-                <button onclick="searchCustomers()">Search</button>
-                <button onclick="loadRecentCustomers()">Load Recent</button>
+            <div class="customer-controls">
+                <input type="text" 
+                       id="customerSearch" 
+                       class="customer-search-input"
+                       placeholder="Search by name or email...">
+                <button onclick="searchCustomers()" class="customer-btn">Search</button>
+                <button onclick="loadRecentCustomers()" class="customer-btn">Show Recent</button>
             </div>
-            <div id="customerList" class="customer-list"></div>
-            <div id="selectedCustomer" style="margin-top: 10px; display: none;">
-                <strong>Selected:</strong> <span id="selectedCustomerName"></span>
+            <div id="customerList" class="customer-list">
+                <div class="no-customers">Loading customers...</div>
+            </div>
+            <div id="selectedCustomer" class="selected-customer-display">
+                <strong>Selected Customer:</strong> 
+                <span id="selectedCustomerInfo"></span>
             </div>
         </div>
 
-        <!-- Service Calculator (same as customer version) -->
+        <!-- Service Calculator (reusing existing elements) -->
         <div class="service-selector">
             <h3>Select Service Type</h3>
             <div class="service-options">
@@ -212,10 +376,14 @@
             <div class="price-breakdown" id="priceBreakdown"></div>
         </div>
 
-        <!-- Charge Summary -->
+        <!-- Charge Summary Section -->
         <div class="charge-summary">
-            <h3>Charge Summary</h3>
-            <div id="chargeSummary">Select a customer and configure service details</div>
+            <h3>💳 Charge Summary</h3>
+            <div class="charge-details" id="chargeDetails">
+                <div style="text-align: center; color: #7f8c8d;">
+                    Select a customer and configure service details
+                </div>
+            </div>
             <button id="chargeButton" class="charge-button" onclick="chargeCustomer()" disabled>
                 Charge Customer
             </button>
@@ -230,117 +398,186 @@
         let selectedCustomer = null;
         let customers = [];
 
-        // Initialize the calculator
+        // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
-            // Use existing calculator event listeners
+            // Set up event listeners for the calculator
             document.querySelectorAll('input[name="service"]').forEach(radio => {
-                radio.addEventListener('change', handleServiceChange);
+                radio.addEventListener('change', function() {
+                    handleServiceChange();
+                    updateChargeSummary();
+                });
             });
             
-            document.getElementById('boatLength').addEventListener('input', calculatePrice);
-            document.getElementById('paintCondition').addEventListener('change', calculatePrice);
-            document.getElementById('growthLevel').addEventListener('change', calculatePrice);
+            document.getElementById('boatLength').addEventListener('input', function() {
+                calculatePrice();
+                updateChargeSummary();
+            });
             
+            document.getElementById('paintCondition')?.addEventListener('change', function() {
+                calculatePrice();
+                updateChargeSummary();
+            });
+            
+            document.getElementById('growthLevel')?.addEventListener('change', function() {
+                calculatePrice();
+                updateChargeSummary();
+            });
+
+            // Add enter key support for search
+            document.getElementById('customerSearch').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    searchCustomers();
+                }
+            });
+            
+            // Initial calculations
             calculatePrice();
             loadRecentCustomers();
         });
 
-        // Load recent customers on page load
+        // Load recent customers
         async function loadRecentCustomers() {
+            const listEl = document.getElementById('customerList');
+            listEl.innerHTML = '<div class="no-customers">Loading customers...</div>';
+            
             try {
-                const response = await fetch('/api/stripe-customers?limit=10');
+                const response = await fetch('http://localhost:3001/api/stripe-customers?limit=10');
                 const data = await response.json();
                 customers = data.customers || [];
                 displayCustomers(customers);
             } catch (error) {
                 console.error('Error loading customers:', error);
-                document.getElementById('customerList').innerHTML = 
-                    '<div style="padding: 10px; color: #666;">Error loading customers</div>';
+                listEl.innerHTML = '<div class="no-customers">Error loading customers. Check console.</div>';
             }
         }
 
         // Search customers
         async function searchCustomers() {
-            const query = document.getElementById('customerSearch').value;
+            const query = document.getElementById('customerSearch').value.trim();
             if (!query) {
                 loadRecentCustomers();
                 return;
             }
 
+            const listEl = document.getElementById('customerList');
+            listEl.innerHTML = '<div class="no-customers">Searching...</div>';
+
             try {
-                const response = await fetch(`/api/stripe-customers?search=${encodeURIComponent(query)}`);
+                const response = await fetch(`http://localhost:3001/api/stripe-customers?search=${encodeURIComponent(query)}`);
                 const data = await response.json();
                 customers = data.customers || [];
                 displayCustomers(customers);
             } catch (error) {
                 console.error('Error searching customers:', error);
+                listEl.innerHTML = '<div class="no-customers">Error searching. Check console.</div>';
             }
         }
 
         // Display customer list
         function displayCustomers(customerList) {
             const listEl = document.getElementById('customerList');
-            if (customerList.length === 0) {
-                listEl.innerHTML = '<div style="padding: 10px; color: #666;">No customers found</div>';
+            
+            if (!customerList || customerList.length === 0) {
+                listEl.innerHTML = '<div class="no-customers">No customers found</div>';
                 return;
             }
 
             listEl.innerHTML = customerList.map(customer => `
-                <div class="customer-item" onclick="selectCustomer('${customer.id}')">
-                    <div><strong>${customer.name || 'No name'}</strong></div>
-                    <div class="customer-info">${customer.email}</div>
-                    <div class="customer-info">Payment: ${customer.payment_method ? '✓ On file' : '✗ None'}</div>
+                <div class="customer-item" onclick="selectCustomer('${customer.id}', event)">
+                    <div class="customer-name">${customer.name || 'Unnamed Customer'}</div>
+                    <div class="customer-email">${customer.email}</div>
+                    <span class="customer-payment ${customer.payment_method ? 'has-card' : 'no-card'}">
+                        ${customer.payment_method ? '✓ Card on file' : '✗ No payment method'}
+                    </span>
                 </div>
             `).join('');
+
+            // Re-select if a customer was already selected
+            if (selectedCustomer) {
+                const selectedEl = document.querySelector(`[onclick*="${selectedCustomer.id}"]`);
+                if (selectedEl) {
+                    selectedEl.classList.add('selected');
+                }
+            }
         }
 
         // Select a customer
-        function selectCustomer(customerId) {
+        function selectCustomer(customerId, event) {
             selectedCustomer = customers.find(c => c.id === customerId);
+            
+            if (!selectedCustomer) return;
             
             // Update UI
             document.querySelectorAll('.customer-item').forEach(el => {
                 el.classList.remove('selected');
             });
-            event.currentTarget.classList.add('selected');
             
-            // Show selected customer
-            document.getElementById('selectedCustomer').style.display = 'block';
-            document.getElementById('selectedCustomerName').textContent = 
-                `${selectedCustomer.name || 'No name'} (${selectedCustomer.email})`;
+            if (event && event.currentTarget) {
+                event.currentTarget.classList.add('selected');
+            }
+            
+            // Show selected customer info
+            const selectedDisplay = document.getElementById('selectedCustomer');
+            selectedDisplay.classList.add('active');
+            document.getElementById('selectedCustomerInfo').textContent = 
+                `${selectedCustomer.name || 'Unnamed'} (${selectedCustomer.email}) - ${
+                    selectedCustomer.payment_method ? 'Card ending in ' + selectedCustomer.payment_method.card.last4 : 'No card on file'
+                }`;
             
             updateChargeSummary();
         }
 
         // Update charge summary
         function updateChargeSummary() {
+            const chargeDetails = document.getElementById('chargeDetails');
+            const chargeButton = document.getElementById('chargeButton');
+            
             if (!selectedCustomer) {
-                document.getElementById('chargeSummary').innerHTML = 'Select a customer and configure service details';
-                document.getElementById('chargeButton').disabled = true;
+                chargeDetails.innerHTML = `
+                    <div style="text-align: center; color: #7f8c8d;">
+                        Select a customer and configure service details
+                    </div>
+                `;
+                chargeButton.disabled = true;
                 return;
             }
 
-            const price = parseFloat(document.querySelector('.total-price')?.textContent.replace('$', '') || '0');
-            const service = document.querySelector('input[name="service"]:checked').value;
-            
-            document.getElementById('chargeSummary').innerHTML = `
-                <div><strong>Customer:</strong> ${selectedCustomer.name || 'No name'} (${selectedCustomer.email})</div>
-                <div><strong>Service:</strong> ${service.replace('_', ' ').toUpperCase()}</div>
-                <div><strong>Amount:</strong> $${price.toFixed(2)}</div>
-                <div style="margin-top: 10px; color: ${selectedCustomer.payment_method ? 'green' : 'red'}">
-                    ${selectedCustomer.payment_method ? '✓ Payment method on file' : '✗ No payment method on file'}
+            const priceElement = document.querySelector('.total-price');
+            const price = priceElement ? parseFloat(priceElement.textContent.replace('$', '')) : 0;
+            const service = document.querySelector('input[name="service"]:checked');
+            const serviceName = service ? service.parentElement.querySelector('.service-title').textContent : '';
+
+            chargeDetails.innerHTML = `
+                <div class="charge-detail-row">
+                    <span>Customer:</span>
+                    <span>${selectedCustomer.name || 'Unnamed'}</span>
+                </div>
+                <div class="charge-detail-row">
+                    <span>Email:</span>
+                    <span>${selectedCustomer.email}</span>
+                </div>
+                <div class="charge-detail-row">
+                    <span>Payment Method:</span>
+                    <span style="color: ${selectedCustomer.payment_method ? '#27ae60' : '#e74c3c'}">
+                        ${selectedCustomer.payment_method ? 
+                            `Card ending in ${selectedCustomer.payment_method.card.last4}` : 
+                            'No card on file'}
+                    </span>
+                </div>
+                <div class="charge-detail-row">
+                    <span>Service:</span>
+                    <span>${serviceName}</span>
+                </div>
+                <div class="charge-detail-row">
+                    <span>Total Amount:</span>
+                    <span>$${price.toFixed(2)}</span>
                 </div>
             `;
             
-            document.getElementById('chargeButton').disabled = !selectedCustomer.payment_method || price === 0;
+            chargeButton.disabled = !selectedCustomer.payment_method || price === 0;
+            chargeButton.textContent = selectedCustomer.payment_method ? 
+                `Charge $${price.toFixed(2)}` : 'No Payment Method Available';
         }
-
-        // Override the calculatePrice function to also update charge summary
-        const originalCalculatePrice = calculatePrice;
-        calculatePrice = function() {
-            originalCalculatePrice();
-            updateChargeSummary();
-        };
 
         // Charge the customer
         async function chargeCustomer() {
@@ -351,15 +588,17 @@
 
             const button = document.getElementById('chargeButton');
             const originalText = button.innerHTML;
-            button.innerHTML = 'Processing... <span class="loading"></span>';
+            button.innerHTML = 'Processing... <span class="loading-spinner"></span>';
+            button.classList.add('processing');
             button.disabled = true;
 
-            const price = parseFloat(document.querySelector('.total-price')?.textContent.replace('$', '') || '0');
+            const priceElement = document.querySelector('.total-price');
+            const price = priceElement ? parseFloat(priceElement.textContent.replace('$', '')) : 0;
             const service = document.querySelector('input[name="service"]:checked').value;
             const boatLength = document.getElementById('boatLength').value;
 
             try {
-                const response = await fetch('/api/charge-customer', {
+                const response = await fetch('http://localhost:3001/api/charge-customer', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -380,23 +619,28 @@
                 const result = await response.json();
                 
                 if (result.success) {
-                    showResult('success', `Successfully charged $${price.toFixed(2)} to ${selectedCustomer.name || selectedCustomer.email}. Payment ID: ${result.paymentIntent.id}`);
+                    showResult('success', 
+                        `✅ Successfully charged $${price.toFixed(2)} to ${selectedCustomer.name || selectedCustomer.email}<br>
+                         Payment ID: ${result.paymentIntent.id}`);
                     
-                    // Reset form
+                    // Reset selection after success
                     setTimeout(() => {
                         selectedCustomer = null;
-                        document.getElementById('selectedCustomer').style.display = 'none';
-                        document.querySelectorAll('.customer-item').forEach(el => el.classList.remove('selected'));
+                        document.getElementById('selectedCustomer').classList.remove('active');
+                        document.querySelectorAll('.customer-item').forEach(el => {
+                            el.classList.remove('selected');
+                        });
                         updateChargeSummary();
                     }, 3000);
                 } else {
-                    showResult('error', `Payment failed: ${result.error}`);
+                    showResult('error', `❌ Payment failed: ${result.error}`);
                 }
             } catch (error) {
-                showResult('error', `Error processing payment: ${error.message}`);
+                showResult('error', `❌ Error processing payment: ${error.message}`);
             } finally {
                 button.innerHTML = originalText;
-                button.disabled = false;
+                button.classList.remove('processing');
+                updateChargeSummary();
             }
         }
 
