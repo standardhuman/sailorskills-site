@@ -311,36 +311,10 @@
         <!-- Service Calculator (reusing existing elements) -->
         <div class="service-selector">
             <h3>Select Service Type</h3>
-            <div class="service-options">
-                <label class="service-option">
-                    <input type="radio" name="service" value="recurring" checked>
-                    <span class="service-content">
-                        <span class="service-title">⚡ Recurring Cleaning</span>
-                        <span class="service-description">Regular maintenance keeps your boat performing at its best</span>
-                    </span>
-                </label>
-                <label class="service-option">
-                    <input type="radio" name="service" value="one_time">
-                    <span class="service-content">
-                        <span class="service-title">🧽 One-Time Cleaning</span>
-                        <span class="service-description">Thorough cleaning to restore your hull's condition</span>
-                    </span>
-                </label>
-                <label class="service-option">
-                    <input type="radio" name="service" value="recovery">
-                    <span class="service-content">
-                        <span class="service-title">🔍 Item Recovery</span>
-                        <span class="service-description">Lost something overboard? We'll find it</span>
-                    </span>
-                </label>
-                <label class="service-option">
-                    <input type="radio" name="service" value="inspection">
-                    <span class="service-content">
-                        <span class="service-title">📋 Underwater Inspection</span>
-                        <span class="service-description">Comprehensive assessment with photo documentation</span>
-                    </span>
-                </label>
+            <div class="service-selection-grid" id="serviceButtons">
+                <!-- Service buttons will be populated by JS -->
             </div>
+            <p class="variable-info" id="servicePriceExplainer" style="margin-top: 15px;">Select a service to see its description.</p>
         </div>
 
         <div class="boat-details">
@@ -393,33 +367,41 @@
         <div id="chargeResult" class="charge-result"></div>
     </div>
 
-    <script src="script.js"></script>
-    <script>
+    <script src="script.js" type="module"></script>
+    <script type="module">
         let selectedCustomer = null;
         let customers = [];
 
-        // Initialize on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            // Set up event listeners for the calculator
-            document.querySelectorAll('input[name="service"]').forEach(radio => {
-                radio.addEventListener('change', function() {
-                    handleServiceChange();
-                    updateChargeSummary();
-                });
-            });
+        // Wait for script.js to load completely
+        function initializePage() {
+            // Populate service buttons from script.js
+            if (window.populateServiceButtons) {
+                window.populateServiceButtons();
+            } else {
+                // Retry if not loaded yet
+                setTimeout(initializePage, 100);
+                return;
+            }
             
+            // Set up event listeners for the calculator
             document.getElementById('boatLength').addEventListener('input', function() {
-                calculatePrice();
+                if (window.calculateCost) {
+                    window.calculateCost();
+                }
                 updateChargeSummary();
             });
             
             document.getElementById('paintCondition')?.addEventListener('change', function() {
-                calculatePrice();
+                if (window.calculateCost) {
+                    window.calculateCost();
+                }
                 updateChargeSummary();
             });
             
             document.getElementById('growthLevel')?.addEventListener('change', function() {
-                calculatePrice();
+                if (window.calculateCost) {
+                    window.calculateCost();
+                }
                 updateChargeSummary();
             });
 
@@ -431,8 +413,15 @@
             });
             
             // Initial calculations
-            calculatePrice();
+            if (window.calculateCost) {
+                window.calculateCost();
+            }
             loadRecentCustomers();
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            initializePage();
         });
 
         // Load recent customers

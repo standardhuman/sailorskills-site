@@ -1020,3 +1020,8 @@ function showCheckout() {
     // Scroll to top
     window.scrollTo(0, 0);
 } 
+// Export functions for use in charge-customer.html
+window.populateServiceButtons = populateServiceButtons;
+window.calculateCost = calculateCost;
+window.selectService = selectService;
+window.serviceData = serviceData;
