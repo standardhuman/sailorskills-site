@@ -1,0 +1,154 @@
+/* Navigation Header */
+.navigation-header {
+  background: white;
+  border-bottom: 1px solid #e1e8ed;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.nav-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+}
+
+.nav-logo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #2c3e50;
+  text-decoration: none;
+  letter-spacing: 1px;
+}
+
+.nav-links {
+  display: flex;
+  gap: 2rem;
+}
+
+.nav-links a,
+.nav-link {
+  color: #5a6c7d;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+  font-size: 0.95rem;
+  letter-spacing: 0.5px;
+}
+
+.nav-links a:hover,
+.nav-link:hover {
+  color: #3498db;
+}
+
+.nav-links a.active {
+  color: #2980b9;
+  font-weight: 600;
+}
+
+/* Homepage */
+.homepage {
+  min-height: 100vh;
+  background: #f8f9fa;
+}
+
+.hero-header {
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+  color: white;
+  padding: 4rem 2rem;
+  text-align: center;
+}
+
+.hero-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.hero-brand {
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: 2px;
+  opacity: 0.9;
+  margin-bottom: 1rem;
+}
+
+.hero-service {
+  font-size: 3rem;
+  font-weight: 300;
+  margin: 0.5rem 0;
+  letter-spacing: 1px;
+}
+
+.hero-tagline {
+  font-size: 1.2rem;
+  font-weight: 400;
+  opacity: 0.95;
+  letter-spacing: 1px;
+}
+
+/* Services Container */
+.services-container {
+  max-width: 1200px;
+  margin: -3rem auto 0;
+  padding: 0 2rem 4rem;
+  position: relative;
+}
+
+.services-container h2 {
+  text-align: center;
+  color: #2c3e50;
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  font-weight: 400;
+}
+
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.service-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.service-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  border-color: #3498db;
+}
+
+.service-card h3 {
+  color: #2c3e50;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+
+.service-card p {
+  color: #5a6c7d;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.service-link {
+  color: #3498db;
+  text-decoration: none;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  transition: color 0.3s ease;
+}
+
+.service-link:hover {
+  color: #2980b9;
+}

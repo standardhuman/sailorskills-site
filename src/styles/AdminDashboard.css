@@ -1,0 +1,606 @@
+.admin-dashboard {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.admin-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.admin-header h1 {
+  font-size: 2.5rem;
+  color: #2c3e50;
+  font-weight: 300;
+}
+
+/* Admin Tabs */
+.admin-tabs {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  border-bottom: 2px solid #e1e8ed;
+  padding-bottom: 0;
+}
+
+.admin-tabs button {
+  padding: 0.75rem 1.5rem;
+  background: none;
+  border: none;
+  color: #7f8c8d;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+}
+
+.admin-tabs button:hover {
+  color: #3498db;
+}
+
+.admin-tabs button.active {
+  color: #2980b9;
+  border-bottom-color: #2980b9;
+  font-weight: 600;
+}
+
+/* Admin Content */
+.admin-content {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  min-height: 500px;
+}
+
+/* Bookings Section */
+.bookings-section h2 {
+  color: #2c3e50;
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+  font-weight: 400;
+}
+
+.bookings-table {
+  overflow-x: auto;
+}
+
+.bookings-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.bookings-table th {
+  background: #f8f9fa;
+  color: #2c3e50;
+  font-weight: 600;
+  text-align: left;
+  padding: 1rem;
+  border-bottom: 2px solid #e1e8ed;
+}
+
+.bookings-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #e1e8ed;
+  color: #5a6c7d;
+}
+
+.customer-info {
+  line-height: 1.4;
+}
+
+.customer-contact {
+  font-size: 0.9rem;
+  color: #95a5a6;
+}
+
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  display: inline-block;
+}
+
+.status-confirmed {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-pending {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status-cancelled {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.status-completed {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+.status-select {
+  padding: 0.25rem 0.5rem;
+  border: 1px solid #e1e8ed;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+/* Services Section */
+.services-section h2 {
+  color: #2c3e50;
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+  font-weight: 400;
+}
+
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.service-admin-card {
+  background: #f8f9fa;
+  border: 2px solid #e1e8ed;
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.service-admin-card:hover {
+  border-color: #3498db;
+  cursor: pointer;
+}
+
+.service-display h3 {
+  color: #2c3e50;
+  font-size: 1.3rem;
+  margin-bottom: 0.5rem;
+}
+
+.service-display p {
+  color: #5a6c7d;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+}
+
+.service-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.95rem;
+}
+
+.service-meta span {
+  padding: 0.25rem 0.5rem;
+  background: white;
+  border-radius: 4px;
+}
+
+.service-meta .active {
+  color: #27ae60;
+  background: #d4edda;
+}
+
+.service-meta .inactive {
+  color: #c0392b;
+  background: #f8d7da;
+}
+
+/* Service Edit Form */
+.service-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.service-edit-form input,
+.service-edit-form textarea {
+  padding: 0.75rem;
+  border: 2px solid #e1e8ed;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: inherit;
+}
+
+.service-edit-form input:focus,
+.service-edit-form textarea:focus {
+  outline: none;
+  border-color: #3498db;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.button-group {
+  display: flex;
+  gap: 1rem;
+}
+
+.btn-save,
+.btn-cancel {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-save {
+  background: #27ae60;
+  color: white;
+}
+
+.btn-save:hover {
+  background: #229954;
+}
+
+.btn-cancel {
+  background: #95a5a6;
+  color: white;
+}
+
+.btn-cancel:hover {
+  background: #7f8c8d;
+}
+
+/* Availability Section */
+.availability-section h2 {
+  color: #2c3e50;
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+  font-weight: 400;
+}
+
+.availability-rules,
+.blocked-dates {
+  margin-bottom: 3rem;
+}
+
+.availability-rules h3,
+.blocked-dates h3 {
+  color: #2c3e50;
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+
+.rules-table {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.availability-rule {
+  display: grid;
+  grid-template-columns: 150px 1fr auto;
+  gap: 1rem;
+  align-items: center;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.day-name {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.time-inputs {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.time-inputs input {
+  padding: 0.5rem;
+  border: 2px solid #e1e8ed;
+  border-radius: 6px;
+}
+
+.time-inputs input:disabled {
+  background: #ecf0f1;
+  cursor: not-allowed;
+}
+
+.availability-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.availability-toggle input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+
+/* Blocked Dates */
+.block-date-form {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding: 1.5rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.block-date-form input {
+  padding: 0.75rem;
+  border: 2px solid #e1e8ed;
+  border-radius: 8px;
+  font-size: 1rem;
+  flex: 1;
+}
+
+.block-date-form .btn-primary {
+  padding: 0.75rem 1.5rem;
+  background: #3498db;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.block-date-form .btn-primary:hover {
+  background: #2980b9;
+}
+
+.blocked-dates-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.blocked-date-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: white;
+  border: 1px solid #e1e8ed;
+  border-radius: 8px;
+}
+
+.blocked-date-item .date {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.blocked-date-item .reason {
+  flex: 1;
+  color: #7f8c8d;
+}
+
+.btn-remove {
+  padding: 0.25rem 0.75rem;
+  background: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.btn-remove:hover {
+  background: #c0392b;
+}
+
+/* Calendar View */
+.calendar-section h2 {
+  color: #2c3e50;
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+  font-weight: 400;
+}
+
+.calendar-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.calendar-controls button {
+  padding: 0.5rem 1rem;
+  background: #3498db;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.calendar-controls button:hover {
+  background: #2980b9;
+}
+
+.current-week {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.calendar-day {
+  background: white;
+  border: 1px solid #e1e8ed;
+  border-radius: 8px;
+  min-height: 200px;
+  overflow: hidden;
+}
+
+.calendar-day.blocked {
+  background: #f5f5f5;
+}
+
+.day-header {
+  background: #f8f9fa;
+  padding: 0.5rem;
+  border-bottom: 1px solid #e1e8ed;
+  text-align: center;
+}
+
+.day-name {
+  font-size: 0.9rem;
+  color: #7f8c8d;
+}
+
+.day-date {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.day-bookings {
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.blocked-indicator {
+  text-align: center;
+  color: #7f8c8d;
+  padding: 1rem;
+  font-style: italic;
+}
+
+.booking-slot {
+  padding: 0.5rem;
+  background: #f8f9fa;
+  border-left: 3px solid #3498db;
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
+.booking-slot.status-confirmed {
+  border-left-color: #27ae60;
+  background: #d4edda;
+}
+
+.booking-slot.status-pending {
+  border-left-color: #f39c12;
+  background: #fff3cd;
+}
+
+.booking-slot.status-cancelled {
+  border-left-color: #e74c3c;
+  background: #f8d7da;
+}
+
+.booking-time {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.booking-name {
+  color: #5a6c7d;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.booking-service {
+  font-size: 0.8rem;
+  color: #95a5a6;
+}
+
+/* Loading State */
+.loading {
+  text-align: center;
+  padding: 3rem;
+  color: #7f8c8d;
+  font-size: 1.2rem;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .calendar-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  
+  .calendar-day:nth-child(n+5) {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-dashboard {
+    padding: 1rem;
+  }
+
+  .admin-tabs {
+    flex-wrap: wrap;
+  }
+
+  .admin-tabs button {
+    flex: 1;
+    min-width: 100px;
+  }
+
+  .bookings-table {
+    font-size: 0.9rem;
+  }
+
+  .services-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .availability-rule {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .calendar-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .calendar-day:nth-child(n+2) {
+    display: none;
+  }
+
+  .calendar-day:first-child {
+    display: block;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-header h1 {
+    font-size: 1.8rem;
+  }
+
+  .block-date-form {
+    flex-direction: column;
+  }
+
+  .time-inputs {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
