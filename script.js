@@ -237,7 +237,12 @@ function renderCurrentStep() {
         if (isPerFootService) {
             nextButton.textContent = 'Next (Boat Length)';
         } else if (selectedServiceKey) { // Flat rate service selected
-            nextButton.textContent = 'Next (Anodes)';
+            // For recovery/inspection, go straight to estimate
+            if (selectedServiceKey === 'item_recovery' || selectedServiceKey === 'underwater_inspection') {
+                nextButton.textContent = 'View Estimate';
+            } else {
+                nextButton.textContent = 'Next (Anodes)';
+            }
         } else {
             nextButton.textContent = 'Next'; // Default if no service selected yet
         }
@@ -307,8 +312,14 @@ function handleNextClick() {
 
     // Skip per-foot steps if service is flat rate, ONLY when starting from step 0
     if (serviceType === 'flat' && numericCurrentStep === 0) {
-        nextStep = 7; // Skip directly to Anodes (Step 7)
-        // console.log('handleNextClick - Flat rate service, skipping to step 7. nextStep:', nextStep);
+        // For recovery and inspection services, skip anodes and go straight to results
+        if (selectedServiceKey === 'item_recovery' || selectedServiceKey === 'underwater_inspection') {
+            nextStep = 8; // Skip directly to Results
+            // console.log('handleNextClick - Recovery/Inspection service, skipping to results. nextStep:', nextStep);
+        } else {
+            nextStep = 7; // Skip to Anodes (Step 7) for other flat rate services
+            // console.log('handleNextClick - Flat rate service, skipping to step 7. nextStep:', nextStep);
+        }
     }
     
     currentStep = nextStep;
@@ -333,9 +344,16 @@ function handleBackClick() {
 
     let prevStep = currentStep - 1;
 
-    // If current service is flat rate and we are on Anodes (step 7), going back should skip to Service Selection (step 0)
-    if (serviceType === 'flat' && currentStep === 7) {
-        prevStep = 0;
+    // If current service is flat rate
+    if (serviceType === 'flat') {
+        // If on Anodes (step 7), go back to Service Selection (step 0)
+        if (currentStep === 7) {
+            prevStep = 0;
+        }
+        // If on Results (step 8) for recovery/inspection, go back to Service Selection (step 0)
+        else if (currentStep === 8 && (selectedServiceKey === 'item_recovery' || selectedServiceKey === 'underwater_inspection')) {
+            prevStep = 0;
+        }
     }
     
     currentStep = prevStep;
