@@ -35,19 +35,29 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
-// Fetch Stripe customers
+// Fetch Stripe customers with improved search
 app.get('/api/stripe-customers', async (req, res) => {
   try {
     const { search, limit = 10 } = req.query;
     
     let customers;
     if (search) {
-      // Search customers by email or name
+      // First try Stripe's search API
       customers = await stripe.customers.search({
         query: `email~"${search}" OR name~"${search}"`,
-        limit: parseInt(limit)
+        limit: 100
       });
       customers = customers.data;
+      
+      // If no exact matches, fetch all and do partial matching
+      if (customers.length === 0) {
+        const allCustomers = await stripe.customers.list({
+          limit: 100
+        });
+        
+        // Skip the first pass filtering - we'll check everything including billing details in Step 3
+        customers = allCustomers.data;
+      }
     } else {
       // Get recent customers
       customers = await stripe.customers.list({
@@ -56,24 +66,62 @@ app.get('/api/stripe-customers', async (req, res) => {
       customers = customers.data;
     }
 
-    // Get payment methods for each customer
-    const customersWithPaymentMethods = await Promise.all(
-      customers.map(async (customer) => {
-        const paymentMethods = await stripe.paymentMethods.list({
-          customer: customer.id,
-          type: 'card',
-          limit: 1
-        });
+    // Get payment methods and check billing details
+    const customersWithPaymentMethods = [];
+    
+    for (const customer of customers) {
+      const paymentMethods = await stripe.paymentMethods.list({
+        customer: customer.id,
+        type: 'card',
+        limit: 1
+      });
+      
+      // If searching, also check billing details name
+      let includeCustomer = true;
+      let displayName = customer.name;
+      
+      if (search) {
+        const searchLower = search.toLowerCase();
+        const searchTerms = searchLower.split(' ').filter(term => term.length > 0);
+        const customerName = (customer.name || '').toLowerCase();
+        const customerEmail = (customer.email || '').toLowerCase();
+        const billingName = (paymentMethods.data[0]?.billing_details?.name || '').toLowerCase();
         
-        return {
+        // Check if search matches customer data or billing name
+        const customerMatch = searchTerms.every(term => 
+          customerName.includes(term) || customerEmail.includes(term)
+        );
+        
+        const billingMatch = searchTerms.every(term => 
+          billingName.includes(term)
+        );
+        
+        includeCustomer = customerMatch || billingMatch || 
+                         customerName.includes(searchLower) || 
+                         customerEmail.includes(searchLower) ||
+                         billingName.includes(searchLower);
+        
+        // Use billing name if customer name is empty but billing matches
+        if (!customer.name && billingName && billingMatch) {
+          displayName = paymentMethods.data[0].billing_details.name;
+        }
+      }
+      
+      if (includeCustomer) {
+        customersWithPaymentMethods.push({
           id: customer.id,
-          name: customer.name,
+          name: displayName || paymentMethods.data[0]?.billing_details?.name || 'Unknown',
           email: customer.email,
           payment_method: paymentMethods.data[0] || null,
           created: customer.created
-        };
-      })
-    );
+        });
+      }
+      
+      // Stop if we have enough results
+      if (customersWithPaymentMethods.length >= parseInt(limit)) {
+        break;
+      }
+    }
 
     res.json({ customers: customersWithPaymentMethods });
   } catch (error) {

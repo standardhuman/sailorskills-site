@@ -12,16 +12,16 @@ const serviceData = {
         description: "Complete hull cleaning and zinc anode inspection. Perfect for pre-haul out, pre-survey, or when your regular diver is unavailable."
     },
     item_recovery: { 
-        rate: 150, 
+        rate: 199, 
         name: "Item Recovery", 
         type: 'flat',
         description: "Professional recovery of dropped items like phones, keys, tools, or dinghies. Quick response to minimize water damage."
     },
     underwater_inspection: { 
-        rate: 150, 
+        rate: 4, 
         name: "Underwater Inspection", 
-        type: 'flat',
-        description: "Thorough underwater inspection with detailed photo/video documentation. Ideal for insurance claims, pre-purchase surveys, or damage assessment."
+        type: 'per_foot',
+        description: "Thorough underwater inspection with detailed photo/video documentation. Ideal for insurance claims, pre-purchase surveys, or damage assessment. $4 per foot with $150 minimum."
     }
 };
 const minimumCharge = 100;
@@ -43,7 +43,8 @@ const paintConditions = {
     EXCELLENT: "Excellent",
     GOOD: "Good",
     FAIR: "Fair",
-    POOR: "Poor" // Added Poor condition
+    POOR: "Poor",
+    MISSING: "Missing"
 };
 
 /*
@@ -124,8 +125,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     populateServiceButtons();
     
-    nextButton.addEventListener('click', handleNextClick);
-    backButton.addEventListener('click', handleBackClick);
+    // Only add event listeners if the buttons exist (not on charge-customer page)
+    if (nextButton) {
+        nextButton.addEventListener('click', handleNextClick);
+    }
+    if (backButton) {
+        backButton.addEventListener('click', handleBackClick);
+    }
     
     // Initialize Stripe
     initializeStripe();
@@ -137,11 +143,19 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function populateServiceButtons() {
+    // Skip if serviceButtons element doesn't exist
+    if (!serviceButtons) {
+        console.log('serviceButtons element not found, skipping population');
+        return;
+    }
+    
     // Clear existing buttons if any
     serviceButtons.innerHTML = '';
     
     // Define the order to display services
     const serviceOrder = ['onetime_cleaning', 'recurring_cleaning', 'item_recovery', 'underwater_inspection'];
+    
+    console.log('Populating service buttons with click handlers...');
     
     for (const key of serviceOrder) {
         const service = serviceData[key];
@@ -176,14 +190,18 @@ function populateServiceButtons() {
         }
         
         button.addEventListener('click', function() {
+            console.log('Service button clicked:', key);
             selectService(key);
         });
+        console.log('Added click listener for:', key);
         
         serviceButtons.appendChild(button);
     }
 }
 
 function selectService(serviceKey) {
+    console.log('selectService called with:', serviceKey);
+    
     // Remove selected class from all buttons
     document.querySelectorAll('.service-option').forEach(btn => {
         btn.classList.remove('selected');
@@ -197,17 +215,32 @@ function selectService(serviceKey) {
     
     // Update selected service
     selectedServiceKey = serviceKey;
+    console.log('Set selectedServiceKey to:', selectedServiceKey);
     
     // Update service price explainer
     updateServicePriceExplainer();
+    
+    // Calculate cost for the selected service
+    console.log('About to call calculateCost...');
+    calculateCost();
+    console.log('calculateCost finished');
+    
+    // Update charge summary if on charge-customer page
+    if (typeof window.updateChargeSummary === 'function') {
+        console.log('Calling updateChargeSummary...');
+        window.updateChargeSummary();
+    }
 }
 
 function updateServicePriceExplainer() {
-    if (selectedServiceKey && serviceData[selectedServiceKey]) {
-        const service = serviceData[selectedServiceKey];
-        servicePriceExplainer.textContent = service.description || "Select a service to see its description.";
-    } else {
-        servicePriceExplainer.textContent = "Select a service to see its description.";
+    // Check if servicePriceExplainer exists (might not exist on charge-customer page)
+    if (servicePriceExplainer) {
+        if (selectedServiceKey && serviceData[selectedServiceKey]) {
+            const service = serviceData[selectedServiceKey];
+            servicePriceExplainer.textContent = service.description || "Select a service to see its description.";
+        } else {
+            servicePriceExplainer.textContent = "Select a service to see its description.";
+        }
     }
     renderCurrentStep(); // Add this call to update button states
 }
@@ -215,6 +248,11 @@ function updateServicePriceExplainer() {
 function renderCurrentStep() {
     // console.log('renderCurrentStep - currentStep:', currentStep);
     // console.log('renderCurrentStep - stepElements.length:', stepElements.length);
+    
+    // Skip if we're on a page without step navigation
+    if (!stepElements || stepElements.length === 0) {
+        return;
+    }
     
     stepElements.forEach((stepEl, index) => {
         if (!stepEl) {
@@ -225,15 +263,17 @@ function renderCurrentStep() {
     });
 
     // Button visibility and text
-    backButton.style.display = (currentStep === 0) ? 'none' : 'inline-block';
+    if (backButton) {
+        backButton.style.display = (currentStep === 0) ? 'none' : 'inline-block';
+    }
     
     const totalSteps = stepElements.length;
     const perFootServiceSteps = [1, 2, 3, 4, 5, 6]; // Indices of per-foot only steps
     const isPerFootService = selectedServiceKey && serviceData[selectedServiceKey] && serviceData[selectedServiceKey].type === 'per_foot';
 
-    if (currentStep === totalSteps - 1) { // Last step (Results)
+    if (nextButton && currentStep === totalSteps - 1) { // Last step (Results)
         nextButton.textContent = 'Start Over';
-    } else if (currentStep === 0) {
+    } else if (nextButton && currentStep === 0) {
         if (isPerFootService) {
             nextButton.textContent = 'Next (Boat Length)';
         } else if (selectedServiceKey) { // Flat rate service selected
@@ -246,7 +286,7 @@ function renderCurrentStep() {
         } else {
             nextButton.textContent = 'Next'; // Default if no service selected yet
         }
-    } else if (isPerFootService) {
+    } else if (nextButton && isPerFootService) {
         if (currentStep === 1) nextButton.textContent = 'Next (Boat Type)';
         else if (currentStep === 2) nextButton.textContent = 'Next (Hull Type)';
         else if (currentStep === 3) nextButton.textContent = 'Next (Engine Config)';
@@ -255,7 +295,7 @@ function renderCurrentStep() {
         else if (currentStep === 6) nextButton.textContent = 'Next (Anodes)';
         else if (currentStep === 7) nextButton.textContent = 'View Estimate';
         else nextButton.textContent = 'Next'; // Should not happen in per-foot flow
-    } else { // Flat rate service, and currentStep > 0
+    } else if (nextButton) { // Flat rate service, and currentStep > 0
         if (currentStep === 7) { // Anodes step for flat rate (equivalent of old step-2)
             nextButton.textContent = 'View Estimate';
         } else {
@@ -264,10 +304,10 @@ function renderCurrentStep() {
     }
     
     // Disable Next if no service is selected on the first step
-    if (currentStep === 0 && (!selectedServiceKey || selectedServiceKey === "")) {
+    if (nextButton && currentStep === 0 && (!selectedServiceKey || selectedServiceKey === "")) {
         nextButton.disabled = true;
-         nextButton.textContent = 'Next'; // Reset text if it was 'View Estimate'
-    } else {
+        nextButton.textContent = 'Next'; // Reset text if it was 'View Estimate'
+    } else if (nextButton) {
         nextButton.disabled = false;
     }
 }
@@ -383,8 +423,8 @@ function resetForm() {
     anodesToInstallInput.value = "0";
 
     // Clear results
-    costBreakdownEl.innerText = "";
-    totalCostDisplayEl.innerText = "$0.00";
+    if (costBreakdownEl) costBreakdownEl.innerText = "";
+    if (totalCostDisplayEl) totalCostDisplayEl.innerText = "$0.00";
     if (paintExplainerEl) {
         paintExplainerEl.innerHTML = "The age of your boat's bottom paint helps us estimate its current condition."; // Reset explainer
     }
@@ -431,13 +471,30 @@ function resetForm() {
 
 
 function calculateCost() {
-    // console.log('calculateCost - starting');
+    console.log('calculateCost - starting with selectedServiceKey:', selectedServiceKey);
+    
+    // Re-initialize elements if they're null (for charge-customer page)
+    if (!costBreakdownEl) {
+        costBreakdownEl = document.getElementById('costBreakdown');
+        console.log('Initialized costBreakdownEl:', costBreakdownEl ? 'found' : 'not found');
+    }
+    if (!totalCostDisplayEl) {
+        totalCostDisplayEl = document.getElementById('totalCostDisplay');
+        console.log('Initialized totalCostDisplayEl:', totalCostDisplayEl ? 'found' : 'not found');
+    }
+    if (!twinEnginesCheckbox) {
+        twinEnginesCheckbox = document.getElementById('has_twin_engines');
+        console.log('Initialized twinEnginesCheckbox:', twinEnginesCheckbox ? 'found' : 'not found');
+    }
+    
     if (!selectedServiceKey) {
-        costBreakdownEl.innerText = "Please select a service first.";
-        totalCostDisplayEl.innerText = "$0.00";
+        console.log('No service key selected');
+        if (costBreakdownEl) costBreakdownEl.innerText = "Please select a service first.";
+        if (totalCostDisplayEl) totalCostDisplayEl.innerText = "$0.00";
         return;
     }
     const currentServiceData = serviceData[selectedServiceKey];
+    console.log('Service data for', selectedServiceKey, ':', currentServiceData);
     
     let boatLength = 0;
     let isPowerboat = false;
@@ -449,37 +506,71 @@ function calculateCost() {
     let growthSurchargePercent = 0;
     let estimatedGrowthLevelBaseLabel = ""; 
     
-    costBreakdownEl.innerHTML = ""; // Clear previous results
-    totalCostDisplayEl.innerText = "$0.00"; 
+    if (costBreakdownEl) costBreakdownEl.innerHTML = ""; // Clear previous results
+    if (totalCostDisplayEl) totalCostDisplayEl.innerText = "$0.00"; 
 
-    // --- Determine Paint Condition & Surcharge ---
-    const lastPaintedValue = document.getElementById('lastPaintedTime')?.value;
-    if (lastPaintedValue) {
-        estimatedPaintConditionBaseLabel = getPaintCondition(lastPaintedValue);
-        paintSurchargePercent = getSpecificPaintSurchargePercent(estimatedPaintConditionBaseLabel, lastPaintedValue);
-        if (paintExplainerEl) {
-            paintExplainerEl.innerHTML = `Est. Paint Condition: <strong>${estimatedPaintConditionBaseLabel}</strong>. Potential surcharge: <strong>+${(paintSurchargePercent * 100).toFixed(1)}%</strong>.`;
-        }
-    }
-
-    // --- Determine Growth & Surcharge ---
-    const lastCleanedValue = document.getElementById('lastCleanedTime')?.value;
-    if (lastCleanedValue) {
-        estimatedGrowthLevelBaseLabel = getGrowthLevel(estimatedPaintConditionBaseLabel, lastCleanedValue);
-    growthSurchargePercent = getSpecificGrowthSurchargePercent(estimatedPaintConditionBaseLabel, lastCleanedValue);
+    // Check if we're on the charge-customer page with direct condition dropdowns
+    const actualPaintCondition = document.getElementById('actualPaintCondition');
+    const actualGrowthLevel = document.getElementById('actualGrowthLevel');
     
-    let growthExplainerMsg = `Est. Growth Level: <strong>${estimatedGrowthLevelBaseLabel}</strong>. `;
-    if (estimatedGrowthLevelBaseLabel === estGrowthLabels.MINIMAL || estimatedGrowthLevelBaseLabel === estGrowthLabels.MODERATE) {
-        growthExplainerMsg += `Potential surcharge: <strong>0%</strong>.`;
-    } else if (estimatedGrowthLevelBaseLabel === estGrowthLabels.HEAVY) {
-        growthExplainerMsg += `Potential surcharge: <strong>+25-50%</strong>.`;
-    } else if (estimatedGrowthLevelBaseLabel === estGrowthLabels.SEVERE) {
-        growthExplainerMsg += `Potential surcharge: <strong>+50-100%</strong>.`;
-    }
+    if (actualPaintCondition && actualGrowthLevel) {
+        // Direct condition mode (charge-customer page)
+        const paintValue = actualPaintCondition.value;
+        const growthValue = actualGrowthLevel.value;
+        
+        // Map direct values to labels
+        switch(paintValue) {
+            case 'excellent': estimatedPaintConditionBaseLabel = paintConditions.EXCELLENT; break;
+            case 'good': estimatedPaintConditionBaseLabel = paintConditions.GOOD; break;
+            case 'fair': estimatedPaintConditionBaseLabel = paintConditions.FAIR; break;
+            case 'poor': estimatedPaintConditionBaseLabel = paintConditions.POOR; break;
+            case 'missing': estimatedPaintConditionBaseLabel = paintConditions.MISSING; break;
+            default: estimatedPaintConditionBaseLabel = paintConditions.GOOD;
+        }
+        
+        switch(growthValue) {
+            case 'minimal': estimatedGrowthLevelBaseLabel = estGrowthLabels.MINIMAL; break;
+            case 'moderate': estimatedGrowthLevelBaseLabel = estGrowthLabels.MODERATE; break;
+            case 'heavy': estimatedGrowthLevelBaseLabel = estGrowthLabels.HEAVY; break;
+            case 'severe': estimatedGrowthLevelBaseLabel = estGrowthLabels.SEVERE; break;
+            default: estimatedGrowthLevelBaseLabel = estGrowthLabels.MINIMAL;
+        }
+        
+        // Use direct surcharge functions
+        paintSurchargePercent = getDirectPaintSurcharge(estimatedPaintConditionBaseLabel);
+        growthSurchargePercent = getDirectGrowthSurcharge(estimatedGrowthLevelBaseLabel);
+        
+    } else {
+        // Time-based estimation mode (regular calculator)
+        // --- Determine Paint Condition & Surcharge ---
+        const lastPaintedValue = document.getElementById('lastPaintedTime')?.value;
+        if (lastPaintedValue) {
+            estimatedPaintConditionBaseLabel = getPaintCondition(lastPaintedValue);
+            paintSurchargePercent = getSpecificPaintSurchargePercent(estimatedPaintConditionBaseLabel, lastPaintedValue);
+            if (paintExplainerEl) {
+                paintExplainerEl.innerHTML = `Est. Paint Condition: <strong>${estimatedPaintConditionBaseLabel}</strong>. Potential surcharge: <strong>+${(paintSurchargePercent * 100).toFixed(1)}%</strong>.`;
+            }
+        }
 
-    if (growthExplainerEl) {
-        growthExplainerEl.innerHTML = growthExplainerMsg;
-    }
+        // --- Determine Growth & Surcharge ---
+        const lastCleanedValue = document.getElementById('lastCleanedTime')?.value;
+        if (lastCleanedValue) {
+            estimatedGrowthLevelBaseLabel = getGrowthLevel(estimatedPaintConditionBaseLabel, lastCleanedValue);
+            growthSurchargePercent = getSpecificGrowthSurchargePercent(estimatedPaintConditionBaseLabel, lastCleanedValue);
+            
+            let growthExplainerMsg = `Est. Growth Level: <strong>${estimatedGrowthLevelBaseLabel}</strong>. `;
+            if (estimatedGrowthLevelBaseLabel === estGrowthLabels.MINIMAL || estimatedGrowthLevelBaseLabel === estGrowthLabels.MODERATE) {
+                growthExplainerMsg += `Potential surcharge: <strong>0%</strong>.`;
+            } else if (estimatedGrowthLevelBaseLabel === estGrowthLabels.HEAVY) {
+                growthExplainerMsg += `Potential surcharge: <strong>+25-50%</strong>.`;
+            } else if (estimatedGrowthLevelBaseLabel === estGrowthLabels.SEVERE) {
+                growthExplainerMsg += `Potential surcharge: <strong>+50-100%</strong>.`;
+            }
+
+            if (growthExplainerEl) {
+                growthExplainerEl.innerHTML = growthExplainerMsg;
+            }
+        }
     }
 
     // --- Main Calculation Logic ---
@@ -487,8 +578,8 @@ function calculateCost() {
     if (currentServiceData.type === 'per_foot') {
         boatLength = parseFloat(document.getElementById('boatLength').value) || 0;
         if (boatLength <= 0) {
-            costBreakdownEl.innerText = "Error: Boat length is invalid for a per-foot service. Please go back and enter a valid length.";
-            totalCostDisplayEl.innerText = "$0.00";
+            if (costBreakdownEl) costBreakdownEl.innerText = "Error: Boat length is invalid for a per-foot service. Please go back and enter a valid length.";
+            if (totalCostDisplayEl) totalCostDisplayEl.innerText = "$0.00";
             return; 
         }
         isPowerboat = document.querySelector('input[name="boat_type"]:checked').value === 'powerboat';
@@ -510,9 +601,12 @@ function calculateCost() {
         baseServiceCost = initialBaseCost; // Start with the calculated cost
         let appliedBaseMinimumNote = "";
 
-        if (baseServiceCost < minimumCharge && baseServiceCost > 0) {
-            baseServiceCost = minimumCharge;
-            appliedBaseMinimumNote = ` (adjusted to $${minimumCharge.toFixed(2)} minimum base rate)`;
+        // Use different minimum for underwater inspection
+        const serviceMinimum = selectedServiceKey === 'underwater_inspection' ? 150 : minimumCharge;
+        
+        if (baseServiceCost < serviceMinimum && baseServiceCost > 0) {
+            baseServiceCost = serviceMinimum;
+            appliedBaseMinimumNote = ` (adjusted to $${serviceMinimum.toFixed(2)} minimum base rate)`;
         }
         breakdown += `- Base (${currentServiceData.rate.toFixed(2)}/ft * ${boatLength}ft): $${initialBaseCost.toFixed(2)}${appliedBaseMinimumNote}\n`;
         if (appliedBaseMinimumNote) { // If note was added, show the actual base used for surcharges if different from initial calc + note
@@ -543,15 +637,18 @@ function calculateCost() {
         
         let actualPaintSurchargeAmount = baseServiceCost * paintSurchargePercent;
         variableSurchargeTotal += actualPaintSurchargeAmount;
-        variableDetails += `  - Est. Paint (${estimatedPaintConditionBaseLabel}): +${(paintSurchargePercent * 100).toFixed(2)}% ($${actualPaintSurchargeAmount.toFixed(2)})\n`;
+        // Use "Actual" prefix when direct conditions are used, "Est." otherwise
+        const conditionPrefix = (actualPaintCondition && actualGrowthLevel) ? "Actual" : "Est.";
+        variableDetails += `  - ${conditionPrefix} Paint (${estimatedPaintConditionBaseLabel}): +${(paintSurchargePercent * 100).toFixed(2)}% ($${actualPaintSurchargeAmount.toFixed(2)})\n`;
         
         let actualGrowthSurchargeAmount = baseServiceCost * growthSurchargePercent;
         variableSurchargeTotal += actualGrowthSurchargeAmount;
-        variableDetails += `  - Est. Growth (${estimatedGrowthLevelBaseLabel}): +${(growthSurchargePercent * 100).toFixed(0)}% ($${actualGrowthSurchargeAmount.toFixed(2)})\n`;
+        variableDetails += `  - ${conditionPrefix} Growth (${estimatedGrowthLevelBaseLabel}): +${(growthSurchargePercent * 100).toFixed(0)}% ($${actualGrowthSurchargeAmount.toFixed(2)})\n`;
         
         calculatedSubtotal = baseServiceCost + variableSurchargeTotal;
         if (variableDetails) {
-            breakdown += "Variable Surcharges Applied (Estimates):\n" + variableDetails; // variableDetails already has \n for its items
+            const surchargeHeaderText = (actualPaintCondition && actualGrowthLevel) ? "Variable Surcharges Applied (Actual Conditions):\n" : "Variable Surcharges Applied (Estimates):\n";
+            breakdown += surchargeHeaderText + variableDetails; // variableDetails already has \n for its items
         }
         breakdown += `- Subtotal for Diving Service: $${calculatedSubtotal.toFixed(2)}\n`;
 
@@ -584,7 +681,9 @@ function calculateCost() {
             finalCost = minimumCharge;
         }
         
-        breakdown += `\nTotal Estimate: $${finalCost.toFixed(2)}\n`; // Show rounded/minimum amount
+        // Use "Total" instead of "Total Estimate" when in direct condition mode
+        const totalLabel = (actualPaintCondition && actualGrowthLevel) ? "Total" : "Total Estimate";
+        breakdown += `\n${totalLabel}: $${finalCost.toFixed(2)}\n`; // Show rounded/minimum amount
         if (totalBeforeMinimum < minimumCharge && totalBeforeMinimum > 0) {
             breakdown += `Applied Minimum Charge: $${minimumCharge.toFixed(2)}\n`;
         }
@@ -598,7 +697,8 @@ function calculateCost() {
     }
 
     const lines = breakdown.trim().split('\n');
-    costBreakdownEl.innerHTML = lines.map(line => {
+    if (costBreakdownEl) {
+        costBreakdownEl.innerHTML = lines.map(line => {
         if (line.trim() === "") return ""; 
         if (line.startsWith('  - ')) {
             return `<span class="breakdown-item breakdown-detail">${line.replace('  - ', '&nbsp;&nbsp;&bull;&nbsp;')}</span>`;
@@ -610,12 +710,13 @@ function calculateCost() {
             return `<strong class="breakdown-header">${line}</strong>`;
         }
         return `<span class="breakdown-line">${line}</span>`; 
-    }).join('');
+        }).join('');
+    }
 
     if (finalCost % 1 === 0) {
-        totalCostDisplayEl.innerText = `$${finalCost}`;
+        if (totalCostDisplayEl) totalCostDisplayEl.innerText = `$${finalCost}`;
     } else {
-        totalCostDisplayEl.innerText = `$${finalCost.toFixed(2)}`;
+        if (totalCostDisplayEl) totalCostDisplayEl.innerText = `$${finalCost.toFixed(2)}`;
     }
     
     // Store order data
@@ -633,6 +734,11 @@ function calculateCost() {
         growthLevel: estimatedGrowthLevelBaseLabel
     };
     
+    // If we're on the charge customer page, update the charge summary
+    if (typeof updateChargeSummary === 'function') {
+        updateChargeSummary();
+    }
+    
     // Add checkout button if not already present
     if (!document.getElementById('checkout-button')) {
         const checkoutButton = document.createElement('button');
@@ -646,6 +752,48 @@ function calculateCost() {
         resultSection.appendChild(checkoutButton);
     }
 }
+
+// Get paint surcharge based on actual condition (for charge-customer page)
+function getDirectPaintSurcharge(paintCondition) {
+    switch(paintCondition) {
+        case paintConditions.EXCELLENT:
+        case paintConditions.GOOD:
+        case paintConditions.FAIR:
+            return 0; // No surcharge for Excellent, Good, or Fair
+        case paintConditions.POOR:
+            return 0.10; // 10% surcharge for poor paint (average of 5-15%)
+        case paintConditions.MISSING:
+            return 0.15; // 15% surcharge for missing paint
+        default:
+            return 0;
+    }
+}
+
+// Get growth surcharge based on actual condition (for charge-customer page)
+function getDirectGrowthSurcharge(growthLevel) {
+    switch(growthLevel) {
+        case estGrowthLabels.MINIMAL:
+            return 0; // No surcharge
+        case estGrowthLabels.MODERATE:
+            return 0; // No surcharge
+        case estGrowthLabels.HEAVY:
+            return 0.35; // 35% surcharge (average of 25-50%)
+        case estGrowthLabels.SEVERE:
+            return 1.00; // 100% surcharge
+        default:
+            return 0;
+    }
+}
+
+// Calculate cost with direct paint/growth values (for charge-customer page)
+function calculateCostDirect() {
+    calculateCost(); // Just use regular calculateCost, it will detect the actual dropdowns
+}
+
+// Make it available globally
+window.calculateCostDirect = calculateCostDirect;
+window.getDirectPaintSurcharge = getDirectPaintSurcharge;
+window.getDirectGrowthSurcharge = getDirectGrowthSurcharge;
 
 // Helper function to determine paint condition
 function getPaintCondition(lastPaintedValue) {
@@ -720,34 +868,34 @@ function getSpecificGrowthSurchargePercent(paintCondition, lastCleanedValue) {
             if (lastCleanedValue === '3-4_months') return 0; // Moderate
             if (lastCleanedValue === '5-6_months') return 0.25; // Heavy (early)
             if (lastCleanedValue === '7-8_months') return 0.40; // Heavy (late)
-            if (lastCleanedValue === '9-12_months') return 0.50; // Severe (early)
-            if (lastCleanedValue === '13-24_months') return 0.60; // Severe (mid)
-            if (lastCleanedValue === 'over_24_months_unsure') return 0.70; // Severe (high but capped for excellent paint)
+            if (lastCleanedValue === '9-12_months') return 0.70; // Severe (early)
+            if (lastCleanedValue === '13-24_months') return 0.85; // Severe (mid)
+            if (lastCleanedValue === 'over_24_months_unsure') return 1.00; // Severe (max for excellent paint)
             break;
         case paintConditions.GOOD:
             if (lastCleanedValue === '0-2_months') return 0; // Minimal
             if (lastCleanedValue === '3-4_months') return 0; // Moderate
             if (lastCleanedValue === '5-6_months') return 0.25; // Heavy (early)
             if (lastCleanedValue === '7-8_months') return 0.40; // Heavy (late)
-            if (lastCleanedValue === '9-12_months') return 0.55; // Severe (early-mid)
-            if (lastCleanedValue === '13-24_months') return 0.65; // Severe (mid-high)
-            if (lastCleanedValue === 'over_24_months_unsure') return 0.75; // Severe (high but capped for good paint)
+            if (lastCleanedValue === '9-12_months') return 0.75; // Severe (early-mid)
+            if (lastCleanedValue === '13-24_months') return 0.90; // Severe (mid-high)
+            if (lastCleanedValue === 'over_24_months_unsure') return 1.00; // Severe (100%)
             break;
         case paintConditions.FAIR:
             if (lastCleanedValue === '0-2_months') return 0; // Moderate
             if (lastCleanedValue === '3-4_months') return 0.25; // Heavy (early)
             if (lastCleanedValue === '5-6_months') return 0.40; // Heavy (late)
-            if (lastCleanedValue === '7-8_months') return 0.50; // Severe (early)
-            if (lastCleanedValue === '9-12_months') return 0.65; // Severe (mid-low)
-            if (lastCleanedValue === '13-24_months') return 0.75; // Severe (mid-high)
-            if (lastCleanedValue === 'over_24_months_unsure') return 0.85; // Severe (high, capped for fair paint)
+            if (lastCleanedValue === '7-8_months') return 0.70; // Severe (early)
+            if (lastCleanedValue === '9-12_months') return 0.85; // Severe (mid-low)
+            if (lastCleanedValue === '13-24_months') return 0.95; // Severe (95%)
+            if (lastCleanedValue === 'over_24_months_unsure') return 1.00; // Severe (max for fair paint)
             break;
         case paintConditions.POOR: // Also covers "Missing Paint" implicitly
             if (lastCleanedValue === '0-2_months') return 0.30; // Heavy (early, poor paint)
             if (lastCleanedValue === '3-4_months') return 0.50; // Heavy (late, poor paint)
-            if (lastCleanedValue === '5-6_months') return 0.60; // Severe (early, poor paint)
-            if (lastCleanedValue === '7-8_months') return 0.80; // Severe (mid, poor paint)
-            if (lastCleanedValue === '9-12_months') return 0.90; // Severe (late, poor paint)
+            if (lastCleanedValue === '5-6_months') return 0.80; // Severe (early, poor paint)
+            if (lastCleanedValue === '7-8_months') return 0.90; // Severe (mid, poor paint)
+            if (lastCleanedValue === '9-12_months') return 0.95; // Severe (late, poor paint)
             if (lastCleanedValue === '13-24_months') return 1.00; // Severe (max, poor paint)
             if (lastCleanedValue === 'over_24_months_unsure') return 1.00; // Severe (max, poor paint / unsure)
             break;
@@ -1043,3 +1191,8 @@ window.populateServiceButtons = populateServiceButtons;
 window.calculateCost = calculateCost;
 window.selectService = selectService;
 window.serviceData = serviceData;
+// Expose selectedServiceKey as a getter so it's always current
+Object.defineProperty(window, 'selectedServiceKey', {
+    get: function() { return selectedServiceKey; },
+    set: function(value) { selectedServiceKey = value; }
+});

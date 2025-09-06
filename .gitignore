@@ -1,5 +1,7 @@
 # Test files
 test_*.py
+test-*.js
+test-*.cjs
 *.png
 playwright-report/
 

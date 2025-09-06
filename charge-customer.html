@@ -279,6 +279,108 @@
             padding: 40px;
             color: #7f8c8d;
         }
+        
+        /* Boat Configuration Section */
+        .boat-config-section {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+            margin: 30px 0;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .boat-config-section h3 {
+            color: #1e3a5f;
+            margin-bottom: 25px;
+            font-size: 20px;
+        }
+        
+        .config-group {
+            margin-bottom: 25px;
+        }
+        
+        .config-group label {
+            display: block;
+            font-weight: 600;
+            color: #1e3a5f;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+        
+        .radio-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .radio-option {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: normal;
+        }
+        
+        .radio-option:hover {
+            background: #e9ecef;
+            border-color: #3498db;
+        }
+        
+        .radio-option input[type="radio"] {
+            margin-right: 10px;
+        }
+        
+        .radio-option input[type="radio"]:checked + span {
+            font-weight: 600;
+            color: #3498db;
+        }
+        
+        .radio-option input[type="radio"]:checked {
+            accent-color: #3498db;
+        }
+        
+        .radio-option:has(input[type="radio"]:checked) {
+            background: linear-gradient(to right, rgba(52, 152, 219, 0.1), rgba(52, 152, 219, 0.05));
+            border-color: #3498db;
+        }
+        
+        .checkbox-option {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .checkbox-option:hover {
+            background: #e9ecef;
+            border-color: #3498db;
+        }
+        
+        .checkbox-option input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            accent-color: #3498db;
+        }
+        
+        .checkbox-option input[type="checkbox"]:checked + span {
+            font-weight: 600;
+            color: #3498db;
+        }
+        
+        .checkbox-option:has(input[type="checkbox"]:checked) {
+            background: linear-gradient(to right, rgba(52, 152, 219, 0.1), rgba(52, 152, 219, 0.05));
+            border-color: #3498db;
+        }
     </style>
 </head>
 <body>
@@ -316,6 +418,90 @@
             </div>
             <p class="variable-info" id="servicePriceExplainer" style="margin-top: 15px;">Select a service to see its description.</p>
         </div>
+        
+        <!-- Boat Configuration Section (visible for cleaning services) -->
+        <div id="boatConfigSection" class="boat-config-section" style="display: none;">
+            <h3>⛵ Boat Configuration</h3>
+            
+            <div class="config-group">
+                <label>Boat Type</label>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="boat_type" value="sailboat" checked onchange="updateBoatConfig()">
+                        <span>Sailboat</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="boat_type" value="powerboat" onchange="updateBoatConfig()">
+                        <span>Powerboat (+25% surcharge)</span>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="config-group">
+                <label>Hull Type</label>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="hull_type" value="monohull" checked onchange="updateBoatConfig()">
+                        <span>Monohull</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="hull_type" value="catamaran" onchange="updateBoatConfig()">
+                        <span>Catamaran (+25% surcharge)</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="hull_type" value="trimaran" onchange="updateBoatConfig()">
+                        <span>Trimaran (+50% surcharge)</span>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="config-group">
+                <label>Engine Configuration</label>
+                <div class="checkbox-group">
+                    <label class="checkbox-option">
+                        <input type="checkbox" id="has_twin_engines" name="has_twin_engines" value="true" onchange="updateBoatConfig()">
+                        <span>Twin engines (+10% surcharge)</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Hidden step elements for calculator compatibility -->
+        <div style="display: none;">
+            <div id="step-0" class="form-step active"></div>
+            <div id="step-1" class="form-step">
+                <input type="number" id="dummy-boatLength" value="35">
+            </div>
+            <div id="step-2" class="form-step"></div>
+            <div id="step-3" class="form-step"></div>
+            <div id="step-4" class="form-step"></div>
+            <div id="step-5" class="form-step">
+                <select id="hiddenLastPaintedTime">
+                    <option value="0-1">0-1 years</option>
+                    <option value="1-2" selected>1-2 years</option>
+                    <option value="2-3">2-3 years</option>
+                    <option value="3+">3+ years</option>
+                </select>
+            </div>
+            <div id="step-6" class="form-step">
+                <select id="hiddenLastCleanedTime">
+                    <option value="0-3">0-3 months</option>
+                    <option value="3-6" selected>3-6 months</option>
+                    <option value="6-9">6-9 months</option>
+                    <option value="9+">9+ months</option>
+                </select>
+            </div>
+            <div id="step-7" class="form-step">
+                <input type="number" id="anodesToInstall" value="0">
+            </div>
+            <div id="step-8" class="result-section form-step">
+                <div id="hiddenCostBreakdown" style="display: none;"></div>
+                <div class="total-row">
+                    <span class="total-label">Total:</span>
+                    <span class="total-value" id="hiddenTotalCostDisplay">$0</span>
+                </div>
+            </div>
+        </div>
 
         <div class="boat-details">
             <h3>Boat Details</h3>
@@ -326,28 +512,37 @@
             
             <div id="cleaningOptions">
                 <div class="input-group">
-                    <label for="paintCondition">Paint Condition</label>
-                    <select id="paintCondition">
-                        <option value="good">Good - Smooth surface</option>
-                        <option value="fair">Fair - Some roughness</option>
-                        <option value="poor">Poor - Very rough/ablative</option>
+                    <label for="actualPaintCondition">Actual Paint Condition Found</label>
+                    <select id="actualPaintCondition">
+                        <option value="excellent" selected>Excellent</option>
+                        <option value="good">Good</option>
+                        <option value="fair">Fair</option>
+                        <option value="poor">Poor</option>
+                        <option value="missing">Missing</option>
                     </select>
                 </div>
                 
                 <div class="input-group">
-                    <label for="growthLevel">Growth Level</label>
-                    <select id="growthLevel">
-                        <option value="light">Light - Thin film</option>
+                    <label for="actualGrowthLevel">Actual Growth Level Found</label>
+                    <select id="actualGrowthLevel">
+                        <option value="minimal" selected>Minimal - Thin film</option>
                         <option value="moderate">Moderate - Visible growth</option>
-                        <option value="heavy">Heavy - Thick growth/barnacles</option>
+                        <option value="heavy">Heavy - Thick growth</option>
+                        <option value="severe">Severe - Barnacles/heavy fouling</option>
                     </select>
                 </div>
             </div>
         </div>
 
         <div class="pricing-display" id="pricingDisplay">
-            <h3>Service Estimate</h3>
-            <div class="price-breakdown" id="priceBreakdown"></div>
+            <h3>Service Total</h3>
+            <div class="price-breakdown" id="priceBreakdown">
+                <pre id="costBreakdown" style="font-family: inherit; white-space: pre-wrap; margin: 10px 0;"></pre>
+                <div class="total-row" style="font-size: 20px; font-weight: bold; color: #1e3a5f; margin-top: 15px; padding-top: 15px; border-top: 2px solid #dee2e6;">
+                    <span class="total-label">Total:</span>
+                    <span class="total-value" id="totalCostDisplay">$0</span>
+                </div>
+            </div>
         </div>
 
         <!-- Charge Summary Section -->
@@ -383,23 +578,37 @@
                 return;
             }
             
+            // Set up a watcher for service selection changes
+            setInterval(() => {
+                const serviceKey = window.selectedServiceKey || window.getSelectedServiceKey?.();
+                updateBoatConfigVisibility(serviceKey);
+            }, 100);
+            
             // Set up event listeners for the calculator
             document.getElementById('boatLength').addEventListener('input', function() {
+                // Sync with hidden field for calculator
+                const hiddenLength = document.getElementById('dummy-boatLength');
+                if (hiddenLength) hiddenLength.value = this.value;
+                
                 if (window.calculateCost) {
                     window.calculateCost();
                 }
                 updateChargeSummary();
             });
             
-            document.getElementById('paintCondition')?.addEventListener('change', function() {
-                if (window.calculateCost) {
+            document.getElementById('actualPaintCondition')?.addEventListener('change', function() {
+                if (window.calculateCostDirect) {
+                    window.calculateCostDirect();
+                } else if (window.calculateCost) {
                     window.calculateCost();
                 }
                 updateChargeSummary();
             });
             
-            document.getElementById('growthLevel')?.addEventListener('change', function() {
-                if (window.calculateCost) {
+            document.getElementById('actualGrowthLevel')?.addEventListener('change', function() {
+                if (window.calculateCostDirect) {
+                    window.calculateCostDirect();
+                } else if (window.calculateCost) {
                     window.calculateCost();
                 }
                 updateChargeSummary();
@@ -439,6 +648,9 @@
                 listEl.innerHTML = '<div class="no-customers">Error loading customers. Check console.</div>';
             }
         }
+        
+        // Make functions globally available
+        window.loadRecentCustomers = loadRecentCustomers;
 
         // Search customers
         async function searchCustomers() {
@@ -461,6 +673,9 @@
                 listEl.innerHTML = '<div class="no-customers">Error searching. Check console.</div>';
             }
         }
+        
+        // Make functions globally available
+        window.searchCustomers = searchCustomers;
 
         // Display customer list
         function displayCustomers(customerList) {
@@ -515,6 +730,53 @@
             
             updateChargeSummary();
         }
+        
+        // Make selectCustomer globally available
+        window.selectCustomer = selectCustomer;
+        
+        // Update boat configuration and recalculate
+        function updateBoatConfig() {
+            if (window.calculateCost) {
+                window.calculateCost();
+            }
+            updateChargeSummary();
+        }
+        
+        window.updateBoatConfig = updateBoatConfig;
+        
+        // Function to update boat config visibility
+        function updateBoatConfigVisibility(serviceKey) {
+            const boatConfigSection = document.getElementById('boatConfigSection');
+            const boatDetails = document.querySelector('.boat-details');
+            const cleaningOptions = document.getElementById('cleaningOptions');
+            
+            const isCleaningService = serviceKey === 'onetime_cleaning' || serviceKey === 'recurring_cleaning';
+            
+            if (boatConfigSection) {
+                const currentDisplay = boatConfigSection.style.display;
+                const newDisplay = isCleaningService ? 'block' : 'none';
+                if (currentDisplay !== newDisplay) {
+                    boatConfigSection.style.display = newDisplay;
+                    console.log('Updated boat config visibility:', newDisplay, 'for service:', serviceKey);
+                }
+            }
+            if (boatDetails) {
+                boatDetails.style.display = 'block'; // Always show boat length
+            }
+            if (cleaningOptions) {
+                cleaningOptions.style.display = isCleaningService ? 'block' : 'none';
+            }
+        }
+        
+        // Also listen for clicks on service buttons directly
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.service-option')) {
+                const serviceKey = e.target.closest('.service-option').dataset.serviceKey;
+                if (serviceKey) {
+                    setTimeout(() => updateBoatConfigVisibility(serviceKey), 50);
+                }
+            }
+        });
 
         // Update charge summary
         function updateChargeSummary() {
@@ -531,10 +793,15 @@
                 return;
             }
 
-            const priceElement = document.querySelector('.total-price');
-            const price = priceElement ? parseFloat(priceElement.textContent.replace('$', '')) : 0;
-            const service = document.querySelector('input[name="service"]:checked');
-            const serviceName = service ? service.parentElement.querySelector('.service-title').textContent : '';
+            // Get price from the results section (total value)
+            // The totalCostDisplay element directly holds the value
+            const totalElement = document.getElementById('totalCostDisplay');
+            const price = totalElement ? parseFloat(totalElement.textContent.replace('$', '').replace(',', '')) : 0;
+            
+            // Get selected service from the service buttons
+            const selectedServiceEl = document.querySelector('.service-option.selected');
+            const serviceTitleEl = selectedServiceEl ? selectedServiceEl.querySelector('.service-title') : null;
+            const serviceName = serviceTitleEl ? serviceTitleEl.textContent : '';
 
             chargeDetails.innerHTML = `
                 <div class="charge-detail-row">
@@ -559,13 +826,23 @@
                 </div>
                 <div class="charge-detail-row">
                     <span>Total Amount:</span>
-                    <span>$${price.toFixed(2)}</span>
+                    <span>
+                        $<input type="number" 
+                               id="editableAmount" 
+                               value="${price.toFixed(2)}" 
+                               step="0.01" 
+                               min="0" 
+                               style="width: 100px; border: 1px solid #ddd; padding: 4px; border-radius: 4px;"
+                               oninput="updateChargeButton()">
+                    </span>
                 </div>
             `;
             
-            chargeButton.disabled = !selectedCustomer.payment_method || price === 0;
+            // Update charge button based on editable amount
+            const editableAmount = parseFloat(document.getElementById('editableAmount')?.value || 0);
+            chargeButton.disabled = !selectedCustomer.payment_method || editableAmount === 0;
             chargeButton.textContent = selectedCustomer.payment_method ? 
-                `Charge $${price.toFixed(2)}` : 'No Payment Method Available';
+                `Charge $${editableAmount.toFixed(2)}` : 'No Payment Method Available';
         }
 
         // Charge the customer
@@ -581,10 +858,61 @@
             button.classList.add('processing');
             button.disabled = true;
 
-            const priceElement = document.querySelector('.total-price');
-            const price = priceElement ? parseFloat(priceElement.textContent.replace('$', '')) : 0;
-            const service = document.querySelector('input[name="service"]:checked').value;
+            // Get price from the editable amount field if it exists, otherwise from totalCostDisplay
+            const editableAmountEl = document.getElementById('editableAmount');
+            let price;
+            if (editableAmountEl) {
+                price = parseFloat(editableAmountEl.value) || 0;
+            } else {
+                const totalElement = document.getElementById('totalCostDisplay');
+                price = totalElement ? parseFloat(totalElement.textContent.replace('$', '').replace(',', '')) : 0;
+            }
+            
+            // Get selected service key
+            const selectedServiceEl = document.querySelector('.service-option.selected');
+            const service = selectedServiceEl ? selectedServiceEl.dataset.serviceKey : '';
             const boatLength = document.getElementById('boatLength').value;
+
+            // Build metadata based on service type
+            const metadata = { service: service };
+            
+            // Only include boat details for cleaning services
+            const isCleaningService = service === 'onetime_cleaning' || service === 'recurring_cleaning';
+            const isFlatRateService = service === 'item_recovery' || service === 'underwater_inspection';
+            
+            if (isCleaningService) {
+                metadata.boat_length = boatLength;
+                metadata.last_paint = document.getElementById('lastPaintedTime')?.value;
+                metadata.last_cleaned = document.getElementById('lastCleanedTime')?.value;
+                
+                // Add hull type and engine configuration if available
+                const hullType = document.querySelector('input[name="hull_type"]:checked')?.value;
+                if (hullType) {
+                    metadata.hull_type = hullType;
+                    if (hullType === 'catamaran') metadata.additional_hulls = 1;
+                    if (hullType === 'trimaran') metadata.additional_hulls = 2;
+                }
+                
+                const hasTwinEngines = document.getElementById('has_twin_engines')?.checked;
+                if (hasTwinEngines) {
+                    metadata.twin_engines = true;
+                    metadata.engine_type = 'twin';
+                } else {
+                    metadata.engine_type = 'single';
+                }
+                
+                // Add boat type (sailboat/powerboat)
+                const boatType = document.querySelector('input[name="boat_type"]:checked')?.value;
+                if (boatType) {
+                    metadata.boat_type = boatType;
+                }
+            }
+            
+            // Build appropriate description
+            let description = service.replace(/_/g, ' ');
+            if (!isFlatRateService && boatLength) {
+                description += ` - ${boatLength}ft boat`;
+            }
 
             try {
                 const response = await fetch('http://localhost:3001/api/charge-customer', {
@@ -595,13 +923,8 @@
                     body: JSON.stringify({
                         customerId: selectedCustomer.id,
                         amount: Math.round(price * 100), // Convert to cents
-                        description: `${service.replace('_', ' ')} - ${boatLength}ft boat`,
-                        metadata: {
-                            service: service,
-                            boat_length: boatLength,
-                            paint_condition: document.getElementById('paintCondition')?.value,
-                            growth_level: document.getElementById('growthLevel')?.value
-                        }
+                        description: description,
+                        metadata: metadata
                     })
                 });
 
@@ -632,6 +955,22 @@
                 updateChargeSummary();
             }
         }
+        
+        // Update charge button when amount is edited
+        function updateChargeButton() {
+            const editableAmount = parseFloat(document.getElementById('editableAmount')?.value || 0);
+            const chargeButton = document.getElementById('chargeButton');
+            
+            if (selectedCustomer && selectedCustomer.payment_method) {
+                chargeButton.disabled = editableAmount === 0;
+                chargeButton.textContent = `Charge $${editableAmount.toFixed(2)}`;
+            }
+        }
+        
+        // Make functions globally available
+        window.chargeCustomer = chargeCustomer;
+        window.updateChargeSummary = updateChargeSummary;
+        window.updateChargeButton = updateChargeButton;
 
         // Show result message
         function showResult(type, message) {
