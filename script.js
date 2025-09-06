@@ -15,16 +15,22 @@ const serviceData = {
         rate: 199, 
         name: "Item Recovery", 
         type: 'flat',
-        description: "Professional recovery of dropped items like phones, keys, tools, or dinghies. Quick response to minimize water damage."
+        description: "Professional recovery of dropped items like phones, keys, tools, or dinghies. Quick response to minimize water damage. Service includes up to 45 minutes of searching time. Recovery is not guaranteed."
     },
     underwater_inspection: { 
         rate: 4, 
         name: "Underwater Inspection", 
         type: 'per_foot',
         description: "Thorough underwater inspection with detailed photo/video documentation. Ideal for insurance claims, pre-purchase surveys, or damage assessment. $4 per foot with $150 minimum."
+    },
+    propeller_service: {
+        rate: 349,
+        name: "Propeller Removal/Installation",
+        type: 'flat',
+        description: "Professional propeller removal or installation service. $349 per propeller for either service. Includes proper handling, alignment, and torque specifications."
     }
 };
-const minimumCharge = 100;
+const minimumCharge = 150;
 
 const estPaintLabels = {
     EXCELLENT: "Excellent", // Simplified for explainer text
@@ -153,7 +159,7 @@ function populateServiceButtons() {
     serviceButtons.innerHTML = '';
     
     // Define the order to display services
-    const serviceOrder = ['onetime_cleaning', 'recurring_cleaning', 'item_recovery', 'underwater_inspection'];
+    const serviceOrder = ['recurring_cleaning', 'onetime_cleaning', 'item_recovery', 'underwater_inspection', 'propeller_service'];
     
     console.log('Populating service buttons with click handlers...');
     
@@ -220,6 +226,23 @@ function selectService(serviceKey) {
     // Update service price explainer
     updateServicePriceExplainer();
     
+    // Scroll to position the recurring cleaning service (first service) at the top of viewport
+    setTimeout(() => {
+        const firstServiceButton = document.querySelector('[data-service-key="recurring_cleaning"]');
+        if (firstServiceButton) {
+            // Get the first service button's position
+            const buttonRect = firstServiceButton.getBoundingClientRect();
+            // Scroll to put the recurring cleaning service at the top with a small offset
+            const scrollTo = window.pageYOffset + buttonRect.top - 20; // 20px padding from top
+            
+            // Smooth scroll to show recurring cleaning at top
+            window.scrollTo({
+                top: scrollTo,
+                behavior: 'smooth'
+            });
+        }
+    }, 100); // Small delay to ensure DOM updates
+    
     // Calculate cost for the selected service
     console.log('About to call calculateCost...');
     calculateCost();
@@ -261,6 +284,30 @@ function renderCurrentStep() {
         }
         stepEl.style.display = (index === currentStep) ? 'block' : 'none';
     });
+    
+    // Scroll to focus on the content for steps after service selection
+    if (currentStep > 0) {
+        setTimeout(() => {
+            // Find the active step content
+            const activeStep = stepElements[currentStep];
+            if (activeStep) {
+                // Find the first heading or form element in the active step
+                const heading = activeStep.querySelector('h2, h3, .question-text');
+                const targetElement = heading || activeStep;
+                
+                // Calculate position
+                const rect = targetElement.getBoundingClientRect();
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                const targetPosition = rect.top + scrollTop - 30; // 30px padding from top
+                
+                // Scroll to position
+                window.scrollTo({
+                    top: targetPosition,
+                    behavior: 'smooth'
+                });
+            }
+        }, 100);
+    }
 
     // Button visibility and text
     if (backButton) {
@@ -601,8 +648,8 @@ function calculateCost() {
         baseServiceCost = initialBaseCost; // Start with the calculated cost
         let appliedBaseMinimumNote = "";
 
-        // Use different minimum for underwater inspection
-        const serviceMinimum = selectedServiceKey === 'underwater_inspection' ? 150 : minimumCharge;
+        // Apply minimum charge to base service
+        const serviceMinimum = minimumCharge;
         
         if (baseServiceCost < serviceMinimum && baseServiceCost > 0) {
             baseServiceCost = serviceMinimum;
@@ -674,16 +721,16 @@ function calculateCost() {
     if (anodeInstallationCost > 0) serviceOrAnodesPriced = true;
 
     if (serviceOrAnodesPriced) {
-        // Apply rounding before showing in breakdown
+        // Apply minimum charge if needed, but no rounding
         if (totalBeforeMinimum > 0 && totalBeforeMinimum >= minimumCharge) {
-            finalCost = Math.round(totalBeforeMinimum / 10) * 10;
+            finalCost = totalBeforeMinimum;
         } else if (totalBeforeMinimum < minimumCharge && totalBeforeMinimum > 0) {
             finalCost = minimumCharge;
         }
         
         // Use "Total" instead of "Total Estimate" when in direct condition mode
         const totalLabel = (actualPaintCondition && actualGrowthLevel) ? "Total" : "Total Estimate";
-        breakdown += `\n${totalLabel}: $${finalCost.toFixed(2)}\n`; // Show rounded/minimum amount
+        breakdown += `\n${totalLabel}: $${finalCost.toFixed(2)}\n`;
         if (totalBeforeMinimum < minimumCharge && totalBeforeMinimum > 0) {
             breakdown += `Applied Minimum Charge: $${minimumCharge.toFixed(2)}\n`;
         }
@@ -1144,48 +1191,108 @@ function showCheckout() {
     document.querySelector('.service-info-section').style.display = 'none';
     checkoutSection.style.display = 'block';
     
-    // Show/hide service interval section based on service type
+    // Show/hide appropriate form sections based on service type
+    const boatInfoSection = document.getElementById('boat-info-section');
+    const itemRecoverySection = document.getElementById('item-recovery-section');
     const intervalSection = document.getElementById('service-interval-section');
     const oneTimeOption = document.querySelector('[data-interval="one-time"]');
     
-    if (selectedServiceKey === 'recurring_cleaning') {
-        intervalSection.style.display = 'block';
-        // Hide the one-time option for recurring service
-        if (oneTimeOption) {
-            oneTimeOption.style.display = 'none';
-        }
-        // If one-time was previously selected, select bi-monthly (recommended) instead
-        if (orderData.interval === 'one-time' || !orderData.interval) {
-            const biMonthlyOption = document.querySelector('[data-interval="2"]');
-            if (biMonthlyOption) {
+    // Handle form sections based on service type
+    if (selectedServiceKey === 'item_recovery') {
+        // For item recovery, show special location form
+        if (boatInfoSection) boatInfoSection.style.display = 'none';
+        if (itemRecoverySection) itemRecoverySection.style.display = 'block';
+        
+        // Hide interval section and set to one-time
+        intervalSection.style.display = 'none';
+        orderData.interval = 'one-time';
+        
+        // Update required fields
+        toggleRequiredFields(false, true);
+    } else {
+        // For all other services, show boat info
+        if (boatInfoSection) boatInfoSection.style.display = 'block';
+        if (itemRecoverySection) itemRecoverySection.style.display = 'none';
+        
+        // Update required fields
+        toggleRequiredFields(true, false);
+        
+        // Handle interval section for other services
+        if (selectedServiceKey === 'recurring_cleaning') {
+            intervalSection.style.display = 'block';
+            // Hide the one-time option for recurring service
+            if (oneTimeOption) {
+                oneTimeOption.style.display = 'none';
+            }
+            // If one-time was previously selected, select bi-monthly (recommended) instead
+            if (orderData.interval === 'one-time' || !orderData.interval) {
+                const biMonthlyOption = document.querySelector('[data-interval="2"]');
+                if (biMonthlyOption) {
+                    document.querySelectorAll('.interval-option').forEach(opt => opt.classList.remove('selected'));
+                    biMonthlyOption.classList.add('selected');
+                    orderData.interval = '2';
+                }
+            }
+        } else {
+            intervalSection.style.display = 'none';
+            // Show the one-time option for non-recurring services
+            if (oneTimeOption) {
+                oneTimeOption.style.display = 'flex';
+            }
+            // For non-recurring services, automatically select "one-time"
+            if (oneTimeOption) {
                 document.querySelectorAll('.interval-option').forEach(opt => opt.classList.remove('selected'));
-                biMonthlyOption.classList.add('selected');
-                orderData.interval = '2';
+                oneTimeOption.classList.add('selected');
+                orderData.interval = 'one-time';
             }
         }
-    } else {
-        intervalSection.style.display = 'none';
-        // Show the one-time option for non-recurring services
-        if (oneTimeOption) {
-            oneTimeOption.style.display = 'flex';
-        }
-        // For non-recurring services, automatically select "one-time"
-        if (oneTimeOption) {
-            document.querySelectorAll('.interval-option').forEach(opt => opt.classList.remove('selected'));
-            oneTimeOption.classList.add('selected');
-            orderData.interval = 'one-time';
+        
+        // Pre-fill boat length (only for non-item-recovery services)
+        const boatLengthCheckout = document.getElementById('boat-length-checkout');
+        if (orderData.boatLength > 0 && boatLengthCheckout) {
+            boatLengthCheckout.value = orderData.boatLength;
         }
     }
     
-    // Pre-fill boat length
-    const boatLengthCheckout = document.getElementById('boat-length-checkout');
-    if (orderData.boatLength > 0) {
-        boatLengthCheckout.value = orderData.boatLength;
-    }
+    // Scroll to focus on checkout form, past the header
+    setTimeout(() => {
+        const checkoutSection = document.getElementById('checkout-section');
+        if (checkoutSection) {
+            // Get the position of the checkout section
+            const rect = checkoutSection.getBoundingClientRect();
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const targetPosition = rect.top + scrollTop - 30; // 30px padding from top
+            
+            // Scroll to position
+            window.scrollTo({
+                top: targetPosition,
+                behavior: 'smooth'
+            });
+        }
+    }, 100);
+}
+
+// Toggle required fields based on service type
+function toggleRequiredFields(boatFields, itemRecoveryFields) {
+    // Boat info fields
+    const boatFieldIds = ['boat-name', 'boat-make', 'boat-model', 'marina-name', 'dock', 'slip-number'];
+    boatFieldIds.forEach(id => {
+        const field = document.getElementById(id);
+        if (field) {
+            field.required = boatFields;
+        }
+    });
     
-    // Scroll to top
-    window.scrollTo(0, 0);
-} 
+    // Item recovery fields
+    const itemFieldIds = ['recovery-location', 'item-description', 'drop-date'];
+    itemFieldIds.forEach(id => {
+        const field = document.getElementById(id);
+        if (field) {
+            field.required = itemRecoveryFields;
+        }
+    });
+}
+
 // Export functions for use in charge-customer.html
 window.populateServiceButtons = populateServiceButtons;
 window.calculateCost = calculateCost;

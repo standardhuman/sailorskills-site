@@ -577,6 +577,14 @@ input[type="tel"]:focus {
     grid-column: 1 / -1;
 }
 
+/* Center the last service if it's alone in its row */
+.service-option:nth-child(5):last-child {
+    grid-column: 1 / -1;
+    max-width: calc(50% - 7.5px); /* Half width minus half gap */
+    margin-left: auto;
+    margin-right: auto;
+}
+
 /* On mobile, stack all services in single column */
 @media (max-width: 768px) {
     .service-selection-grid {
@@ -730,6 +738,29 @@ input[type="tel"]:focus {
     margin-bottom: 15px;
 }
 
+.agreement-section ul {
+    margin: 15px 0 15px 25px;
+    padding-left: 0;
+    list-style: none;
+}
+
+.agreement-section ul li {
+    position: relative;
+    padding-left: 25px;
+    margin-bottom: 10px;
+    line-height: 1.6;
+    color: #856404;
+}
+
+.agreement-section ul li::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: #856404;
+    font-size: 1.2em;
+    line-height: 1.3;
+}
+
 .agreement-checkbox {
     display: flex;
     align-items: flex-start;
@@ -745,6 +776,48 @@ input[type="tel"]:focus {
     font-weight: normal;
     color: #000;
     flex: 1;
+}
+
+/* Item Recovery Form Styles */
+#item-recovery-section textarea {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    resize: vertical;
+    min-height: 120px;
+}
+
+#item-recovery-section textarea:focus {
+    border-color: #56B4EF;
+    outline: none;
+}
+
+/* Larger date picker for item recovery */
+#drop-date {
+    padding: 14px 16px;
+    font-size: 16px;
+    height: 50px;
+    cursor: pointer;
+}
+
+#drop-date::-webkit-calendar-picker-indicator {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+}
+
+.field-help {
+    margin-top: 8px;
+    padding: 10px;
+    background-color: #e8f4f8;
+    border-left: 3px solid #56B4EF;
+    color: #1e3a5f;
+    font-size: 13px;
+    line-height: 1.5;
+    border-radius: 4px;
 }
 
 /* Submit Button */

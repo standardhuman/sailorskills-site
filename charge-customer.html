@@ -381,6 +381,39 @@
             background: linear-gradient(to right, rgba(52, 152, 219, 0.1), rgba(52, 152, 219, 0.05));
             border-color: #3498db;
         }
+        
+        /* Better formatted bullet points in price breakdown */
+        .price-breakdown .breakdown-item {
+            display: block;
+            margin-left: 20px;
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+        
+        .price-breakdown .breakdown-detail {
+            margin-left: 40px;
+            font-size: 0.95em;
+            color: #555;
+        }
+        
+        .price-breakdown .breakdown-header {
+            display: block;
+            margin-top: 12px;
+            margin-bottom: 8px;
+            color: #1e3a5f;
+        }
+        
+        .price-breakdown .breakdown-total-line {
+            display: block;
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .price-breakdown .breakdown-line {
+            display: block;
+            margin-bottom: 5px;
+        }
     </style>
 </head>
 <body>
@@ -412,11 +445,11 @@
 
         <!-- Service Calculator (reusing existing elements) -->
         <div class="service-selector">
-            <h3>Select Service Type</h3>
+            <h3>Select a service to see more details</h3>
             <div class="service-selection-grid" id="serviceButtons">
                 <!-- Service buttons will be populated by JS -->
             </div>
-            <p class="variable-info" id="servicePriceExplainer" style="margin-top: 15px;">Select a service to see its description.</p>
+            <p class="variable-info" id="servicePriceExplainer" style="margin-top: 15px;"></p>
         </div>
         
         <!-- Boat Configuration Section (visible for cleaning services) -->

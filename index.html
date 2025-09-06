@@ -38,16 +38,14 @@
         </div>
         
         <div class="calculator-container">
-        <h2 class="calculator-title">Cost Estimator</h2>
-
         <!-- Step 0: Service Selection -->
         <div id="step-0" class="form-step active">
-            <h2>Select a Service:</h2>
+            <h2>Select a service to see more details</h2>
             <div class="input-group">
                 <div class="service-selection-grid" id="serviceButtons">
                     <!-- Service buttons will be populated by JS -->
                 </div>
-                <p class="variable-info" id="servicePriceExplainer" style="margin-top: 15px;">Select a service to see its description.</p>
+                <p class="variable-info" id="servicePriceExplainer" style="margin-top: 15px;"></p>
             </div>
         </div>
 
@@ -159,8 +157,8 @@
         <div id="checkout-section" class="checkout-section" style="display: none;">
             <h2>Complete Your Service Order</h2>
             
-            <!-- Boat Information -->
-            <div class="checkout-form">
+            <!-- Boat Information (for non-item-recovery services) -->
+            <div class="checkout-form" id="boat-info-section">
                 <h3>Boat Information</h3>
                 <div class="form-row">
                     <div class="form-group">
@@ -200,7 +198,31 @@
                         <input type="text" id="slip-number" name="slip-number" required>
                     </div>
                 </div>
+            </div>
+            
+            <!-- Item Recovery Location Information (only for item recovery service) -->
+            <div class="checkout-form" id="item-recovery-section" style="display: none;">
+                <h3>Recovery Location Information</h3>
+                <div class="form-group">
+                    <label for="recovery-location">Location Details*</label>
+                    <textarea id="recovery-location" name="recovery-location" rows="6" required 
+                        placeholder="Please describe the recovery location in detail. Include:&#10;• Marina name and address&#10;• Slip number (if applicable)&#10;• Boat name (if item is near a boat)&#10;• Exact location where the item was dropped&#10;• Any landmarks or reference points"></textarea>
+                    <p class="field-help">Please lower a weighted line into the water as close to where the item was last seen as possible. This will help us locate the item more quickly.</p>
+                </div>
                 
+                <div class="form-group">
+                    <label for="item-description">Item Description*</label>
+                    <input type="text" id="item-description" name="item-description" required 
+                        placeholder="Describe the item (e.g., keys on blue floaty, iPhone 14 Pro, prescription sunglasses)">
+                </div>
+                
+                <div class="form-group">
+                    <label for="drop-date">When was the item dropped?*</label>
+                    <input type="datetime-local" id="drop-date" name="drop-date" required>
+                </div>
+            </div>
+            
+            <div class="checkout-form">
                 <div id="service-interval-section">
                     <h3>Service Interval</h3>
                     <div class="form-group">
