@@ -355,7 +355,7 @@ input[type="tel"]:focus {
     border-bottom: 1px solid #e0e0e0;
 }
 
-.result-section .variable-info { /* "$100 minimum for all services." text */
+.result-section .variable-info { /* "$150 minimum for all services." text */
     text-align: center;
     margin-top: 10px;
     font-size: 0.85em;
@@ -577,12 +577,9 @@ input[type="tel"]:focus {
     grid-column: 1 / -1;
 }
 
-/* Center the last service if it's alone in its row */
-.service-option:nth-child(5):last-child {
+/* Make propeller service (5th child) span full width like cleaning services */
+.service-option:nth-child(5) {
     grid-column: 1 / -1;
-    max-width: calc(50% - 7.5px); /* Half width minus half gap */
-    margin-left: auto;
-    margin-right: auto;
 }
 
 /* On mobile, stack all services in single column */
@@ -615,6 +612,54 @@ input[type="tel"]:focus {
     background-color: #345475; /* Dark blue-gray */
     color: white;
     border-color: #345475;
+}
+
+/* Expanded service button with description */
+.service-option.expanded {
+    height: auto;
+    min-height: 120px;
+    padding: 20px;
+}
+
+.service-description-inline {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+    font-size: 14px;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.95);
+    text-align: left;
+    animation: fadeIn 0.3s ease-in;
+    width: 100%;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.service-click-hint {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    font-size: 14px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+    text-align: center;
+    animation: fadeIn 0.5s ease-in 0.3s both;
+    cursor: pointer;
+}
+
+.service-click-hint:hover {
+    color: white;
+    transform: translateX(3px);
+    transition: all 0.2s ease;
 }
 
 .service-option .service-name {

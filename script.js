@@ -139,6 +139,18 @@ document.addEventListener('DOMContentLoaded', function() {
         backButton.addEventListener('click', handleBackClick);
     }
     
+    // Add event listeners for paint and cleaning dropdowns to update surcharge displays
+    const lastPaintedDropdown = document.getElementById('lastPaintedTime');
+    const lastCleanedDropdown = document.getElementById('lastCleanedTime');
+    
+    if (lastPaintedDropdown) {
+        lastPaintedDropdown.addEventListener('change', updatePaintSurchargeDisplay);
+    }
+    
+    if (lastCleanedDropdown) {
+        lastCleanedDropdown.addEventListener('change', updateGrowthSurchargeDisplay);
+    }
+    
     // Initialize Stripe
     initializeStripe();
     
@@ -208,23 +220,84 @@ function populateServiceButtons() {
 function selectService(serviceKey) {
     console.log('selectService called with:', serviceKey);
     
-    // Remove selected class from all buttons
+    // Check if this service is already selected
+    const wasAlreadySelected = selectedServiceKey === serviceKey;
+    
+    // If already selected, trigger the next button action
+    if (wasAlreadySelected) {
+        console.log('Service already selected, triggering next button');
+        if (nextButton) {
+            nextButton.click();
+        }
+        return;
+    }
+    
+    // First, restore all buttons to their original state
     document.querySelectorAll('.service-option').forEach(btn => {
-        btn.classList.remove('selected');
+        btn.classList.remove('selected', 'expanded');
+        // Restore original content if it was expanded
+        const key = btn.dataset.serviceKey;
+        const service = serviceData[key];
+        if (service) {
+            // Clear and rebuild original button content
+            btn.innerHTML = '';
+            
+            const nameDiv = document.createElement('div');
+            nameDiv.className = 'service-name';
+            nameDiv.textContent = service.name;
+            btn.appendChild(nameDiv);
+            
+            const priceDiv = document.createElement('div');
+            priceDiv.className = 'service-price';
+            if (service.type === 'per_foot') {
+                priceDiv.textContent = `$${service.rate} per foot`;
+            } else {
+                priceDiv.textContent = `$${service.rate} flat rate`;
+            }
+            btn.appendChild(priceDiv);
+            
+            // Re-add "Save 25%" badge to recurring cleaning
+            if (key === 'recurring_cleaning') {
+                const saveBadge = document.createElement('div');
+                saveBadge.className = 'save-badge';
+                saveBadge.textContent = 'Save 25%';
+                btn.appendChild(saveBadge);
+            }
+        }
     });
     
-    // Add selected class to clicked button
+    // Add selected class and expand the clicked button with description
     const selectedButton = document.querySelector(`[data-service-key="${serviceKey}"]`);
     if (selectedButton) {
-        selectedButton.classList.add('selected');
+        selectedButton.classList.add('selected', 'expanded');
+        
+        // Add description to the selected button
+        const service = serviceData[serviceKey];
+        if (service && service.description) {
+            const descDiv = document.createElement('div');
+            descDiv.className = 'service-description-inline';
+            descDiv.textContent = service.description;
+            selectedButton.appendChild(descDiv);
+            
+            // Add "click again" hint
+            const hintDiv = document.createElement('div');
+            hintDiv.className = 'service-click-hint';
+            hintDiv.textContent = '→ Click again to continue';
+            selectedButton.appendChild(hintDiv);
+        }
     }
     
     // Update selected service
     selectedServiceKey = serviceKey;
     console.log('Set selectedServiceKey to:', selectedServiceKey);
     
-    // Update service price explainer
-    updateServicePriceExplainer();
+    // Hide the old service price explainer since description is now inline
+    if (servicePriceExplainer) {
+        servicePriceExplainer.style.display = 'none';
+    }
+    
+    // Update button states to enable the Next button
+    renderCurrentStep();
     
     // Scroll to position the recurring cleaning service (first service) at the top of viewport
     setTimeout(() => {
@@ -645,54 +718,46 @@ function calculateCost() {
 
     if (currentServiceData.type === 'per_foot' && boatLength > 0) {
         let initialBaseCost = currentServiceData.rate * boatLength;
-        baseServiceCost = initialBaseCost; // Start with the calculated cost
-        let appliedBaseMinimumNote = "";
-
-        // Apply minimum charge to base service
-        const serviceMinimum = minimumCharge;
+        baseServiceCost = initialBaseCost; // Keep original calculation
         
-        if (baseServiceCost < serviceMinimum && baseServiceCost > 0) {
-            baseServiceCost = serviceMinimum;
-            appliedBaseMinimumNote = ` (adjusted to $${serviceMinimum.toFixed(2)} minimum base rate)`;
-        }
-        breakdown += `- Base (${currentServiceData.rate.toFixed(2)}/ft * ${boatLength}ft): $${initialBaseCost.toFixed(2)}${appliedBaseMinimumNote}\n`;
-        if (appliedBaseMinimumNote) { // If note was added, show the actual base used for surcharges if different from initial calc + note
-            if (initialBaseCost.toFixed(2) !== baseServiceCost.toFixed(2)) { // Check if initial and adjusted are different to avoid redundancy
-                 breakdown += `  (Surcharges will be based on $${baseServiceCost.toFixed(2)})\n`;
-            }
-        }
+        // Check if minimum will need to be applied later
+        const serviceMinimum = minimumCharge;
+        const belowMinimum = (initialBaseCost < serviceMinimum && initialBaseCost > 0);
+        
+        breakdown += `- Base (${currentServiceData.rate.toFixed(2)}/ft * ${boatLength}ft): $${initialBaseCost.toFixed(2)}\n`;
 
         let variableSurchargeTotal = 0;
         let variableDetails = "";
 
+        // Calculate all surcharges based on actual boat cost, not minimum
         if (isPowerboat) {
-            let surcharge = baseServiceCost * 0.25;
+            let surcharge = initialBaseCost * 0.25;  // Use actual cost, not minimum
             variableSurchargeTotal += surcharge;
             variableDetails += `  - Powerboat Surcharge (+25%): $${surcharge.toFixed(2)}\n`;
         }
         if (additionalHulls > 0) {
             let surchargeFactor = additionalHulls === 1 ? 0.25 : 0.50;
-            let surcharge = baseServiceCost * surchargeFactor;
+            let surcharge = initialBaseCost * surchargeFactor;  // Use actual cost
             variableSurchargeTotal += surcharge;
             variableDetails += `  - ${additionalHulls === 1 ? 'Catamaran' : 'Trimaran'} Surcharge (+${surchargeFactor * 100}%): $${surcharge.toFixed(2)}\n`;
         }
         if (additionalProps > 0) {
-            let surcharge = baseServiceCost * 0.10;
+            let surcharge = initialBaseCost * 0.10;  // Use actual cost
             variableSurchargeTotal += surcharge;
             variableDetails += `  - Twin Engine Surcharge (+10%): $${surcharge.toFixed(2)}\n`;
         }
         
-        let actualPaintSurchargeAmount = baseServiceCost * paintSurchargePercent;
+        let actualPaintSurchargeAmount = initialBaseCost * paintSurchargePercent;  // Use actual cost
         variableSurchargeTotal += actualPaintSurchargeAmount;
         // Use "Actual" prefix when direct conditions are used, "Est." otherwise
         const conditionPrefix = (actualPaintCondition && actualGrowthLevel) ? "Actual" : "Est.";
         variableDetails += `  - ${conditionPrefix} Paint (${estimatedPaintConditionBaseLabel}): +${(paintSurchargePercent * 100).toFixed(2)}% ($${actualPaintSurchargeAmount.toFixed(2)})\n`;
         
-        let actualGrowthSurchargeAmount = baseServiceCost * growthSurchargePercent;
+        let actualGrowthSurchargeAmount = initialBaseCost * growthSurchargePercent;  // Use actual cost
         variableSurchargeTotal += actualGrowthSurchargeAmount;
         variableDetails += `  - ${conditionPrefix} Growth (${estimatedGrowthLevelBaseLabel}): +${(growthSurchargePercent * 100).toFixed(0)}% ($${actualGrowthSurchargeAmount.toFixed(2)})\n`;
         
-        calculatedSubtotal = baseServiceCost + variableSurchargeTotal;
+        calculatedSubtotal = initialBaseCost + variableSurchargeTotal;  // Use actual cost as base
         if (variableDetails) {
             const surchargeHeaderText = (actualPaintCondition && actualGrowthLevel) ? "Variable Surcharges Applied (Actual Conditions):\n" : "Variable Surcharges Applied (Estimates):\n";
             breakdown += surchargeHeaderText + variableDetails; // variableDetails already has \n for its items
@@ -793,10 +858,20 @@ function calculateCost() {
         checkoutButton.className = 'submit-button';
         checkoutButton.textContent = 'Proceed to Checkout';
         checkoutButton.style.marginTop = '20px';
+        checkoutButton.style.marginBottom = '30px';
         checkoutButton.addEventListener('click', showCheckout);
         
+        // Insert button after the minimum fee text, before the breakdown
         const resultSection = document.getElementById('step-8');
-        resultSection.appendChild(checkoutButton);
+        const minimumFeeText = resultSection.querySelector('.variable-info');
+        
+        if (minimumFeeText && minimumFeeText.nextSibling) {
+            // Insert after the minimum fee text
+            minimumFeeText.parentNode.insertBefore(checkoutButton, minimumFeeText.nextSibling);
+        } else {
+            // Fallback to appending at the end
+            resultSection.appendChild(checkoutButton);
+        }
     }
 }
 
@@ -1291,6 +1366,50 @@ function toggleRequiredFields(boatFields, itemRecoveryFields) {
             field.required = itemRecoveryFields;
         }
     });
+}
+
+// Update paint surcharge display when dropdown changes
+function updatePaintSurchargeDisplay() {
+    const lastPaintedValue = document.getElementById('lastPaintedTime')?.value;
+    const paintExplainerEl = document.getElementById('paintExplainerText');
+    
+    if (!lastPaintedValue || !paintExplainerEl) return;
+    
+    // Get paint condition based on time since last painting
+    const estimatedPaintCondition = getPaintCondition(lastPaintedValue);
+    const paintSurchargePercent = getSpecificPaintSurchargePercent(estimatedPaintCondition, lastPaintedValue);
+    
+    // Build the explainer message
+    paintExplainerEl.innerHTML = `Est. Paint Condition: <strong>${estimatedPaintCondition}</strong>. Potential surcharge: <strong>+${(paintSurchargePercent * 100).toFixed(1)}%</strong>.`;
+}
+
+// Update growth surcharge display when dropdown changes
+function updateGrowthSurchargeDisplay() {
+    const lastCleanedValue = document.getElementById('lastCleanedTime')?.value;
+    const growthExplainerEl = document.getElementById('growthExplainerText');
+    
+    if (!lastCleanedValue || !growthExplainerEl) return;
+    
+    // Get the estimated paint condition from the paint dropdown if available
+    const lastPaintedValue = document.getElementById('lastPaintedTime')?.value;
+    const estimatedPaintCondition = lastPaintedValue ? getPaintCondition(lastPaintedValue) : "Good";
+    
+    // Get growth level based on time since last cleaning
+    const estimatedGrowthLevel = getGrowthLevel(estimatedPaintCondition, lastCleanedValue);
+    
+    // Build the explainer message
+    let growthExplainerMsg = `Est. Growth Level: <strong>${estimatedGrowthLevel}</strong>. `;
+    
+    // Add surcharge percentage based on growth level
+    if (estimatedGrowthLevel === "Minimal" || estimatedGrowthLevel === "Moderate") {
+        growthExplainerMsg += `Potential surcharge: <strong>0%</strong>.`;
+    } else if (estimatedGrowthLevel === "Heavy") {
+        growthExplainerMsg += `Potential surcharge: <strong>+25-50%</strong>.`;
+    } else if (estimatedGrowthLevel === "Severe") {
+        growthExplainerMsg += `Potential surcharge: <strong>+50-100%</strong>.`;
+    }
+    
+    growthExplainerEl.innerHTML = growthExplainerMsg;
 }
 
 // Export functions for use in charge-customer.html
