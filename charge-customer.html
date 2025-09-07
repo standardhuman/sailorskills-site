@@ -4,9 +4,84 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - Charge Customer | Sailor Skills</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <style>
-        /* Admin specific styles */
+        /* Admin specific styles - matching cost calculator theme */
+        body {
+            background-color: #ffffff;
+            min-height: 100vh;
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #181818;
+        }
+        
+        /* Hero Header - matching cost calculator */
+        .hero-header {
+            background-color: #ffffff;
+            min-height: 229px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            border-bottom: 1px solid #345475;
+        }
+        
+        .hero-content {
+            text-align: center;
+            padding: 30px 20px 40px;
+        }
+        
+        .hero-brand {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 20px;
+            font-weight: 400;
+            color: #181818;
+            letter-spacing: 0.2em;
+            margin-bottom: -10px;
+            text-transform: uppercase;
+        }
+        
+        .hero-service {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 100px;
+            font-weight: 400;
+            color: #181818;
+            line-height: 1;
+            margin: 0 0 -5px 0;
+            padding: 0;
+            letter-spacing: normal;
+        }
+        
+        .hero-tagline {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 20px;
+            font-weight: 400;
+            color: #6d7b89;
+            line-height: 1.5;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+        
+        .hero-subtitle {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
+            font-weight: 400;
+            color: #6d7b89;
+            font-style: italic;
+            margin-top: 5px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px 40px 40px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        
         .admin-badge {
             background: linear-gradient(135deg, #e74c3c, #c0392b);
             color: white;
@@ -14,41 +89,49 @@
             font-weight: bold;
             text-align: center;
             position: fixed;
-            top: 0;
+            top: 20px;
             right: 20px;
             z-index: 1000;
-            border-radius: 0 0 8px 8px;
-            box-shadow: 0 2px 10px rgba(231, 76, 60, 0.3);
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
         }
 
-        /* Customer selector styles matching the main design */
+        /* Customer selector styles matching the cost calculator design */
         .customer-section {
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+            background: #ffffff;
+            padding: 30px 0;
             margin-bottom: 30px;
-            border: 1px solid rgba(0,0,0,0.05);
+            border-bottom: 1px solid #e0e0e0;
         }
 
-        .customer-section h3 {
-            color: #1e3a5f;
+        .customer-section h2 {
+            color: #181818;
             margin-bottom: 20px;
-            font-size: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .customer-section h3::before {
-            content: '👥';
-            font-size: 24px;
+            font-size: 28px;
+            font-weight: 400;
+            letter-spacing: normal;
         }
 
         .customer-controls {
             display: flex;
             gap: 10px;
             margin-bottom: 20px;
+            position: relative;
         }
 
         .customer-search-input {
@@ -59,16 +142,17 @@
             font-size: 16px;
             transition: all 0.3s ease;
         }
+        
 
         .customer-search-input:focus {
-            border-color: #3498db;
+            border-color: #345475;
             outline: none;
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+            box-shadow: 0 0 0 3px rgba(52, 84, 117, 0.1);
         }
 
         .customer-btn {
             padding: 12px 24px;
-            background: linear-gradient(135deg, #3498db, #2980b9);
+            background-color: #345475;
             color: white;
             border: none;
             border-radius: 8px;
@@ -78,15 +162,16 @@
         }
 
         .customer-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+            background-color: #2a3f5f;
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(52, 68, 117, 0.3);
         }
 
         .customer-list {
             max-height: 300px;
             overflow-y: auto;
-            border: 2px solid #f0f0f0;
-            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
             background: #fafafa;
         }
 
@@ -103,11 +188,11 @@
         }
 
         .customer-item:hover {
-            background: linear-gradient(to right, rgba(52, 152, 219, 0.05), rgba(52, 152, 219, 0.02));
+            background: linear-gradient(to right, rgba(52, 84, 117, 0.05), rgba(52, 84, 117, 0.02));
         }
 
         .customer-item.selected {
-            background: linear-gradient(135deg, #3498db, #2980b9);
+            background: #345475;
             color: white;
         }
 
@@ -149,9 +234,9 @@
         .selected-customer-display {
             margin-top: 20px;
             padding: 15px;
-            background: linear-gradient(to right, rgba(52, 152, 219, 0.1), rgba(52, 152, 219, 0.05));
+            background: linear-gradient(to right, rgba(52, 84, 117, 0.1), rgba(52, 84, 117, 0.05));
             border-radius: 8px;
-            border: 2px solid #3498db;
+            border: 2px solid #345475;
             display: none;
         }
 
@@ -161,23 +246,25 @@
 
         /* Charge summary matching the price display style */
         .charge-summary {
-            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-            padding: 25px;
-            border-radius: 12px;
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 8px;
             margin-top: 30px;
-            border: 2px solid #dee2e6;
+            border: 1px solid #e0e0e0;
         }
 
         .charge-summary h3 {
-            color: #1e3a5f;
+            color: #181818;
             margin-bottom: 20px;
-            font-size: 20px;
+            font-size: 28px;
+            font-weight: 400;
         }
 
         .charge-details {
             background: white;
             padding: 20px;
-            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
             margin-bottom: 20px;
         }
 
@@ -194,14 +281,14 @@
             margin-bottom: 0;
             padding-top: 10px;
             font-size: 20px;
-            font-weight: bold;
-            color: #1e3a5f;
+            font-weight: 600;
+            color: #181818;
         }
 
         .charge-button {
             width: 100%;
             padding: 18px;
-            background: linear-gradient(135deg, #27ae60, #229954);
+            background-color: #345475;
             color: white;
             border: none;
             border-radius: 12px;
@@ -214,8 +301,9 @@
         }
 
         .charge-button:hover:not(:disabled) {
+            background-color: #2a3f5f;
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(39, 174, 96, 0.3);
+            box-shadow: 0 8px 20px rgba(52, 68, 117, 0.3);
         }
 
         .charge-button:disabled {
@@ -280,20 +368,95 @@
             color: #7f8c8d;
         }
         
+        /* Service selector section to match cost calculator */
+        .service-selector {
+            background: #ffffff;
+            padding: 30px 0;
+            margin-bottom: 30px;
+        }
+        
+        .service-selector h2 {
+            color: #181818;
+            margin-bottom: 20px;
+            font-size: 28px;
+            font-weight: 400;
+            letter-spacing: normal;
+        }
+        
+        /* Boat details section */
+        .boat-details {
+            background: #ffffff;
+            padding: 30px 0;
+            margin-bottom: 30px;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .boat-details h3 {
+            color: #181818;
+            margin-bottom: 20px;
+            font-size: 28px;
+            font-weight: 400;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        .input-group label {
+            display: block;
+            color: #345475;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        
+        .input-group input:focus,
+        .input-group select:focus {
+            border-color: #345475;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 84, 117, 0.1);
+        }
+        
+        /* Pricing display section */
+        .pricing-display {
+            background: #ffffff;
+            padding: 30px 0;
+            margin-bottom: 30px;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .pricing-display h3 {
+            color: #181818;
+            margin-bottom: 20px;
+            font-size: 28px;
+            font-weight: 400;
+        }
+        
         /* Boat Configuration Section */
         .boat-config-section {
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+            background: #ffffff;
+            padding: 30px 0;
             margin: 30px 0;
-            border: 1px solid rgba(0,0,0,0.05);
+            border-top: 1px solid #e0e0e0;
+            border-bottom: 1px solid #e0e0e0;
         }
         
         .boat-config-section h3 {
-            color: #1e3a5f;
-            margin-bottom: 25px;
-            font-size: 20px;
+            color: #181818;
+            margin-bottom: 20px;
+            font-size: 28px;
+            font-weight: 400;
         }
         
         .config-group {
@@ -302,10 +465,10 @@
         
         .config-group label {
             display: block;
-            font-weight: 600;
-            color: #1e3a5f;
+            font-weight: 500;
+            color: #181818;
             margin-bottom: 12px;
-            font-size: 14px;
+            font-size: 16px;
         }
         
         .radio-group {
@@ -328,7 +491,7 @@
         
         .radio-option:hover {
             background: #e9ecef;
-            border-color: #3498db;
+            border-color: #345475;
         }
         
         .radio-option input[type="radio"] {
@@ -337,16 +500,16 @@
         
         .radio-option input[type="radio"]:checked + span {
             font-weight: 600;
-            color: #3498db;
+            color: #345475;
         }
         
         .radio-option input[type="radio"]:checked {
-            accent-color: #3498db;
+            accent-color: #345475;
         }
         
         .radio-option:has(input[type="radio"]:checked) {
-            background: linear-gradient(to right, rgba(52, 152, 219, 0.1), rgba(52, 152, 219, 0.05));
-            border-color: #3498db;
+            background: linear-gradient(to right, rgba(52, 84, 117, 0.1), rgba(52, 84, 117, 0.05));
+            border-color: #345475;
         }
         
         .checkbox-option {
@@ -362,24 +525,24 @@
         
         .checkbox-option:hover {
             background: #e9ecef;
-            border-color: #3498db;
+            border-color: #345475;
         }
         
         .checkbox-option input[type="checkbox"] {
             width: 20px;
             height: 20px;
             margin-right: 12px;
-            accent-color: #3498db;
+            accent-color: #345475;
         }
         
         .checkbox-option input[type="checkbox"]:checked + span {
             font-weight: 600;
-            color: #3498db;
+            color: #345475;
         }
         
         .checkbox-option:has(input[type="checkbox"]:checked) {
-            background: linear-gradient(to right, rgba(52, 152, 219, 0.1), rgba(52, 152, 219, 0.05));
-            border-color: #3498db;
+            background: linear-gradient(to right, rgba(52, 84, 117, 0.1), rgba(52, 84, 117, 0.05));
+            border-color: #345475;
         }
         
         /* Better formatted bullet points in price breakdown */
@@ -400,7 +563,7 @@
             display: block;
             margin-top: 12px;
             margin-bottom: 8px;
-            color: #1e3a5f;
+            color: #181818;
         }
         
         .price-breakdown .breakdown-total-line {
@@ -417,24 +580,31 @@
     </style>
 </head>
 <body>
-    <div class="admin-badge">ADMIN MODE</div>
+    <!-- Hero Header -->
+    <div class="hero-header">
+        <div class="admin-badge">ADMIN MODE</div>
+        <div class="hero-content">
+            <div class="hero-brand">SAILOR SKILLS</div>
+            <h1 class="hero-service">ADMIN</h1>
+            <div class="hero-tagline">CHARGE CUSTOMER</div>
+            <div class="hero-subtitle">Use pricing calculator for existing customers</div>
+        </div>
+    </div>
     
     <div class="container">
-        <h1>⚓ Charge Customer for Diving Services</h1>
-        <p class="subtitle">Use the same pricing calculator to charge existing customers</p>
         
         <!-- Customer Selector Section -->
         <div class="customer-section">
-            <h3>Select Customer</h3>
+            <h2>Select Customer</h2>
             <div class="customer-controls">
                 <input type="text" 
                        id="customerSearch" 
                        class="customer-search-input"
-                       placeholder="Search by name or email...">
+                       placeholder="Search by name, email, or boat name...">
                 <button onclick="searchCustomers()" class="customer-btn">Search</button>
                 <button onclick="loadRecentCustomers()" class="customer-btn">Show Recent</button>
             </div>
-            <div id="customerList" class="customer-list">
+            <div id="customerList" class="customer-list" style="display: none;">
                 <div class="no-customers">Loading customers...</div>
             </div>
             <div id="selectedCustomer" class="selected-customer-display">
@@ -445,7 +615,7 @@
 
         <!-- Service Calculator (reusing existing elements) -->
         <div class="service-selector">
-            <h3>Select a service to see more details</h3>
+            <h2>Select a service to see more details</h2>
             <div class="service-selection-grid" id="serviceButtons">
                 <!-- Service buttons will be populated by JS -->
             </div>
@@ -536,8 +706,13 @@
             </div>
         </div>
 
-        <div class="boat-details">
+        <div class="boat-details" style="display: none;">
             <h3>Boat Details</h3>
+            <div class="input-group">
+                <label for="boatName">Boat Name</label>
+                <input type="text" id="boatName" placeholder="Enter boat name (optional)">
+            </div>
+            
             <div class="input-group">
                 <label for="boatLength">Boat Length (feet)</label>
                 <input type="number" id="boatLength" min="20" max="100" value="35" required>
@@ -567,7 +742,7 @@
             </div>
         </div>
 
-        <div class="pricing-display" id="pricingDisplay">
+        <div class="pricing-display" id="pricingDisplay" style="display: none;">
             <h3>Service Total</h3>
             <div class="price-breakdown" id="priceBreakdown">
                 <pre id="costBreakdown" style="font-family: inherit; white-space: pre-wrap; margin: 10px 0;"></pre>
@@ -602,10 +777,21 @@
 
         // Wait for script.js to load completely
         function initializePage() {
+            // Make sure serviceButtons and servicePriceExplainer elements are available globally
+            window.serviceButtons = document.getElementById('serviceButtons');
+            window.servicePriceExplainer = document.getElementById('servicePriceExplainer');
+            
+            console.log('Initializing charge-customer page...');
+            console.log('serviceButtons element:', window.serviceButtons);
+            console.log('populateServiceButtons function:', window.populateServiceButtons);
+            console.log('serviceData:', window.serviceData);
+            
             // Populate service buttons from script.js
-            if (window.populateServiceButtons) {
+            if (window.populateServiceButtons && window.serviceData) {
+                console.log('Populating service buttons...');
                 window.populateServiceButtons();
             } else {
+                console.log('Waiting for script.js to load...');
                 // Retry if not loaded yet
                 setTimeout(initializePage, 100);
                 return;
@@ -648,7 +834,8 @@
             });
 
             // Add enter key support for search
-            document.getElementById('customerSearch').addEventListener('keypress', function(e) {
+            const searchInput = document.getElementById('customerSearch');
+            searchInput.addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') {
                     searchCustomers();
                 }
@@ -658,7 +845,7 @@
             if (window.calculateCost) {
                 window.calculateCost();
             }
-            loadRecentCustomers();
+            // Don't auto-load customers on page load
         }
         
         // Initialize on page load
@@ -669,6 +856,7 @@
         // Load recent customers
         async function loadRecentCustomers() {
             const listEl = document.getElementById('customerList');
+            listEl.style.display = 'block';
             listEl.innerHTML = '<div class="no-customers">Loading customers...</div>';
             
             try {
@@ -694,6 +882,7 @@
             }
 
             const listEl = document.getElementById('customerList');
+            listEl.style.display = 'block';
             listEl.innerHTML = '<div class="no-customers">Searching...</div>';
 
             try {
@@ -722,7 +911,7 @@
             listEl.innerHTML = customerList.map(customer => `
                 <div class="customer-item" onclick="selectCustomer('${customer.id}', event)">
                     <div class="customer-name">${customer.name || 'Unnamed Customer'}</div>
-                    <div class="customer-email">${customer.email}</div>
+                    <div class="customer-email">${customer.email}${customer.boat_name ? ' • Boat: ' + customer.boat_name : ''}</div>
                     <span class="customer-payment ${customer.payment_method ? 'has-card' : 'no-card'}">
                         ${customer.payment_method ? '✓ Card on file' : '✗ No payment method'}
                     </span>
@@ -781,10 +970,13 @@
         function updateBoatConfigVisibility(serviceKey) {
             const boatConfigSection = document.getElementById('boatConfigSection');
             const boatDetails = document.querySelector('.boat-details');
+            const pricingDisplay = document.getElementById('pricingDisplay');
             const cleaningOptions = document.getElementById('cleaningOptions');
             
             const isCleaningService = serviceKey === 'onetime_cleaning' || serviceKey === 'recurring_cleaning';
+            const hasService = serviceKey && serviceKey !== '';
             
+            // Show/hide boat configuration for cleaning services
             if (boatConfigSection) {
                 const currentDisplay = boatConfigSection.style.display;
                 const newDisplay = isCleaningService ? 'block' : 'none';
@@ -793,9 +985,16 @@
                     console.log('Updated boat config visibility:', newDisplay, 'for service:', serviceKey);
                 }
             }
+            
+            // Show boat details and pricing only when a service is selected
             if (boatDetails) {
-                boatDetails.style.display = 'block'; // Always show boat length
+                boatDetails.style.display = hasService ? 'block' : 'none';
             }
+            if (pricingDisplay) {
+                pricingDisplay.style.display = hasService ? 'block' : 'none';
+            }
+            
+            // Show cleaning options only for cleaning services
             if (cleaningOptions) {
                 cleaningOptions.style.display = isCleaningService ? 'block' : 'none';
             }
@@ -905,9 +1104,15 @@
             const selectedServiceEl = document.querySelector('.service-option.selected');
             const service = selectedServiceEl ? selectedServiceEl.dataset.serviceKey : '';
             const boatLength = document.getElementById('boatLength').value;
+            const boatName = document.getElementById('boatName')?.value || '';
 
             // Build metadata based on service type
             const metadata = { service: service };
+            
+            // Add boat name if provided
+            if (boatName) {
+                metadata.boat_name = boatName;
+            }
             
             // Only include boat details for cleaning services
             const isCleaningService = service === 'onetime_cleaning' || service === 'recurring_cleaning';

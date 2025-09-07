@@ -76,42 +76,56 @@ app.get('/api/stripe-customers', async (req, res) => {
         limit: 1
       });
       
-      // If searching, also check billing details name
+      // If searching, also check billing details name and metadata
       let includeCustomer = true;
-      let displayName = customer.name;
+      
+      // Prefer billing details name if it has more words (likely includes last name)
+      const billingName = paymentMethods.data[0]?.billing_details?.name || '';
+      const customerName = customer.name || '';
+      const boatName = customer.metadata?.boat_name || '';
+      
+      // Use billing name if it has more words (e.g., "Brian Cline" vs "Brian")
+      let displayName = customerName;
+      if (billingName && billingName.split(' ').length > (customerName.split(' ').length || 0)) {
+        displayName = billingName;
+      } else if (!customerName && billingName) {
+        displayName = billingName;
+      }
       
       if (search) {
         const searchLower = search.toLowerCase();
         const searchTerms = searchLower.split(' ').filter(term => term.length > 0);
-        const customerName = (customer.name || '').toLowerCase();
+        const customerNameLower = customerName.toLowerCase();
         const customerEmail = (customer.email || '').toLowerCase();
-        const billingName = (paymentMethods.data[0]?.billing_details?.name || '').toLowerCase();
+        const billingNameLower = billingName.toLowerCase();
+        const boatNameLower = boatName.toLowerCase();
         
-        // Check if search matches customer data or billing name
+        // Check if search matches customer data, billing name, or boat name
         const customerMatch = searchTerms.every(term => 
-          customerName.includes(term) || customerEmail.includes(term)
+          customerNameLower.includes(term) || customerEmail.includes(term)
         );
         
         const billingMatch = searchTerms.every(term => 
-          billingName.includes(term)
+          billingNameLower.includes(term)
         );
         
-        includeCustomer = customerMatch || billingMatch || 
-                         customerName.includes(searchLower) || 
-                         customerEmail.includes(searchLower) ||
-                         billingName.includes(searchLower);
+        const boatMatch = searchTerms.every(term => 
+          boatNameLower.includes(term)
+        );
         
-        // Use billing name if customer name is empty but billing matches
-        if (!customer.name && billingName && billingMatch) {
-          displayName = paymentMethods.data[0].billing_details.name;
-        }
+        includeCustomer = customerMatch || billingMatch || boatMatch ||
+                         customerNameLower.includes(searchLower) || 
+                         customerEmail.includes(searchLower) ||
+                         billingNameLower.includes(searchLower) ||
+                         boatNameLower.includes(searchLower);
       }
       
       if (includeCustomer) {
         customersWithPaymentMethods.push({
           id: customer.id,
-          name: displayName || paymentMethods.data[0]?.billing_details?.name || 'Unknown',
+          name: displayName || 'Unknown',
           email: customer.email,
+          boat_name: boatName || null,
           payment_method: paymentMethods.data[0] || null,
           created: customer.created
         });
@@ -148,6 +162,26 @@ app.post('/api/charge-customer', async (req, res) => {
 
     if (!paymentMethods.data.length) {
       return res.status(400).json({ error: 'Customer has no payment method on file' });
+    }
+
+    // Update customer metadata with boat name if provided
+    if (metadata && metadata.boat_name) {
+      try {
+        // Get existing customer metadata
+        const customer = await stripe.customers.retrieve(customerId);
+        const existingMetadata = customer.metadata || {};
+        
+        // Update with boat name (this will preserve other metadata)
+        await stripe.customers.update(customerId, {
+          metadata: {
+            ...existingMetadata,
+            boat_name: metadata.boat_name
+          }
+        });
+      } catch (updateError) {
+        console.error('Failed to update customer metadata:', updateError);
+        // Continue with payment even if metadata update fails
+      }
     }
 
     // Create and confirm payment intent
