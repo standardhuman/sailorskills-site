@@ -570,6 +570,35 @@ input[type="tel"]:focus {
     grid-template-columns: repeat(2, 1fr);
     gap: 15px;
     margin-top: 10px;
+    position: relative;
+    min-height: 300px;
+}
+
+/* Transition styles for service selection */
+.service-fade-container {
+    transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
+}
+
+.service-fade-container.fade-out {
+    opacity: 0;
+    transform: translateY(-10px);
+    pointer-events: none;
+}
+
+.service-fade-container.fade-in {
+    opacity: 0;
+    animation: serviceFadeIn 0.4s ease-in-out 0.2s forwards;
+}
+
+@keyframes serviceFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Make cleaning services span full width */

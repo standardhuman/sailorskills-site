@@ -217,17 +217,69 @@ function populateServiceButtons() {
     }
 }
 
+// Function to handle smooth transition from service buttons to details form
+function transitionToDetailsForm(serviceKey) {
+    const service = serviceData[serviceKey];
+    if (!service) return;
+    
+    const serviceContainer = document.getElementById('step-0');
+    const serviceGrid = serviceContainer.querySelector('.service-selection-grid');
+    
+    // Fade out the service buttons
+    serviceGrid.classList.add('service-fade-container', 'fade-out');
+    
+    // After fade out, replace content with the next step's content
+    setTimeout(() => {
+        // Move to the next step
+        currentStep = 1;
+        
+        // Hide the service selection step
+        document.getElementById('step-0').style.display = 'none';
+        
+        // Show the next appropriate step
+        const nextStepElement = getNextStepElement();
+        if (nextStepElement) {
+            nextStepElement.style.display = 'block';
+            nextStepElement.classList.add('service-fade-container', 'fade-in');
+            
+            // Remove fade-in class after animation
+            setTimeout(() => {
+                nextStepElement.classList.remove('service-fade-container', 'fade-in');
+            }, 600);
+        }
+        
+        // Update navigation
+        renderCurrentStep();
+        
+        // Scroll to top of the form
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 400);
+}
+
+// Helper function to get the next step element based on service type
+function getNextStepElement() {
+    const service = serviceData[selectedServiceKey];
+    if (!service) return null;
+    
+    if (service.type === 'per_foot') {
+        return document.getElementById('step-1'); // Boat length step
+    } else {
+        return document.getElementById('step-7'); // Anodes step for flat rate services
+    }
+}
+
 function selectService(serviceKey) {
     console.log('selectService called with:', serviceKey);
     
     // Check if this service is already selected
     const wasAlreadySelected = selectedServiceKey === serviceKey;
     
-    // If already selected, trigger the next button action
+    // If already selected, perform fade transition to next step (only in admin interface)
     if (wasAlreadySelected) {
-        console.log('Service already selected, triggering next button');
-        if (nextButton) {
-            nextButton.click();
+        console.log('Service already selected, transitioning to details form');
+        // Only call transitionToDetailsForm if it exists (admin interface)
+        if (typeof window.transitionToDetailsForm === 'function') {
+            window.transitionToDetailsForm(serviceKey);
         }
         return;
     }
@@ -1412,7 +1464,7 @@ function updateGrowthSurchargeDisplay() {
     growthExplainerEl.innerHTML = growthExplainerMsg;
 }
 
-// Export functions for use in charge-customer.html
+// Export functions for use in admin.html
 window.populateServiceButtons = populateServiceButtons;
 window.calculateCost = calculateCost;
 window.selectService = selectService;

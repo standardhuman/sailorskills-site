@@ -35,6 +35,46 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
+// Create new customer
+app.post('/api/create-customer', async (req, res) => {
+  try {
+    const { name, email, phone, description, metadata } = req.body;
+    
+    // Validate required fields
+    if (!name || !email) {
+      return res.status(400).json({ 
+        error: 'Name and email are required' 
+      });
+    }
+    
+    // Create customer in Stripe
+    const customer = await stripe.customers.create({
+      name,
+      email,
+      phone,
+      description,
+      metadata
+    });
+    
+    console.log('Created new customer:', customer.id);
+    
+    res.json({ 
+      success: true,
+      customer: {
+        id: customer.id,
+        name: customer.name,
+        email: customer.email,
+        metadata: customer.metadata
+      }
+    });
+  } catch (error) {
+    console.error('Error creating customer:', error);
+    res.status(500).json({ 
+      error: error.message || 'Failed to create customer' 
+    });
+  }
+});
+
 // Fetch Stripe customers with improved search
 app.get('/api/stripe-customers', async (req, res) => {
   try {
@@ -144,6 +184,60 @@ app.get('/api/stripe-customers', async (req, res) => {
   }
 });
 
+// Create setup intent for adding payment method
+app.post('/api/create-setup-intent', async (req, res) => {
+  try {
+    const { customerId } = req.body;
+    
+    if (!customerId) {
+      return res.status(400).json({ error: 'Customer ID is required' });
+    }
+    
+    // Create a SetupIntent for this customer
+    const setupIntent = await stripe.setupIntents.create({
+      customer: customerId,
+      payment_method_types: ['card'],
+      usage: 'off_session', // Allow charging when customer not present
+    });
+    
+    res.json({
+      clientSecret: setupIntent.client_secret,
+      setupIntentId: setupIntent.id
+    });
+  } catch (error) {
+    console.error('Error creating setup intent:', error);
+    res.status(500).json({ error: error.message || 'Failed to create setup intent' });
+  }
+});
+
+// Attach payment method to customer
+app.post('/api/attach-payment-method', async (req, res) => {
+  try {
+    const { customerId, paymentMethodId } = req.body;
+    
+    if (!customerId || !paymentMethodId) {
+      return res.status(400).json({ error: 'Customer ID and Payment Method ID are required' });
+    }
+    
+    // Attach the payment method to the customer
+    await stripe.paymentMethods.attach(paymentMethodId, {
+      customer: customerId,
+    });
+    
+    // Set as default payment method
+    await stripe.customers.update(customerId, {
+      invoice_settings: {
+        default_payment_method: paymentMethodId,
+      },
+    });
+    
+    res.json({ success: true, message: 'Payment method added successfully' });
+  } catch (error) {
+    console.error('Error attaching payment method:', error);
+    res.status(500).json({ error: error.message || 'Failed to attach payment method' });
+  }
+});
+
 // Charge existing customer
 app.post('/api/charge-customer', async (req, res) => {
   try {
@@ -164,20 +258,44 @@ app.post('/api/charge-customer', async (req, res) => {
       return res.status(400).json({ error: 'Customer has no payment method on file' });
     }
 
-    // Update customer metadata with boat name if provided
-    if (metadata && metadata.boat_name) {
+    // Update customer metadata with service details if provided
+    if (metadata) {
       try {
         // Get existing customer metadata
         const customer = await stripe.customers.retrieve(customerId);
         const existingMetadata = customer.metadata || {};
         
-        // Update with boat name (this will preserve other metadata)
-        await stripe.customers.update(customerId, {
-          metadata: {
-            ...existingMetadata,
-            boat_name: metadata.boat_name
-          }
-        });
+        // Prepare metadata to update on customer record
+        const customerMetadataUpdate = {};
+        
+        // Add boat details
+        if (metadata.boat_name) customerMetadataUpdate.boat_name = metadata.boat_name;
+        if (metadata.boat_length) customerMetadataUpdate.boat_length = metadata.boat_length;
+        if (metadata.boat_type) customerMetadataUpdate.boat_type = metadata.boat_type;
+        if (metadata.hull_type) customerMetadataUpdate.hull_type = metadata.hull_type;
+        
+        // Add service history - store last service details
+        if (metadata.service_name) {
+          customerMetadataUpdate.last_service = metadata.service_name;
+          customerMetadataUpdate.last_service_date = metadata.service_date || new Date().toISOString().split('T')[0];
+        }
+        
+        // Add boat condition details (for cleaning services)
+        if (metadata.paint_condition) customerMetadataUpdate.paint_condition = metadata.paint_condition;
+        if (metadata.growth_level) customerMetadataUpdate.growth_level = metadata.growth_level;
+        
+        // Add engine configuration
+        if (metadata.engine_type) customerMetadataUpdate.engine_type = metadata.engine_type;
+        
+        // Update customer metadata (this will preserve other metadata)
+        if (Object.keys(customerMetadataUpdate).length > 0) {
+          await stripe.customers.update(customerId, {
+            metadata: {
+              ...existingMetadata,
+              ...customerMetadataUpdate
+            }
+          });
+        }
       } catch (updateError) {
         console.error('Failed to update customer metadata:', updateError);
         // Continue with payment even if metadata update fails

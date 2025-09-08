@@ -1,0 +1,2585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Charge Customer | Sailor Skills</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Admin specific styles - matching cost calculator theme */
+        body {
+            background-color: #ffffff;
+            min-height: 100vh;
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #181818;
+        }
+        
+        /* Hero Header - matching cost calculator */
+        .hero-header {
+            background-color: #ffffff;
+            min-height: 229px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            border-bottom: 1px solid #345475;
+        }
+        
+        .hero-content {
+            text-align: center;
+            padding: 30px 20px 40px;
+        }
+        
+        .hero-brand {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 20px;
+            font-weight: 400;
+            color: #181818;
+            letter-spacing: 0.2em;
+            margin-bottom: -10px;
+            text-transform: uppercase;
+        }
+        
+        .hero-service {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 100px;
+            font-weight: 400;
+            color: #181818;
+            line-height: 1;
+            margin: 0 0 -5px 0;
+            padding: 0;
+            letter-spacing: normal;
+        }
+        
+        .hero-tagline {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 20px;
+            font-weight: 400;
+            color: #6d7b89;
+            line-height: 1.5;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+        
+        .hero-subtitle {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
+            font-weight: 400;
+            color: #6d7b89;
+            font-style: italic;
+            margin-top: 5px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px 40px 40px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        .admin-badge {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            padding: 8px 16px;
+            font-weight: bold;
+            text-align: center;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Customer selector styles matching the cost calculator design */
+        .customer-section {
+            background: #ffffff;
+            padding: 30px 0;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .customer-section h2 {
+            color: #181818;
+            margin-bottom: 20px;
+            font-size: 28px;
+            font-weight: 400;
+            letter-spacing: normal;
+        }
+
+        .customer-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .customer-search-input {
+            flex: 1;
+            padding: 14px 18px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            min-height: 52px;
+            -webkit-appearance: none;
+        }
+        
+
+        .customer-search-input:focus {
+            border-color: #345475;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 84, 117, 0.1);
+        }
+
+        .customer-btn {
+            padding: 14px 28px;
+            background-color: #345475;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 17px;
+            min-height: 52px;
+            white-space: nowrap;
+        }
+
+        .customer-btn:hover {
+            background-color: #2a3f5f;
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(52, 68, 117, 0.3);
+        }
+
+        .customer-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            background: #fafafa;
+        }
+
+        .customer-item {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .customer-item:last-child {
+            border-bottom: none;
+        }
+
+        .customer-item:hover {
+            background: linear-gradient(to right, rgba(52, 84, 117, 0.05), rgba(52, 84, 117, 0.02));
+        }
+
+        .customer-item.selected {
+            background: #345475;
+            color: white;
+        }
+
+        .customer-name {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .customer-email {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .customer-payment {
+            display: inline-block;
+            margin-top: 5px;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .customer-payment.has-card {
+            background: rgba(46, 204, 113, 0.2);
+            color: #27ae60;
+        }
+
+        .customer-payment.no-card {
+            background: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+        }
+
+        .customer-item.selected .customer-payment {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+
+        .selected-customer-display {
+            margin-top: 20px;
+            padding: 15px;
+            background: linear-gradient(to right, rgba(52, 84, 117, 0.1), rgba(52, 84, 117, 0.05));
+            border-radius: 8px;
+            border: 2px solid #345475;
+            display: none;
+        }
+
+        .selected-customer-display.active {
+            display: block;
+        }
+
+        /* Charge summary matching the price display style */
+        .charge-summary {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 8px;
+            margin-top: 30px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .charge-summary h3 {
+            color: #181818;
+            margin-bottom: 20px;
+            font-size: 28px;
+            font-weight: 400;
+        }
+
+        .charge-details {
+            background: white;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        .charge-detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .charge-detail-row:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-top: 10px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #181818;
+        }
+
+        .charge-button {
+            width: 100%;
+            padding: 18px;
+            background-color: #345475;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .charge-button:hover:not(:disabled) {
+            background-color: #2a3f5f;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(52, 68, 117, 0.3);
+        }
+
+        .charge-button:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .charge-button.processing {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+        }
+
+        /* Result messages */
+        .charge-result {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 12px;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        .charge-result.success {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            border: 2px solid #28a745;
+            color: #155724;
+        }
+
+        .charge-result.error {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            border: 2px solid #dc3545;
+            color: #721c24;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-10px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .no-customers {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+        }
+        
+        /* Service selector section to match cost calculator */
+        .service-selector {
+            background: #ffffff;
+            padding: 30px 0;
+            margin-bottom: 30px;
+        }
+        
+        .service-selector h2 {
+            color: #181818;
+            margin-bottom: 20px;
+            font-size: 28px;
+            font-weight: 400;
+            letter-spacing: normal;
+        }
+        
+        /* Fade transition styles for service selection */
+        .service-selection-grid {
+            position: relative;
+            min-height: 300px;
+        }
+        
+        .service-fade-container {
+            transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
+        }
+        
+        .service-fade-container.fade-out {
+            opacity: 0;
+            transform: translateY(-10px);
+            pointer-events: none;
+        }
+        
+        .service-fade-container.fade-in {
+            opacity: 0;
+            animation: serviceFadeIn 0.4s ease-in-out 0.2s forwards;
+        }
+        
+        @keyframes serviceFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Button group styles for options */
+        .option-button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        
+        .option-button {
+            padding: 14px 20px;
+            border: 2px solid #ddd;
+            background-color: #fff;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 100px;
+            text-align: center;
+            flex: 1;
+            min-height: 52px;
+        }
+        
+        .option-button:hover {
+            border-color: #345475;
+            background-color: #f8f9fa;
+        }
+        
+        .option-button.selected {
+            background-color: #345475;
+            color: white;
+            border-color: #345475;
+        }
+        
+        .option-button.selected:hover {
+            background-color: #2a3f5f;
+            border-color: #2a3f5f;
+        }
+        
+        /* Paint condition specific colors */
+        .paint-excellent.selected { background-color: #27ae60; border-color: #27ae60; }
+        .paint-good.selected { background-color: #3498db; border-color: #3498db; }
+        .paint-fair.selected { background-color: #f39c12; border-color: #f39c12; }
+        .paint-poor.selected { background-color: #e67e22; border-color: #e67e22; }
+        .paint-missing.selected { background-color: #e74c3c; border-color: #e74c3c; }
+        
+        /* Growth level specific colors */
+        .growth-minimal.selected { background-color: #27ae60; border-color: #27ae60; }
+        .growth-moderate.selected { background-color: #f39c12; border-color: #f39c12; }
+        .growth-heavy.selected { background-color: #e67e22; border-color: #e67e22; }
+        .growth-severe.selected { background-color: #e74c3c; border-color: #e74c3c; }
+        
+        /* Wizard navigation styles */
+        .wizard-navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 20px 0;
+        }
+        
+        .wizard-nav-btn {
+            padding: 12px 24px;
+            background-color: #345475;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+        }
+        
+        .wizard-nav-btn:hover:not(:disabled) {
+            background-color: #2a3f5f;
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(52, 68, 117, 0.3);
+        }
+        
+        .wizard-nav-btn:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        
+        #wizardContent {
+            min-height: 200px;
+            padding: 20px 0;
+        }
+        
+        .wizard-step {
+            display: none;
+        }
+        
+        .wizard-step.active {
+            display: block;
+            animation: wizardStepFade 0.3s ease-in-out;
+        }
+        
+        @keyframes wizardStepFade {
+            from {
+                opacity: 0;
+                transform: translateX(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        /* Modal styles */
+        .modal {
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background-color: #fefefe;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            color: #aaa;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        
+        .close:hover {
+            color: #000;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #345475;
+            font-weight: 600;
+        }
+        
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            background-color: white;
+            /* Better for touch/gloved fingers */
+            min-height: 48px;
+            -webkit-appearance: none;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #345475;
+            border-width: 2px;
+            box-shadow: 0 0 0 4px rgba(52, 84, 117, 0.2);
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 25px;
+        }
+        
+        .cancel-btn {
+            padding: 14px 24px;
+            background-color: #95a5a6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s;
+            font-size: 16px;
+            min-height: 48px;
+            min-width: 100px;
+        }
+        
+        .cancel-btn:hover {
+            background-color: #7f8c8d;
+        }
+        
+        .submit-btn {
+            padding: 14px 24px;
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s;
+            font-size: 16px;
+            min-height: 48px;
+            min-width: 100px;
+        }
+        
+        .submit-btn:hover {
+            background-color: #229954;
+        }
+        
+        /* Boat details section */
+        .boat-details {
+            background: #ffffff;
+            padding: 30px 0;
+            margin-bottom: 30px;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .boat-details h3 {
+            color: #181818;
+            margin-bottom: 20px;
+            font-size: 28px;
+            font-weight: 400;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        .input-group label {
+            display: block;
+            color: #345475;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        
+        .input-group input:focus,
+        .input-group select:focus {
+            border-color: #345475;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 84, 117, 0.1);
+        }
+        
+        /* Pricing display section */
+        .pricing-display {
+            background: #ffffff;
+            padding: 30px 0;
+            margin-bottom: 30px;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .pricing-display h3 {
+            color: #181818;
+            margin-bottom: 20px;
+            font-size: 28px;
+            font-weight: 400;
+        }
+        
+        /* Boat Configuration Section */
+        .boat-config-section {
+            background: #ffffff;
+            padding: 30px 0;
+            margin: 30px 0;
+            border-top: 1px solid #e0e0e0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .boat-config-section h3 {
+            color: #181818;
+            margin-bottom: 20px;
+            font-size: 28px;
+            font-weight: 400;
+        }
+        
+        .config-group {
+            margin-bottom: 25px;
+        }
+        
+        .config-group label {
+            display: block;
+            font-weight: 500;
+            color: #181818;
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+        
+        .radio-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .radio-option {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: normal;
+        }
+        
+        .radio-option:hover {
+            background: #e9ecef;
+            border-color: #345475;
+        }
+        
+        .radio-option input[type="radio"] {
+            margin-right: 10px;
+        }
+        
+        .radio-option input[type="radio"]:checked + span {
+            font-weight: 600;
+            color: #345475;
+        }
+        
+        .radio-option input[type="radio"]:checked {
+            accent-color: #345475;
+        }
+        
+        .radio-option:has(input[type="radio"]:checked) {
+            background: linear-gradient(to right, rgba(52, 84, 117, 0.1), rgba(52, 84, 117, 0.05));
+            border-color: #345475;
+        }
+        
+        .checkbox-option {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .checkbox-option:hover {
+            background: #e9ecef;
+            border-color: #345475;
+        }
+        
+        .checkbox-option input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            accent-color: #345475;
+        }
+        
+        .checkbox-option input[type="checkbox"]:checked + span {
+            font-weight: 600;
+            color: #345475;
+        }
+        
+        .checkbox-option:has(input[type="checkbox"]:checked) {
+            background: linear-gradient(to right, rgba(52, 84, 117, 0.1), rgba(52, 84, 117, 0.05));
+            border-color: #345475;
+        }
+        
+        /* Better formatted bullet points in price breakdown */
+        .price-breakdown .breakdown-item {
+            display: block;
+            margin-left: 20px;
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+        
+        .price-breakdown .breakdown-detail {
+            margin-left: 40px;
+            font-size: 0.95em;
+            color: #555;
+        }
+        
+        .price-breakdown .breakdown-header {
+            display: block;
+            margin-top: 12px;
+            margin-bottom: 8px;
+            color: #181818;
+        }
+        
+        .price-breakdown .breakdown-total-line {
+            display: block;
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .price-breakdown .breakdown-line {
+            display: block;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Header -->
+    <div class="hero-header">
+        <div class="admin-badge">ADMIN MODE</div>
+        <div class="hero-content">
+            <div class="hero-brand">SAILOR SKILLS</div>
+            <h1 class="hero-service">ADMIN</h1>
+            <div class="hero-tagline">CHARGE CUSTOMER</div>
+            <div class="hero-subtitle">Use pricing calculator for existing customers</div>
+        </div>
+    </div>
+    
+    <!-- Add Payment Method Modal -->
+    <div id="paymentMethodModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close" onclick="closePaymentMethodForm()">&times;</span>
+            <h2>Add Payment Method</h2>
+            <div id="paymentCustomerInfo" style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                <!-- Customer info will be populated here -->
+            </div>
+            <form id="payment-form" autocomplete="off" data-private="true">
+                <div id="card-element" style="padding: 12px; border: 1px solid #ddd; border-radius: 6px; background: white;">
+                    <!-- Stripe card element will be mounted here -->
+                </div>
+                <div id="card-errors" role="alert" style="color: #e74c3c; margin-top: 10px; min-height: 20px;"></div>
+                <div class="form-actions" style="margin-top: 20px;">
+                    <button type="button" onclick="closePaymentMethodForm()" class="cancel-btn">Cancel</button>
+                    <button type="submit" id="submit-payment" class="submit-btn">Add Card</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- New Customer Modal -->
+    <div id="newCustomerModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close" onclick="closeCreateCustomerForm()">&times;</span>
+            <h2>Create New Customer</h2>
+            <form id="newCustomerForm">
+                <div class="form-group">
+                    <label for="newCustomerName">Full Name *</label>
+                    <input type="text" id="newCustomerName" name="name" required placeholder="John Doe">
+                </div>
+                <div class="form-group">
+                    <label for="newCustomerEmail">Email *</label>
+                    <input type="email" id="newCustomerEmail" name="email" required placeholder="customer@example.com">
+                </div>
+                <div class="form-group">
+                    <label for="newCustomerPhone">Phone</label>
+                    <input type="tel" id="newCustomerPhone" name="phone" placeholder="+1 (555) 123-4567">
+                </div>
+                <div class="form-group">
+                    <label for="newCustomerBoatName">Boat Name</label>
+                    <input type="text" id="newCustomerBoatName" name="boat_name" placeholder="Serenity">
+                </div>
+                <div class="form-group">
+                    <label for="newCustomerBoatLength">Boat Length (feet)</label>
+                    <input type="number" id="newCustomerBoatLength" name="boat_length" min="20" max="100" placeholder="35">
+                </div>
+                <div class="form-group">
+                    <label for="newCustomerBoatMake">Boat Make/Manufacturer</label>
+                    <input type="text" id="newCustomerBoatMake" name="boat_make" placeholder="Catalina, Beneteau, etc.">
+                </div>
+                <div class="form-group">
+                    <label for="newCustomerBoatModel">Boat Model</label>
+                    <input type="text" id="newCustomerBoatModel" name="boat_model" placeholder="Oceanis 45, Hunter 36, etc.">
+                </div>
+                <div class="form-group">
+                    <label for="newCustomerBoatYear">Boat Year</label>
+                    <input type="number" id="newCustomerBoatYear" name="boat_year" min="1900" max="2025" placeholder="2018">
+                </div>
+                <div class="form-group">
+                    <label for="newCustomerMarina">Marina</label>
+                    <input type="text" id="newCustomerMarina" name="marina" placeholder="San Francisco Marina">
+                </div>
+                <div class="form-group">
+                    <label for="newCustomerDock">Dock</label>
+                    <input type="text" id="newCustomerDock" name="dock" placeholder="A, B, C, etc.">
+                </div>
+                <div class="form-group">
+                    <label for="newCustomerSlip">Slip Number</label>
+                    <input type="text" id="newCustomerSlip" name="slip" placeholder="42">
+                </div>
+                <div class="form-group">
+                    <label for="newCustomerBoatType">Boat Type</label>
+                    <input type="text" 
+                           id="newCustomerBoatType" 
+                           name="boat_type" 
+                           placeholder="e.g., Sailboat, Powerboat, Catamaran">
+                </div>
+                <div class="form-group">
+                    <label for="newCustomerHullMaterial">Hull Material</label>
+                    <input type="text" 
+                           id="newCustomerHullMaterial" 
+                           name="hull_material" 
+                           placeholder="e.g., Fiberglass, Aluminum, Steel">
+                </div>
+                <div class="form-group">
+                    <label for="newCustomerNotes">Notes</label>
+                    <textarea id="newCustomerNotes" name="description" rows="3" placeholder="Any additional notes about the customer or boat..."></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" onclick="closeCreateCustomerForm()" class="cancel-btn">Cancel</button>
+                    <button type="submit" class="submit-btn">Create Customer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div class="container">
+        
+        <!-- Customer Selector Section -->
+        <div class="customer-section">
+            <h2>Select Customer</h2>
+            <div class="customer-controls">
+                <input type="text" 
+                       id="customerSearch" 
+                       class="customer-search-input"
+                       placeholder="Search by name, email, or boat name...">
+                <button onclick="searchCustomers()" class="customer-btn">Search</button>
+                <button onclick="loadRecentCustomers()" class="customer-btn">Show Recent</button>
+                <button onclick="showCreateCustomerForm()" class="customer-btn" style="background-color: #27ae60;">+ New Customer</button>
+            </div>
+            <div id="customerList" class="customer-list" style="display: none;">
+                <div class="no-customers">Loading customers...</div>
+            </div>
+            <div id="selectedCustomer" class="selected-customer-display">
+                <strong>Selected Customer:</strong> 
+                <span id="selectedCustomerInfo"></span>
+            </div>
+        </div>
+
+        <!-- Service Calculator (reusing existing elements) -->
+        <div class="service-selector">
+            <h2>Select a service to see more details</h2>
+            <div class="service-selection-grid" id="serviceButtons">
+                <!-- Service buttons will be populated by JS -->
+            </div>
+            <p class="variable-info" id="servicePriceExplainer" style="margin-top: 15px;"></p>
+            
+            <!-- In-place wizard container (hidden initially) -->
+            <div id="wizardContainer" style="display: none;">
+                <!-- Consolidated form content -->
+                <div id="wizardContent"></div>
+            </div>
+        </div>
+        
+        <!-- Boat Configuration Section (removed - redundant with wizard) -->
+        <div id="boatConfigSection" class="boat-config-section" style="display: none !important; /* PERMANENTLY HIDDEN - handled by wizard */">
+            <h3>⛵ Boat Configuration</h3>
+            
+            <div class="config-group">
+                <label>Boat Type</label>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="boat_type" value="sailboat" checked onchange="updateBoatConfig()">
+                        <span>Sailboat</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="boat_type" value="powerboat" onchange="updateBoatConfig()">
+                        <span>Powerboat (+25% surcharge)</span>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="config-group">
+                <label>Hull Type</label>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="hull_type" value="monohull" checked onchange="updateBoatConfig()">
+                        <span>Monohull</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="hull_type" value="catamaran" onchange="updateBoatConfig()">
+                        <span>Catamaran (+25% surcharge)</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="hull_type" value="trimaran" onchange="updateBoatConfig()">
+                        <span>Trimaran (+50% surcharge)</span>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="config-group">
+                <label>Engine Configuration</label>
+                <div class="checkbox-group">
+                    <label class="checkbox-option">
+                        <input type="checkbox" id="has_twin_engines" name="has_twin_engines" value="true" onchange="updateBoatConfig()">
+                        <span>Twin engines (+10% surcharge)</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Hidden step elements for calculator compatibility -->
+        <div style="display: none;">
+            <div id="step-0" class="form-step active"></div>
+            <div id="step-1" class="form-step">
+                <!-- Removed redundant boat length input -->
+            </div>
+            <div id="step-2" class="form-step"></div>
+            <div id="step-3" class="form-step"></div>
+            <div id="step-4" class="form-step"></div>
+            <div id="step-5" class="form-step">
+                <!-- Hidden selects removed - using text inputs -->
+            </div>
+            <div id="step-6" class="form-step">
+                <!-- Hidden selects removed - using text inputs -->
+            </div>
+            <div id="step-7" class="form-step">
+                <input type="number" id="anodesToInstall" value="0">
+            </div>
+            <div id="step-8" class="result-section form-step">
+                <div id="hiddenCostBreakdown" style="display: none;"></div>
+                <div class="total-row">
+                    <span class="total-label">Total:</span>
+                    <span class="total-value" id="hiddenTotalCostDisplay">$0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Boat Details Section (removed - redundant with wizard) -->
+        <div class="boat-details" style="display: none !important; /* PERMANENTLY HIDDEN - handled by wizard */">
+            <h3>Boat Details</h3>
+            <div class="input-group">
+                <label for="boatName">Boat Name</label>
+                <input type="text" id="boatName" placeholder="Enter boat name (optional)">
+            </div>
+            
+            <!-- Boat length now handled in wizard only -->
+            <input type="hidden" id="boatLength" value="35">
+            
+            <div id="cleaningOptions">
+                <div class="input-group">
+                    <label>Actual Paint Condition Found</label>
+                    <div class="option-button-group" id="paintConditionButtons">
+                        <button type="button" class="option-button paint-excellent" data-value="excellent" onclick="selectPaintCondition('excellent')">Excellent</button>
+                        <button type="button" class="option-button paint-good selected" data-value="good" onclick="selectPaintCondition('good')">Good</button>
+                        <button type="button" class="option-button paint-fair" data-value="fair" onclick="selectPaintCondition('fair')">Fair</button>
+                        <button type="button" class="option-button paint-poor" data-value="poor" onclick="selectPaintCondition('poor')">Poor</button>
+                        <button type="button" class="option-button paint-missing" data-value="missing" onclick="selectPaintCondition('missing')">Missing</button>
+                    </div>
+                    <input type="hidden" id="actualPaintCondition" value="good">
+                </div>
+                
+                <div class="input-group">
+                    <label>Actual Growth Level Found</label>
+                    <div class="option-button-group" id="growthLevelButtons">
+                        <button type="button" class="option-button growth-minimal selected" data-value="minimal" onclick="selectGrowthLevel('minimal')">Minimal</button>
+                        <button type="button" class="option-button growth-moderate" data-value="moderate" onclick="selectGrowthLevel('moderate')">Moderate</button>
+                        <button type="button" class="option-button growth-heavy" data-value="heavy" onclick="selectGrowthLevel('heavy')">Heavy</button>
+                        <button type="button" class="option-button growth-severe" data-value="severe" onclick="selectGrowthLevel('severe')">Severe</button>
+                    </div>
+                    <input type="hidden" id="actualGrowthLevel" value="minimal">
+                </div>
+            </div>
+        </div>
+
+        <!-- Service Total Section (removed - redundant with wizard) -->
+        <div class="pricing-display" id="pricingDisplay" style="display: none !important; /* PERMANENTLY HIDDEN - handled by wizard */">
+            <h3>Service Total</h3>
+            <div class="price-breakdown" id="priceBreakdown">
+                <pre id="costBreakdown" style="font-family: inherit; white-space: pre-wrap; margin: 10px 0;"></pre>
+                <div class="total-row" style="font-size: 20px; font-weight: bold; color: #1e3a5f; margin-top: 15px; padding-top: 15px; border-top: 2px solid #dee2e6;">
+                    <span class="total-label">Total:</span>
+                    <span class="total-value" id="totalCostDisplay">$0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charge Summary Section -->
+        <div class="charge-summary">
+            <h3>💳 Charge Summary</h3>
+            <div class="charge-details" id="chargeDetails">
+                <div style="text-align: center; color: #7f8c8d;">
+                    Select a customer and configure service details
+                </div>
+            </div>
+            <button id="chargeButton" class="charge-button" onclick="chargeCustomer()" disabled>
+                Charge Customer
+            </button>
+        </div>
+
+        <!-- Result Display -->
+        <div id="chargeResult" class="charge-result"></div>
+    </div>
+
+    <!-- Load Stripe.js -->
+    <script src="https://js.stripe.com/v3/"></script>
+    
+    <script type="module">
+        // Initialize Stripe
+        const stripe = Stripe('pk_live_pri1IepedMvGQmLCFrV4kVzF'); // Your publishable key
+        let elements = null;
+        let cardElement = null;
+        
+        // Override selectService BEFORE script.js loads and populates buttons
+        window.currentServiceKey = null;
+        
+        // Wizard state management - make these global so they're accessible across script blocks
+        window.wizardCurrentStep = 0;
+        window.wizardSteps = [];
+        
+        // Make transitionToDetailsForm available globally (will be defined later)
+        window.transitionToDetailsForm = null;
+        
+        // Store the original selectService that will be loaded from script.js
+        let selectServiceOriginal = null;
+        
+        // Define our override function
+        function selectServiceOverride(serviceKey) {
+            console.log('Admin interface selectService:', serviceKey);
+            console.log('Current service key:', window.currentServiceKey);
+            console.log('Comparison:', window.currentServiceKey === serviceKey);
+            
+            // If clicking the same service twice, do fade transition
+            if (window.currentServiceKey === serviceKey) {
+                console.log('Same service clicked twice, triggering wizard transition');
+                // Use our own transitionToDetailsForm
+                if (typeof window.transitionToDetailsForm === 'function') {
+                    window.transitionToDetailsForm(serviceKey);
+                } else {
+                    console.error('transitionToDetailsForm not yet defined');
+                }
+                return;
+            }
+            
+            // Otherwise, handle selection
+            window.currentServiceKey = serviceKey;
+            window.selectedServiceKey = serviceKey;
+            
+            // Update UI - replicate the necessary parts
+            document.querySelectorAll('.service-option').forEach(btn => {
+                btn.classList.remove('selected', 'expanded');
+            });
+            
+            // Select and expand the clicked button
+            const selectedButton = document.querySelector(`.service-option[data-service-key="${serviceKey}"]`);
+            if (selectedButton) {
+                selectedButton.classList.add('selected', 'expanded');
+                
+                // Update button content to show description
+                const service = window.serviceData ? window.serviceData[serviceKey] : null;
+                if (service && service.description) {
+                    selectedButton.innerHTML = '';
+                    
+                    const titleDiv = document.createElement('div');
+                    titleDiv.className = 'service-title';
+                    titleDiv.textContent = service.name;
+                    selectedButton.appendChild(titleDiv);
+                    
+                    const descDiv = document.createElement('div');
+                    descDiv.className = 'service-description';
+                    descDiv.textContent = service.description;
+                    selectedButton.appendChild(descDiv);
+                    
+                    const clickNote = document.createElement('div');
+                    clickNote.className = 'service-click-note';
+                    clickNote.textContent = 'Click again to select this service';
+                    selectedButton.appendChild(clickNote);
+                }
+            }
+            
+            // Calculate cost if function exists
+            if (window.calculateCost) {
+                window.calculateCost();
+            }
+            
+            // Update visibility
+            setTimeout(() => {
+                if (typeof updateBoatConfigVisibility === 'function') {
+                    updateBoatConfigVisibility(serviceKey);
+                }
+            }, 50);
+        }
+        
+        // Override window.selectService immediately
+        Object.defineProperty(window, 'selectService', {
+            get: function() {
+                return selectServiceOverride;
+            },
+            set: function(value) {
+                // Store the original when script.js tries to set it
+                if (!selectServiceOriginal && value !== selectServiceOverride) {
+                    selectServiceOriginal = value;
+                    console.log('Stored original selectService from script.js');
+                }
+            },
+            configurable: true
+        });
+    </script>
+    <script src="script.js" type="module"></script>
+    <script type="module">
+        let selectedCustomer = null;
+        let customers = [];
+
+        // Wait for script.js to load completely
+        function initializePage() {
+            // Make sure serviceButtons and servicePriceExplainer elements are available globally
+            window.serviceButtons = document.getElementById('serviceButtons');
+            window.servicePriceExplainer = document.getElementById('servicePriceExplainer');
+            
+            console.log('Initializing charge-customer page...');
+            console.log('serviceButtons element:', window.serviceButtons);
+            console.log('populateServiceButtons function:', window.populateServiceButtons);
+            console.log('serviceData:', window.serviceData);
+            
+            // Populate service buttons from script.js
+            if (window.populateServiceButtons && window.serviceData) {
+                console.log('Populating service buttons...');
+                window.populateServiceButtons();
+            } else {
+                console.log('Waiting for script.js to load...');
+                // Retry if not loaded yet
+                setTimeout(initializePage, 100);
+                return;
+            }
+            
+            // Set up a watcher for service selection changes
+            setInterval(() => {
+                const serviceKey = window.selectedServiceKey || window.getSelectedServiceKey?.();
+                updateBoatConfigVisibility(serviceKey);
+            }, 100);
+            
+            // boatLength is now a hidden field that gets synced from wizardBoatLength
+            
+            document.getElementById('actualPaintCondition')?.addEventListener('change', function() {
+                if (window.calculateCostDirect) {
+                    window.calculateCostDirect();
+                } else if (window.calculateCost) {
+                    window.calculateCost();
+                }
+                updateChargeSummary();
+            });
+            
+            document.getElementById('actualGrowthLevel')?.addEventListener('change', function() {
+                if (window.calculateCostDirect) {
+                    window.calculateCostDirect();
+                } else if (window.calculateCost) {
+                    window.calculateCost();
+                }
+                updateChargeSummary();
+            });
+
+            // Add enter key support for search
+            const searchInput = document.getElementById('customerSearch');
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    searchCustomers();
+                }
+            });
+            
+            // Initial calculations
+            if (window.calculateCost) {
+                window.calculateCost();
+            }
+            // Don't auto-load customers on page load
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            initializePage();
+        });
+
+        // Load recent customers
+        async function loadRecentCustomers() {
+            const listEl = document.getElementById('customerList');
+            listEl.style.display = 'block';
+            listEl.innerHTML = '<div class="no-customers">Loading customers...</div>';
+            
+            try {
+                const response = await fetch('http://localhost:3001/api/stripe-customers?limit=10');
+                const data = await response.json();
+                customers = data.customers || [];
+                displayCustomers(customers);
+            } catch (error) {
+                console.error('Error loading customers:', error);
+                listEl.innerHTML = '<div class="no-customers">Error loading customers. Check console.</div>';
+            }
+        }
+        
+        // Make functions globally available
+        window.loadRecentCustomers = loadRecentCustomers;
+
+        // Search customers
+        async function searchCustomers() {
+            const query = document.getElementById('customerSearch').value.trim();
+            if (!query) {
+                loadRecentCustomers();
+                return;
+            }
+
+            const listEl = document.getElementById('customerList');
+            listEl.style.display = 'block';
+            listEl.innerHTML = '<div class="no-customers">Searching...</div>';
+
+            try {
+                const response = await fetch(`http://localhost:3001/api/stripe-customers?search=${encodeURIComponent(query)}`);
+                const data = await response.json();
+                customers = data.customers || [];
+                displayCustomers(customers);
+            } catch (error) {
+                console.error('Error searching customers:', error);
+                listEl.innerHTML = '<div class="no-customers">Error searching. Check console.</div>';
+            }
+        }
+        
+        // Function to show create customer form
+        function showCreateCustomerForm() {
+            const modal = document.getElementById('newCustomerModal');
+            modal.style.display = 'flex';
+            document.getElementById('newCustomerForm').reset();
+        }
+        
+        // Function to close create customer form
+        function closeCreateCustomerForm() {
+            const modal = document.getElementById('newCustomerModal');
+            modal.style.display = 'none';
+        }
+        
+        // Handle new customer form submission
+        const newCustomerForm = document.getElementById('newCustomerForm');
+        if (newCustomerForm) {
+            newCustomerForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+            
+            const formData = new FormData(this);
+            const customerData = {
+                name: formData.get('name'),
+                email: formData.get('email'),
+                phone: formData.get('phone'),
+                description: formData.get('description'),
+                metadata: {
+                    boat_name: formData.get('boat_name'),
+                    boat_length: formData.get('boat_length'),
+                    boat_make: formData.get('boat_make'),
+                    boat_model: formData.get('boat_model'),
+                    boat_year: formData.get('boat_year'),
+                    boat_type: formData.get('boat_type'),
+                    hull_material: formData.get('hull_material'),
+                    marina: formData.get('marina'),
+                    dock: formData.get('dock'),
+                    slip: formData.get('slip')
+                }
+            };
+            
+            // Remove empty metadata fields
+            Object.keys(customerData.metadata).forEach(key => {
+                if (!customerData.metadata[key] || customerData.metadata[key] === '') {
+                    delete customerData.metadata[key];
+                }
+            });
+            
+            // Remove empty phone if not provided
+            if (!customerData.phone) {
+                delete customerData.phone;
+            }
+            
+            console.log('Submitting customer data:', customerData);
+            
+            try {
+                const response = await fetch('http://localhost:3001/api/create-customer', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(customerData)
+                });
+                
+                console.log('Response status:', response.status);
+                const result = await response.json();
+                console.log('Response data:', result);
+                
+                if (response.ok) {
+                    alert(`Customer created successfully!\nCustomer ID: ${result.customer.id}`);
+                    closeCreateCustomerForm();
+                    
+                    // Add the new customer to the list and select them
+                    const newCustomer = {
+                        id: result.customer.id,
+                        name: result.customer.name,
+                        email: result.customer.email,
+                        boat_name: result.customer.metadata?.boat_name,
+                        payment_method: null
+                    };
+                    
+                    customers.unshift(newCustomer);
+                    displayCustomers(customers);
+                    selectCustomer(result.customer.id, { currentTarget: document.querySelector(`[onclick*="${result.customer.id}"]`) });
+                } else {
+                    alert('Error creating customer: ' + (result.error || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Error creating customer:', error);
+                alert('Failed to create customer. Please try again.');
+            }
+        });
+        }
+        
+        // Function to show add payment method form
+        async function showAddPaymentMethod(customerId, event) {
+            if (event) {
+                event.stopPropagation();
+            }
+            
+            // Find customer details
+            const customer = customers.find(c => c.id === customerId) || selectedCustomer;
+            if (!customer) {
+                alert('Please select a customer first');
+                return;
+            }
+            
+            // Show modal
+            const modal = document.getElementById('paymentMethodModal');
+            modal.style.display = 'flex';
+            
+            // Display customer info
+            document.getElementById('paymentCustomerInfo').innerHTML = `
+                <div><strong>Adding payment method for:</strong></div>
+                <div>${customer.name || 'Unnamed'} (${customer.email})</div>
+            `;
+            
+            try {
+                // Create setup intent
+                const response = await fetch('http://localhost:3001/api/create-setup-intent', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ customerId: customerId })
+                });
+                
+                const { clientSecret } = await response.json();
+                
+                // Create Stripe Elements
+                elements = stripe.elements();
+                
+                // Create and mount card element with autofill
+                const style = {
+                    base: {
+                        fontSize: '16px',
+                        color: '#32325d',
+                        '::placeholder': {
+                            color: '#aab7c4'
+                        }
+                    },
+                    invalid: {
+                        color: '#fa755a',
+                        iconColor: '#fa755a'
+                    }
+                };
+                
+                cardElement = elements.create('card', { 
+                    style: style,
+                    hidePostalCode: false, // Show zip code for better fraud prevention
+                    // Disable autofill to prevent admin's own card from auto-populating
+                    disableLink: true,
+                    iconStyle: 'solid'
+                });
+                cardElement.mount('#card-element');
+                
+                // Handle card errors
+                cardElement.on('change', function(event) {
+                    const displayError = document.getElementById('card-errors');
+                    if (event.error) {
+                        displayError.textContent = event.error.message;
+                    } else {
+                        displayError.textContent = '';
+                    }
+                });
+                
+                // Store setup data for form submission
+                window.currentSetupIntent = {
+                    clientSecret: clientSecret,
+                    customerId: customerId
+                };
+                
+            } catch (error) {
+                console.error('Error setting up payment form:', error);
+                alert('Failed to initialize payment form. Please try again.');
+                closePaymentMethodForm();
+            }
+        }
+        
+        // Close payment method form
+        function closePaymentMethodForm() {
+            const modal = document.getElementById('paymentMethodModal');
+            modal.style.display = 'none';
+            
+            // Unmount card element
+            if (cardElement) {
+                cardElement.unmount();
+                cardElement = null;
+            }
+            elements = null;
+            window.currentSetupIntent = null;
+        }
+        
+        // Handle payment form submission
+        document.getElementById('payment-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            
+            if (!window.currentSetupIntent) {
+                alert('Setup not initialized. Please try again.');
+                return;
+            }
+            
+            const submitButton = document.getElementById('submit-payment');
+            submitButton.disabled = true;
+            submitButton.textContent = 'Processing...';
+            
+            try {
+                // Confirm the setup intent with Stripe
+                const result = await stripe.confirmCardSetup(
+                    window.currentSetupIntent.clientSecret,
+                    {
+                        payment_method: {
+                            card: cardElement,
+                        }
+                    }
+                );
+                
+                if (result.error) {
+                    // Show error to customer
+                    document.getElementById('card-errors').textContent = result.error.message;
+                    submitButton.disabled = false;
+                    submitButton.textContent = 'Add Card';
+                } else {
+                    // Payment method attached successfully
+                    alert('Payment method added successfully!');
+                    closePaymentMethodForm();
+                    
+                    // Refresh customer list to show new payment method
+                    if (window.loadRecentCustomers) {
+                        window.loadRecentCustomers();
+                    }
+                }
+            } catch (error) {
+                console.error('Error confirming setup:', error);
+                alert('Failed to add payment method. Please try again.');
+                submitButton.disabled = false;
+                submitButton.textContent = 'Add Card';
+            }
+        });
+        
+        // Make functions globally available
+        window.searchCustomers = searchCustomers;
+        window.showCreateCustomerForm = showCreateCustomerForm;
+        window.closeCreateCustomerForm = closeCreateCustomerForm;
+        window.showAddPaymentMethod = showAddPaymentMethod;
+        window.closePaymentMethodForm = closePaymentMethodForm;
+
+        // Display customer list
+        function displayCustomers(customerList) {
+            const listEl = document.getElementById('customerList');
+            
+            if (!customerList || customerList.length === 0) {
+                listEl.innerHTML = '<div class="no-customers">No customers found</div>';
+                return;
+            }
+
+            listEl.innerHTML = customerList.map(customer => `
+                <div class="customer-item" onclick="selectCustomer('${customer.id}', event)">
+                    <div class="customer-name">${customer.name || 'Unnamed Customer'}</div>
+                    <div class="customer-email">${customer.email}${customer.boat_name ? ' • Boat: ' + customer.boat_name : ''}</div>
+                    <span class="customer-payment ${customer.payment_method ? 'has-card' : 'no-card'}">
+                        ${customer.payment_method ? 
+                            '✓ Card on file' : 
+                            '<span onclick="showAddPaymentMethod(\'${customer.id}\', event)" style="cursor: pointer; text-decoration: underline;">+ Add Card</span>'}
+                    </span>
+                </div>
+            `).join('');
+
+            // Re-select if a customer was already selected
+            if (selectedCustomer) {
+                const selectedEl = document.querySelector(`[onclick*="${selectedCustomer.id}"]`);
+                if (selectedEl) {
+                    selectedEl.classList.add('selected');
+                }
+            }
+        }
+
+        // Select a customer
+        function selectCustomer(customerId, event) {
+            selectedCustomer = customers.find(c => c.id === customerId);
+            
+            if (!selectedCustomer) return;
+            
+            // Update UI
+            document.querySelectorAll('.customer-item').forEach(el => {
+                el.classList.remove('selected');
+            });
+            
+            if (event && event.currentTarget) {
+                event.currentTarget.classList.add('selected');
+            }
+            
+            // Show selected customer info
+            const selectedDisplay = document.getElementById('selectedCustomer');
+            selectedDisplay.classList.add('active');
+            document.getElementById('selectedCustomerInfo').textContent = 
+                `${selectedCustomer.name || 'Unnamed'} (${selectedCustomer.email}) - ${
+                    selectedCustomer.payment_method ? 'Card ending in ' + selectedCustomer.payment_method.card.last4 : 'No card on file'
+                }`;
+            
+            updateChargeSummary();
+        }
+        
+        // Make selectCustomer globally available
+        window.selectCustomer = selectCustomer;
+        
+        // Update boat configuration and recalculate
+        function updateBoatConfig() {
+            if (window.calculateCost) {
+                window.calculateCost();
+            }
+            updateChargeSummary();
+        }
+        
+        window.updateBoatConfig = updateBoatConfig;
+        
+        // Paint condition selection functions
+        function selectPaintCondition(value) {
+            document.querySelectorAll('#paintConditionButtons .option-button').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            document.querySelector(`#paintConditionButtons [data-value="${value}"]`).classList.add('selected');
+            document.getElementById('actualPaintCondition').value = value;
+            
+            if (window.calculateCostDirect) {
+                window.calculateCostDirect();
+            }
+            updateChargeSummary();
+        }
+        
+        function selectWizardPaintCondition(value) {
+            document.querySelectorAll('#wizardPaintConditionButtons .option-button').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            const selectedBtn = document.querySelector(`#wizardPaintConditionButtons [data-value="${value}"]`);
+            if (selectedBtn) {
+                selectedBtn.classList.add('selected');
+            }
+            document.getElementById('wizardPaintCondition').value = value;
+            
+            // Sync with main form
+            const mainCondition = document.getElementById('actualPaintCondition');
+            if (mainCondition) {
+                mainCondition.value = value;
+                selectPaintCondition(value);
+            }
+            
+            // Also sync with paint_condition hidden input for metadata
+            const paintConditionHidden = document.getElementById('paint_condition');
+            if (paintConditionHidden) {
+                paintConditionHidden.value = value;
+            }
+            
+            // Update wizard pricing display
+            setTimeout(() => {
+                updateWizardPricing();
+            }, 100);
+        }
+        
+        // Growth level selection functions
+        function selectGrowthLevel(value) {
+            document.querySelectorAll('#growthLevelButtons .option-button').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            document.querySelector(`#growthLevelButtons [data-value="${value}"]`).classList.add('selected');
+            document.getElementById('actualGrowthLevel').value = value;
+            
+            if (window.calculateCostDirect) {
+                window.calculateCostDirect();
+            }
+            updateChargeSummary();
+        }
+        
+        function selectWizardGrowthLevel(value) {
+            document.querySelectorAll('#wizardGrowthLevelButtons .option-button').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            const selectedBtn = document.querySelector(`#wizardGrowthLevelButtons [data-value="${value}"]`);
+            if (selectedBtn) {
+                selectedBtn.classList.add('selected');
+            }
+            document.getElementById('wizardGrowthLevel').value = value;
+            
+            // Sync with main form
+            const mainGrowth = document.getElementById('actualGrowthLevel');
+            if (mainGrowth) {
+                mainGrowth.value = value;
+                selectGrowthLevel(value);
+            }
+            
+            // Also sync with growth_level hidden input for metadata
+            const growthLevelHidden = document.getElementById('growth_level');
+            if (growthLevelHidden) {
+                growthLevelHidden.value = value;
+            }
+            
+            // Update wizard pricing display
+            setTimeout(() => {
+                updateWizardPricing();
+            }, 100);
+        }
+        
+        // Make functions globally available
+        window.selectPaintCondition = selectPaintCondition;
+        window.selectWizardPaintCondition = selectWizardPaintCondition;
+        window.selectGrowthLevel = selectGrowthLevel;
+        window.selectWizardGrowthLevel = selectWizardGrowthLevel;
+        
+        // Function to update boat config visibility (deprecated - handled by wizard now)
+        function updateBoatConfigVisibility(serviceKey) {
+            // Old sections are now permanently hidden - all handled by wizard
+            // Keeping function for compatibility but it does nothing
+            return;
+            
+            // Show cleaning options only for cleaning services
+            if (cleaningOptions) {
+                cleaningOptions.style.display = isCleaningService ? 'block' : 'none';
+            }
+        }
+        
+        // Note: currentServiceKey, wizardCurrentStep, wizardSteps and selectService override are defined in the earlier script block
+        
+        // Function to handle fade transition in admin interface with wizard
+        window.transitionToDetailsForm = function(serviceKey) {
+            console.log('transitionToDetailsForm called for:', serviceKey);
+            const serviceSelector = document.querySelector('.service-selector');
+            const serviceGrid = serviceSelector.querySelector('.service-selection-grid');
+            const serviceHeading = serviceSelector.querySelector('h2');
+            const servicePriceExplainer = document.getElementById('servicePriceExplainer');
+            const wizardContainer = document.getElementById('wizardContainer');
+            const boatConfigSection = document.getElementById('boatConfigSection');
+            const boatDetails = document.querySelector('.boat-details');
+            const pricingDisplay = document.getElementById('pricingDisplay');
+            
+            // Hide the old boat config and pricing sections immediately
+            if (boatConfigSection) boatConfigSection.style.display = 'none';
+            if (boatDetails) boatDetails.style.display = 'none';
+            if (pricingDisplay) pricingDisplay.style.display = 'none';
+            if (servicePriceExplainer) servicePriceExplainer.style.display = 'none';
+            
+            // Determine service type for rendering
+            const isCleaningService = serviceKey === 'onetime_cleaning' || serviceKey === 'recurring_cleaning';
+            const service = window.serviceData[serviceKey];
+            
+            // Fade out service buttons and heading
+            serviceGrid.classList.add('service-fade-container', 'fade-out');
+            if (serviceHeading) {
+                serviceHeading.classList.add('service-fade-container', 'fade-out');
+            }
+            
+            setTimeout(() => {
+                // Hide service grid and heading, show wizard
+                serviceGrid.style.display = 'none';
+                if (serviceHeading) {
+                    serviceHeading.style.display = 'none';
+                }
+                wizardContainer.style.display = 'block';
+                wizardContainer.classList.add('service-fade-container', 'fade-in');
+                
+                // Render consolidated form with service key
+                renderConsolidatedForm(isCleaningService, serviceKey);
+                
+                // Scroll to the top of the service selector section
+                setTimeout(() => {
+                    serviceSelector.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'start',
+                        inline: 'nearest'
+                    });
+                }, 100);
+                
+                // Remove fade classes after animation
+                setTimeout(() => {
+                    wizardContainer.classList.remove('service-fade-container', 'fade-in');
+                }, 600);
+            }, 400);
+        }
+        
+        // Old wizard step functions removed - replaced by renderConsolidatedForm
+        
+        // Render consolidated form (all fields in one view)
+        window.renderConsolidatedForm = function(isCleaningService, serviceKey) {
+            const wizardContent = document.getElementById('wizardContent');
+            const service = window.serviceData ? window.serviceData[serviceKey] : null;
+            const serviceName = service ? service.name : 'Service';
+            
+            // Determine which fields are needed based on service
+            const needsBoatConfig = isCleaningService;
+            const needsPaintGrowth = isCleaningService;
+            
+            // For other services, just need basic boat info
+            const isItemRecovery = serviceKey === 'item_recovery';
+            const isUnderwaterInspection = serviceKey === 'underwater_inspection';
+            const isPropellerService = serviceKey === 'propeller_service';
+            
+            // Clear any existing content to prevent duplication
+            wizardContent.innerHTML = '';
+            
+            // Build consolidated form HTML
+            let formHTML = '<div class="consolidated-form">';
+            
+            // Add header with service name and back button
+            formHTML += `
+                <div class="form-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 style="margin: 0; color: #2c3e50;">${serviceName}</h2>
+                    <button onclick="backToServices()" class="back-btn" style="padding: 10px 20px; background: #6c757d; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px;">
+                        ← Back to Services
+                    </button>
+                </div>
+            `;
+            
+            // Check if service needs boat length (per-foot services)
+            const needsBoatLength = service && service.type === 'per_foot';
+            
+            // Always include boat information section
+            formHTML += `
+                <div class="form-section">
+                    <h3>Boat Information</h3>
+                    <div class="input-group">
+                        <label for="wizardBoatName">Boat Name</label>
+                        <input type="text" id="wizardBoatName" placeholder="Enter boat name (optional)" 
+                               value="${document.getElementById('boatName')?.value || ''}" 
+                               style="font-size: 18px; padding: 14px; width: 100%; border: 2px solid #ddd; border-radius: 8px;">
+                    </div>`;
+            
+            // Only show boat length for per-foot services
+            if (needsBoatLength) {
+                formHTML += `
+                    <div class="input-group">
+                        <label for="wizardBoatLength">Boat Length (feet)</label>
+                        <input type="text" id="wizardBoatLength" placeholder="e.g., 35, 42, 50" value="35" 
+                               style="font-size: 18px; padding: 14px; width: 100%; border: 2px solid #ddd; border-radius: 8px;">
+                    </div>`;
+            }
+            
+            formHTML += `
+                </div>
+            `;
+            
+            // Add cleaning-specific fields
+            if (isCleaningService) {
+                formHTML += `
+                    <div class="form-section">
+                        <h3>Boat Configuration</h3>
+                        
+                        <!-- Boat Type -->
+                        <div class="input-group">
+                            <label>Boat Type</label>
+                            <div class="radio-group">
+                                <label class="radio-option">
+                                    <input type="radio" name="wizard_boat_type" value="sailboat" checked>
+                                    <span>Sailboat</span>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="wizard_boat_type" value="powerboat">
+                                    <span>Powerboat (+25% surcharge)</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Hull Type -->
+                        <div class="input-group">
+                            <label>Hull Type</label>
+                            <div class="radio-group">
+                                <label class="radio-option">
+                                    <input type="radio" name="wizard_hull_type" value="monohull" checked>
+                                    <span>Monohull</span>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="wizard_hull_type" value="catamaran">
+                                    <span>Catamaran (+25% surcharge)</span>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="wizard_hull_type" value="trimaran">
+                                    <span>Trimaran (+25% surcharge)</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Engine Configuration -->
+                        <div class="input-group">
+                            <label>Engine Configuration</label>
+                            <div class="checkbox-group">
+                                <label class="checkbox-option">
+                                    <input type="checkbox" id="wizard_twin_engines" name="wizard_twin_engines">
+                                    <span>Twin engines (+10% surcharge)</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h3>Current Condition</h3>
+                        
+                        <!-- Paint Condition -->
+                        <div class="input-group">
+                            <label>Actual Paint Condition</label>
+                            <div class="option-button-group" id="wizardPaintConditionButtons">
+                                <button type="button" class="option-button paint-excellent" data-value="excellent" onclick="selectWizardPaintCondition('excellent')">Excellent</button>
+                                <button type="button" class="option-button paint-good selected" data-value="good" onclick="selectWizardPaintCondition('good')">Good</button>
+                                <button type="button" class="option-button paint-fair" data-value="fair" onclick="selectWizardPaintCondition('fair')">Fair</button>
+                                <button type="button" class="option-button paint-poor" data-value="poor" onclick="selectWizardPaintCondition('poor')">Poor</button>
+                                <button type="button" class="option-button paint-missing" data-value="missing" onclick="selectWizardPaintCondition('missing')">Missing</button>
+                            </div>
+                            <input type="hidden" id="wizardPaintCondition" value="good">
+                        </div>
+                        
+                        <!-- Growth Level -->
+                        <div class="input-group">
+                            <label>Actual Growth Level</label>
+                            <div class="option-button-group" id="wizardGrowthLevelButtons">
+                                <button type="button" class="option-button growth-minimal selected" data-value="minimal" onclick="selectWizardGrowthLevel('minimal')">Minimal</button>
+                                <button type="button" class="option-button growth-moderate" data-value="moderate" onclick="selectWizardGrowthLevel('moderate')">Moderate</button>
+                                <button type="button" class="option-button growth-heavy" data-value="heavy" onclick="selectWizardGrowthLevel('heavy')">Heavy</button>
+                                <button type="button" class="option-button growth-severe" data-value="severe" onclick="selectWizardGrowthLevel('severe')">Severe</button>
+                            </div>
+                            <input type="hidden" id="wizardGrowthLevel" value="minimal">
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Add Service Total section at the bottom
+            formHTML += `
+                <div class="form-section">
+                    <h3>Service Total</h3>
+                    <div class="price-display" id="wizardPriceDisplay">
+                        <div id="wizardCostBreakdown" style="font-family: inherit; white-space: pre-wrap; margin: 10px 0; color: #333;"></div>
+                        <div id="wizardTotalPrice" style="font-size: 24px; font-weight: bold; color: #2c3e50; margin-top: 15px;"></div>
+                    </div>
+                </div>
+            `;
+            
+            formHTML += '</div>';
+            
+            // Update content
+            wizardContent.innerHTML = formHTML;
+            wizardContent.className = 'consolidated-form-container active';
+            
+            // Add CSS for form sections if not already added
+            if (!document.getElementById('consolidatedFormStyles')) {
+                const style = document.createElement('style');
+                style.id = 'consolidatedFormStyles';
+                style.textContent = `
+                    .consolidated-form {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 25px;
+                    }
+                    .form-section {
+                        background: #f8f9fa;
+                        padding: 25px;
+                        border-radius: 12px;
+                        border: 1px solid #e0e0e0;
+                    }
+                    .form-section h3 {
+                        margin-top: 0;
+                        margin-bottom: 20px;
+                        color: #2c3e50;
+                        font-size: 20px;
+                        font-weight: 600;
+                    }
+                    .form-section .input-group {
+                        margin-bottom: 20px;
+                    }
+                    .form-section .input-group:last-child {
+                        margin-bottom: 0;
+                    }
+                    .consolidated-form-container {
+                        padding: 20px 0;
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            // Sync values with hidden inputs
+            syncWizardValues();
+            
+            // Calculate and show price in wizard
+            setTimeout(() => {
+                if (window.calculateCost) {
+                    window.calculateCost();
+                }
+                updateWizardPricing();
+            }, 100);
+        }
+        
+        // Update pricing display in wizard
+        function updateWizardPricing() {
+            const wizardCostBreakdown = document.getElementById('wizardCostBreakdown');
+            const wizardTotalPrice = document.getElementById('wizardTotalPrice');
+            const costBreakdown = document.getElementById('costBreakdown');
+            const totalPriceElement = document.getElementById('totalPrice');
+            
+            if (wizardCostBreakdown && costBreakdown) {
+                wizardCostBreakdown.innerHTML = costBreakdown.innerHTML || 'Calculating...';
+            }
+            
+            if (wizardTotalPrice && totalPriceElement) {
+                wizardTotalPrice.innerHTML = totalPriceElement.innerHTML || '';
+            }
+        }
+        
+        // Sync wizard values with hidden form inputs
+        function syncWizardValues() {
+            // Sync boat name
+            const wizardBoatName = document.getElementById('wizardBoatName');
+            if (wizardBoatName) {
+                wizardBoatName.addEventListener('input', function() {
+                    const boatName = document.getElementById('boatName');
+                    if (boatName) boatName.value = this.value;
+                });
+            }
+            
+            // Sync boat length (only if it exists for per-foot services)
+            const wizardBoatLength = document.getElementById('wizardBoatLength');
+            if (wizardBoatLength) {
+                wizardBoatLength.addEventListener('input', function() {
+                    const boatLength = document.getElementById('boatLength');
+                    if (boatLength) {
+                        boatLength.value = this.value;
+                        if (window.calculateCost) window.calculateCost();
+                        updateChargeSummary();
+                        updateWizardPricing();
+                    }
+                });
+            } else {
+                // For flat rate services, set boat length to 0 or a default
+                const boatLength = document.getElementById('boatLength');
+                if (boatLength) {
+                    boatLength.value = '0';
+                }
+            }
+            
+            // Sync boat type
+            const wizardBoatTypes = document.querySelectorAll('input[name="wizard_boat_type"]');
+            wizardBoatTypes.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    const hiddenBoatType = document.querySelector(`input[name="boat_type"][value="${this.value}"]`);
+                    if (hiddenBoatType) {
+                        hiddenBoatType.checked = true;
+                        if (window.calculateCost) window.calculateCost();
+                        updateChargeSummary();
+                        updateWizardPricing();
+                    }
+                });
+            });
+            
+            // Sync hull type
+            const wizardHullTypes = document.querySelectorAll('input[name="wizard_hull_type"]');
+            wizardHullTypes.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    const hiddenHullType = document.querySelector(`input[name="hull_type"][value="${this.value}"]`);
+                    if (hiddenHullType) {
+                        hiddenHullType.checked = true;
+                        if (window.calculateCost) window.calculateCost();
+                        updateChargeSummary();
+                        updateWizardPricing();
+                    }
+                });
+            });
+            
+            // Sync twin engines
+            const wizardTwinEngines = document.getElementById('wizard_twin_engines');
+            if (wizardTwinEngines) {
+                wizardTwinEngines.addEventListener('change', function() {
+                    const hiddenTwinEngines = document.getElementById('has_twin_engines');
+                    if (hiddenTwinEngines) {
+                        hiddenTwinEngines.checked = this.checked;
+                        if (window.calculateCost) window.calculateCost();
+                        updateChargeSummary();
+                        updateWizardPricing();
+                    }
+                });
+            }
+            
+            // Sync paint condition value to hidden input
+            const wizardPaintCondition = document.getElementById('wizardPaintCondition');
+            if (wizardPaintCondition) {
+                // Set initial value
+                const paintConditionHidden = document.getElementById('paint_condition');
+                if (paintConditionHidden) {
+                    paintConditionHidden.value = wizardPaintCondition.value;
+                }
+                
+                // Watch for changes (via MutationObserver since it's updated programmatically)
+                const observer = new MutationObserver(function() {
+                    if (paintConditionHidden) {
+                        paintConditionHidden.value = wizardPaintCondition.value;
+                    }
+                });
+                observer.observe(wizardPaintCondition, { attributes: true, attributeFilter: ['value'] });
+            }
+            
+            // Sync growth level value to hidden input  
+            const wizardGrowthLevel = document.getElementById('wizardGrowthLevel');
+            if (wizardGrowthLevel) {
+                // Set initial value
+                const growthLevelHidden = document.getElementById('growth_level');
+                if (growthLevelHidden) {
+                    growthLevelHidden.value = wizardGrowthLevel.value;
+                }
+                
+                // Watch for changes (via MutationObserver since it's updated programmatically)
+                const observer = new MutationObserver(function() {
+                    if (growthLevelHidden) {
+                        growthLevelHidden.value = wizardGrowthLevel.value;
+                    }
+                });
+                observer.observe(wizardGrowthLevel, { attributes: true, attributeFilter: ['value'] });
+            }
+        }
+        
+        // Wizard navigation functions (no longer needed with consolidated form)
+        /*
+        window.wizardNext = function() {
+            if (window.wizardCurrentStep < window.wizardSteps.length - 1) {
+                window.wizardCurrentStep++;
+                renderWizardStep();
+            } else {
+                // Complete wizard - show all sections
+                completeWizard();
+            }
+        };
+        
+        window.wizardPrevious = function() {
+            if (window.wizardCurrentStep > 0) {
+                window.wizardCurrentStep--;
+                renderWizardStep();
+            }
+        };
+        */
+        
+        // Complete wizard and show pricing
+        function completeWizard() {
+            const wizardContainer = document.getElementById('wizardContainer');
+            const serviceSelector = document.querySelector('.service-selector');
+            const serviceGrid = serviceSelector.querySelector('.service-selection-grid');
+            const serviceHeading = serviceSelector.querySelector('h2');
+            const servicePriceExplainer = document.getElementById('servicePriceExplainer');
+            const pricingDisplay = document.getElementById('pricingDisplay');
+            const boatDetails = document.querySelector('.boat-details');
+            const boatConfig = document.getElementById('boatConfigSection');
+            
+            // Hide wizard with fade out
+            wizardContainer.classList.add('fade-out');
+            
+            setTimeout(() => {
+                wizardContainer.style.display = 'none';
+                
+                // Show service grid and heading again
+                if (serviceHeading) {
+                    serviceHeading.style.display = 'block';
+                    serviceHeading.classList.add('service-fade-container', 'fade-in');
+                }
+                serviceGrid.style.display = 'grid';
+                serviceGrid.classList.add('service-fade-container', 'fade-in');
+                
+                // Show pricing and summary
+                if (boatDetails) {
+                    boatDetails.style.display = 'block';
+                    boatDetails.classList.add('service-fade-container', 'fade-in');
+                }
+                
+                if (pricingDisplay) {
+                    pricingDisplay.style.display = 'block';
+                    pricingDisplay.classList.add('service-fade-container', 'fade-in');
+                }
+                
+                // Calculate and update
+                if (window.calculateCost) window.calculateCost();
+                updateChargeSummary();
+                
+                // Scroll to pricing
+                if (pricingDisplay) {
+                    pricingDisplay.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+                
+                // Remove fade classes after animation
+                setTimeout(() => {
+                    if (serviceHeading) serviceHeading.classList.remove('service-fade-container', 'fade-in');
+                    serviceGrid.classList.remove('service-fade-container', 'fade-in');
+                }, 600);
+            }, 400);
+        }
+        
+        // Make transitionToDetailsForm globally available
+        window.transitionToDetailsForm = transitionToDetailsForm;
+        
+        // Function to go back to service selection
+        function backToServices() {
+            const serviceSelector = document.querySelector('.service-selector');
+            const serviceGrid = serviceSelector.querySelector('.service-selection-grid');
+            const serviceHeading = serviceSelector.querySelector('h2');
+            const wizardContainer = document.getElementById('wizardContainer');
+            
+            // Hide wizard
+            wizardContainer.style.display = 'none';
+            wizardContainer.innerHTML = '';
+            
+            // Show service grid
+            serviceGrid.style.display = 'grid';
+            serviceGrid.classList.remove('service-fade-container', 'fade-out');
+            if (serviceHeading) {
+                serviceHeading.style.display = 'block';
+            }
+            
+            // Reset selected service
+            window.currentServiceKey = null;
+            document.querySelectorAll('.service-option').forEach(btn => {
+                btn.classList.remove('selected', 'expanded');
+            });
+            
+            // Repopulate service buttons
+            if (window.populateServiceButtons) {
+                window.populateServiceButtons();
+            }
+        }
+        
+        // Make backToServices globally available
+        window.backToServices = backToServices;
+        
+        // Wait for buttons to be created and override their handlers
+        setTimeout(() => {
+            const serviceButtons = document.querySelectorAll('.service-option');
+            serviceButtons.forEach(button => {
+                // Remove the old event listener by cloning
+                const newButton = button.cloneNode(true);
+                button.parentNode.replaceChild(newButton, button);
+                
+                // Add our custom click handler
+                newButton.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    const serviceKey = this.dataset.serviceKey;
+                    console.log('Admin interface button clicked:', serviceKey);
+                    
+                    // Check if same service clicked twice
+                    if (window.currentServiceKey === serviceKey) {
+                        console.log('Same service clicked twice, triggering wizard');
+                        transitionToDetailsForm(serviceKey);
+                    } else {
+                        // First click - expand button
+                        window.currentServiceKey = serviceKey;
+                        window.selectedServiceKey = serviceKey;
+                        
+                        // Update UI
+                        document.querySelectorAll('.service-option').forEach(btn => {
+                            btn.classList.remove('selected', 'expanded');
+                        });
+                        
+                        this.classList.add('selected', 'expanded');
+                        
+                        // Update button content
+                        const service = window.serviceData[serviceKey];
+                        if (service && service.description) {
+                            this.innerHTML = '';
+                            
+                            const titleDiv = document.createElement('div');
+                            titleDiv.className = 'service-title';
+                            titleDiv.textContent = service.name;
+                            this.appendChild(titleDiv);
+                            
+                            const descDiv = document.createElement('div');
+                            descDiv.className = 'service-description';
+                            descDiv.textContent = service.description;
+                            this.appendChild(descDiv);
+                            
+                            const clickNote = document.createElement('div');
+                            clickNote.className = 'service-click-note';
+                            clickNote.textContent = 'Click again to select this service';
+                            this.appendChild(clickNote);
+                        }
+                        
+                        // Calculate cost
+                        if (window.calculateCost) {
+                            window.calculateCost();
+                        }
+                        
+                        // Update visibility
+                        setTimeout(() => {
+                            if (typeof updateBoatConfigVisibility === 'function') {
+                                updateBoatConfigVisibility(serviceKey);
+                            }
+                        }, 50);
+                    }
+                });
+            });
+            console.log('Replaced click handlers for', serviceButtons.length, 'service buttons');
+        }, 500); // Wait for buttons to be populated
+
+        // Update charge summary
+        function updateChargeSummary() {
+            const chargeDetails = document.getElementById('chargeDetails');
+            const chargeButton = document.getElementById('chargeButton');
+            
+            if (!selectedCustomer) {
+                chargeDetails.innerHTML = `
+                    <div style="text-align: center; color: #7f8c8d;">
+                        Select a customer and configure service details
+                    </div>
+                `;
+                chargeButton.disabled = true;
+                return;
+            }
+
+            // Get price from the results section (total value)
+            // The totalCostDisplay element directly holds the value
+            const totalElement = document.getElementById('totalCostDisplay');
+            const price = totalElement ? parseFloat(totalElement.textContent.replace('$', '').replace(',', '')) : 0;
+            
+            // Get selected service from the service buttons
+            const selectedServiceEl = document.querySelector('.service-option.selected');
+            const serviceTitleEl = selectedServiceEl ? selectedServiceEl.querySelector('.service-title') : null;
+            const serviceName = serviceTitleEl ? serviceTitleEl.textContent : '';
+
+            chargeDetails.innerHTML = `
+                <div class="charge-detail-row">
+                    <span>Customer:</span>
+                    <span>${selectedCustomer.name || 'Unnamed'}</span>
+                </div>
+                <div class="charge-detail-row">
+                    <span>Email:</span>
+                    <span>${selectedCustomer.email}</span>
+                </div>
+                <div class="charge-detail-row">
+                    <span>Payment Method:</span>
+                    <span style="color: ${selectedCustomer.payment_method ? '#27ae60' : '#e74c3c'}">
+                        ${selectedCustomer.payment_method ? 
+                            `Card ending in ${selectedCustomer.payment_method.card.last4}` : 
+                            'No card on file'}
+                    </span>
+                </div>
+                <div class="charge-detail-row">
+                    <span>Service:</span>
+                    <span>${serviceName}</span>
+                </div>
+                <div class="charge-detail-row">
+                    <span>Total Amount:</span>
+                    <span>
+                        $<input type="number" 
+                               id="editableAmount" 
+                               value="${price.toFixed(2)}" 
+                               step="0.01" 
+                               min="0" 
+                               style="width: 100px; border: 1px solid #ddd; padding: 4px; border-radius: 4px;"
+                               oninput="updateChargeButton()">
+                    </span>
+                </div>
+            `;
+            
+            // Update charge button based on editable amount
+            const editableAmount = parseFloat(document.getElementById('editableAmount')?.value || 0);
+            chargeButton.disabled = !selectedCustomer.payment_method || editableAmount === 0;
+            chargeButton.textContent = selectedCustomer.payment_method ? 
+                `Charge $${editableAmount.toFixed(2)}` : 'No Payment Method Available';
+        }
+
+        // Charge the customer
+        async function chargeCustomer() {
+            if (!selectedCustomer || !selectedCustomer.payment_method) {
+                alert('Please select a customer with a payment method on file');
+                return;
+            }
+
+            const button = document.getElementById('chargeButton');
+            const originalText = button.innerHTML;
+            button.innerHTML = 'Processing... <span class="loading-spinner"></span>';
+            button.classList.add('processing');
+            button.disabled = true;
+
+            // Get price from the editable amount field if it exists, otherwise from totalCostDisplay
+            const editableAmountEl = document.getElementById('editableAmount');
+            let price;
+            if (editableAmountEl) {
+                price = parseFloat(editableAmountEl.value) || 0;
+            } else {
+                const totalElement = document.getElementById('totalCostDisplay');
+                price = totalElement ? parseFloat(totalElement.textContent.replace('$', '').replace(',', '')) : 0;
+            }
+            
+            // Get selected service key and details
+            const selectedServiceEl = document.querySelector('.service-option.selected');
+            const service = selectedServiceEl ? selectedServiceEl.dataset.serviceKey : '';
+            const serviceTitleEl = selectedServiceEl ? selectedServiceEl.querySelector('.service-title') : null;
+            const serviceName = serviceTitleEl ? serviceTitleEl.textContent : '';
+            const boatLength = document.getElementById('boatLength').value;
+            const boatName = document.getElementById('boatName')?.value || '';
+
+            // Build comprehensive metadata for transaction history
+            const metadata = { 
+                service_key: service,
+                service_name: serviceName,
+                service_date: new Date().toISOString().split('T')[0],
+                service_time: new Date().toLocaleTimeString()
+            };
+            
+            // Add boat name and customer boat metadata if provided
+            if (boatName) {
+                metadata.boat_name = boatName;
+            }
+            
+            // Include customer's boat details from their profile
+            if (selectedCustomer.boat_name && !boatName) {
+                metadata.boat_name = selectedCustomer.boat_name;
+            }
+            
+            // Only include boat details for cleaning services
+            const isCleaningService = service === 'onetime_cleaning' || service === 'recurring_cleaning';
+            const isFlatRateService = service === 'item_recovery' || service === 'underwater_inspection';
+            
+            if (isCleaningService) {
+                metadata.boat_length = boatLength;
+                metadata.last_paint = document.getElementById('lastPaintedTime')?.value;
+                metadata.last_cleaned = document.getElementById('lastCleanedTime')?.value;
+                
+                // Add hull type and engine configuration if available
+                const hullType = document.querySelector('input[name="hull_type"]:checked')?.value;
+                if (hullType) {
+                    metadata.hull_type = hullType;
+                    if (hullType === 'catamaran') metadata.additional_hulls = 1;
+                    if (hullType === 'trimaran') metadata.additional_hulls = 2;
+                }
+                
+                const hasTwinEngines = document.getElementById('has_twin_engines')?.checked;
+                if (hasTwinEngines) {
+                    metadata.twin_engines = true;
+                    metadata.engine_type = 'twin';
+                } else {
+                    metadata.engine_type = 'single';
+                }
+                
+                // Add boat type (sailboat/powerboat)
+                const boatType = document.querySelector('input[name="boat_type"]:checked')?.value;
+                if (boatType) {
+                    metadata.boat_type = boatType;
+                }
+                
+                // Add paint condition and growth level
+                const paintCondition = document.getElementById('actualPaintCondition')?.value || document.getElementById('wizardPaintCondition')?.value;
+                if (paintCondition) {
+                    metadata.paint_condition = paintCondition;
+                }
+                
+                const growthLevel = document.getElementById('actualGrowthLevel')?.value || document.getElementById('wizardGrowthLevel')?.value;
+                if (growthLevel) {
+                    metadata.growth_level = growthLevel;
+                }
+            }
+            
+            // Build detailed description for Stripe transaction
+            let description = serviceName || service.replace(/_/g, ' ');
+            
+            // Add boat details to description
+            if (boatName) {
+                description = `${description} - ${boatName}`;
+            }
+            if (!isFlatRateService && boatLength) {
+                description += ` (${boatLength}ft)`;
+            }
+            
+            // Add service date
+            description += ` - ${new Date().toLocaleDateString()}`;
+
+            try {
+                const response = await fetch('http://localhost:3001/api/charge-customer', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        customerId: selectedCustomer.id,
+                        amount: Math.round(price * 100), // Convert to cents
+                        description: description,
+                        metadata: metadata
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    showResult('success', 
+                        `✅ Successfully charged $${price.toFixed(2)} to ${selectedCustomer.name || selectedCustomer.email}<br>
+                         Payment ID: ${result.paymentIntent.id}`);
+                    
+                    // Reset selection after success
+                    setTimeout(() => {
+                        selectedCustomer = null;
+                        document.getElementById('selectedCustomer').classList.remove('active');
+                        document.querySelectorAll('.customer-item').forEach(el => {
+                            el.classList.remove('selected');
+                        });
+                        updateChargeSummary();
+                    }, 3000);
+                } else {
+                    showResult('error', `❌ Payment failed: ${result.error}`);
+                }
+            } catch (error) {
+                showResult('error', `❌ Error processing payment: ${error.message}`);
+            } finally {
+                button.innerHTML = originalText;
+                button.classList.remove('processing');
+                updateChargeSummary();
+            }
+        }
+        
+        // Update charge button when amount is edited
+        function updateChargeButton() {
+            const editableAmount = parseFloat(document.getElementById('editableAmount')?.value || 0);
+            const chargeButton = document.getElementById('chargeButton');
+            
+            if (selectedCustomer && selectedCustomer.payment_method) {
+                chargeButton.disabled = editableAmount === 0;
+                chargeButton.textContent = `Charge $${editableAmount.toFixed(2)}`;
+            }
+        }
+        
+        // Make functions globally available
+        window.chargeCustomer = chargeCustomer;
+        window.updateChargeSummary = updateChargeSummary;
+        window.updateChargeButton = updateChargeButton;
+
+        // Show result message
+        function showResult(type, message) {
+            const resultEl = document.getElementById('chargeResult');
+            resultEl.className = `charge-result ${type}`;
+            resultEl.innerHTML = message;
+            resultEl.style.display = 'block';
+            
+            setTimeout(() => {
+                resultEl.style.display = 'none';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
