@@ -842,6 +842,276 @@
             display: block;
             margin-bottom: 5px;
         }
+        
+        /* Anode Charging Styles */
+        .anode-section {
+            display: none;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 2px solid #345475;
+        }
+        
+        .anode-section.active {
+            display: block;
+        }
+        
+        .daily-schedule {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        
+        .daily-schedule h3 {
+            color: #181818;
+            margin-bottom: 15px;
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .schedule-date-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .schedule-date-selector input[type="date"] {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        .boat-schedule-list {
+            display: grid;
+            gap: 10px;
+        }
+        
+        .boat-schedule-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .boat-schedule-item:hover {
+            border-color: #345475;
+            box-shadow: 0 2px 8px rgba(52, 84, 117, 0.1);
+        }
+        
+        .boat-schedule-item.selected {
+            background: #345475;
+            color: white;
+            border-color: #345475;
+        }
+        
+        .boat-schedule-item.completed {
+            opacity: 0.6;
+            background: #e8f5e9;
+        }
+        
+        .boat-info {
+            flex: 1;
+        }
+        
+        .boat-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .boat-customer {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        .boat-status {
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+            background: #27ae60;
+            color: white;
+        }
+        
+        .anode-selector {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .anode-selector h3 {
+            color: #181818;
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: 500;
+        }
+        
+        .anode-categories {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .category-btn {
+            padding: 10px 20px;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .category-btn:hover {
+            border-color: #345475;
+        }
+        
+        .category-btn.active {
+            background: #345475;
+            color: white;
+            border-color: #345475;
+        }
+        
+        .anode-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .anode-item {
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        
+        .anode-item:hover {
+            border-color: #345475;
+            box-shadow: 0 2px 8px rgba(52, 84, 117, 0.1);
+        }
+        
+        .anode-item.selected {
+            background: rgba(52, 84, 117, 0.1);
+            border-color: #345475;
+        }
+        
+        .anode-name {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #181818;
+        }
+        
+        .anode-price {
+            font-size: 18px;
+            color: #345475;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .anode-quantity {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .quantity-btn {
+            width: 30px;
+            height: 30px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .quantity-btn:hover {
+            background: #f8f9fa;
+        }
+        
+        .quantity-input {
+            width: 50px;
+            text-align: center;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 5px;
+        }
+        
+        .anode-cart {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        
+        .anode-cart h4 {
+            margin-bottom: 15px;
+            color: #181818;
+        }
+        
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .cart-total {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid #345475;
+        }
+        
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        
+        .total-row.grand-total {
+            font-size: 20px;
+            font-weight: 600;
+            color: #181818;
+            margin-top: 10px;
+        }
+        
+        .charge-anode-btn {
+            width: 100%;
+            padding: 18px;
+            background: #345475;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .charge-anode-btn:hover {
+            background: #2a3f5f;
+        }
+        
+        .charge-anode-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 <body>
@@ -959,13 +1229,18 @@
         <div class="customer-section">
             <h2>Select Customer</h2>
             <div class="customer-controls">
-                <input type="text" 
-                       id="customerSearch" 
-                       class="customer-search-input"
-                       placeholder="Search by name, email, or boat name...">
-                <button onclick="searchCustomers()" class="customer-btn">Search</button>
-                <button onclick="loadRecentCustomers()" class="customer-btn">Show Recent</button>
-                <button onclick="showCreateCustomerForm()" class="customer-btn" style="background-color: #27ae60;">+ New Customer</button>
+                <div style="width: 100%; margin-bottom: 15px;">
+                    <input type="text" 
+                           id="customerSearch" 
+                           class="customer-search-input"
+                           placeholder="Search by name, email, or boat name..."
+                           style="width: 100%; box-sizing: border-box;">
+                </div>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button onclick="searchCustomers()" class="customer-btn">Search</button>
+                    <button onclick="loadRecentCustomers()" class="customer-btn">Show Recent</button>
+                    <button onclick="showCreateCustomerForm()" class="customer-btn" style="background-color: #27ae60;">+ New Customer</button>
+                </div>
             </div>
             <div id="customerList" class="customer-list" style="display: none;">
                 <div class="no-customers">Loading customers...</div>
@@ -976,19 +1251,395 @@
             </div>
         </div>
 
-        <!-- Service Calculator (reusing existing elements) -->
+        <!-- Service Selection -->
         <div class="service-selector">
-            <h2>Select a service to see more details</h2>
-            <div class="service-selection-grid" id="serviceButtons">
-                <!-- Service buttons will be populated by JS -->
+            <h2>Select Service Type</h2>
+            <div class="simple-service-buttons" id="simpleServiceButtons" style="display: flex; flex-wrap: wrap; gap: 10px; margin: 20px 0;">
+                <!-- Simple service buttons -->
+                <button onclick="if(window.selectServiceDirect) selectServiceDirect('recurring_cleaning')" class="simple-service-btn" style="padding: 12px 20px; background: #3498db; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px;">Recurring Cleaning</button>
+                <button onclick="if(window.selectServiceDirect) selectServiceDirect('onetime_cleaning')" class="simple-service-btn" style="padding: 12px 20px; background: #3498db; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px;">One-Time Cleaning</button>
+                <button onclick="if(window.selectServiceDirect) selectServiceDirect('item_recovery')" class="simple-service-btn" style="padding: 12px 20px; background: #3498db; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px;">Item Recovery</button>
+                <button onclick="if(window.selectServiceDirect) selectServiceDirect('underwater_inspection')" class="simple-service-btn" style="padding: 12px 20px; background: #3498db; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px;">Underwater Inspection</button>
+                <button onclick="if(window.selectServiceDirect) selectServiceDirect('propeller_service')" class="simple-service-btn" style="padding: 12px 20px; background: #3498db; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px;">Propeller Service</button>
+                <button onclick="if(window.selectServiceDirect) selectServiceDirect('anodes_only')" class="simple-service-btn" style="padding: 12px 20px; background: #e67e22; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px;">Anodes Only</button>
             </div>
-            <p class="variable-info" id="servicePriceExplainer" style="margin-top: 15px;"></p>
             
-            <!-- In-place wizard container (hidden initially) -->
+            <!-- Service details container -->
             <div id="wizardContainer" style="display: none;">
-                <!-- Consolidated form content -->
                 <div id="wizardContent"></div>
             </div>
+        </div>
+        
+        <!-- Define selectServiceDirect function immediately -->
+        <script>
+            window.selectServiceDirect = function(serviceKey) {
+                console.log('Direct service selection:', serviceKey);
+                
+                // Update service state
+                window.currentServiceKey = serviceKey;
+                window.selectedServiceKey = serviceKey;
+                
+                // Hide the simple service buttons
+                const simpleButtons = document.getElementById('simpleServiceButtons');
+                if (simpleButtons) {
+                    simpleButtons.style.display = 'none';
+                }
+                
+                // Update the heading
+                const serviceHeading = document.querySelector('.service-selector h2');
+                if (serviceHeading) {
+                    serviceHeading.style.display = 'none';
+                }
+                
+                // Show the wizard container
+                const wizardContainer = document.getElementById('wizardContainer');
+                if (wizardContainer) {
+                    wizardContainer.style.display = 'block';
+                    
+                    // Basic content for now
+                    const wizardContent = document.getElementById('wizardContent');
+                    if (wizardContent) {
+                        const service = window.serviceData && window.serviceData[serviceKey];
+                        const serviceName = service ? service.name : serviceKey;
+                        
+                        wizardContent.innerHTML = `
+                            <div style="padding: 20px;">
+                                <h2 style="margin-bottom: 20px;">${serviceName}</h2>
+                                <p style="margin-bottom: 20px;">Service configuration will load here...</p>
+                                <button onclick="if(window.backToServices) backToServices(); else location.reload();" 
+                                        style="padding: 10px 20px; background: #6c757d; color: white; border: none; border-radius: 8px; cursor: pointer;">
+                                    ← Back to Services
+                                </button>
+                            </div>
+                        `;
+                        
+                        // Call renderConsolidatedForm immediately - it's now always available
+                        const isCleaningService = serviceKey === 'onetime_cleaning' || serviceKey === 'recurring_cleaning';
+                        window.renderConsolidatedForm(isCleaningService, serviceKey);
+                        
+                        // Try again after a delay in case the full version loads later
+                        setTimeout(() => {
+                            window.renderConsolidatedForm(isCleaningService, serviceKey);
+                        }, 1000);
+                    }
+                }
+            };
+            
+            // Initialize anode catalog and cart
+            window.anodeCatalog = window.anodeCatalog || [];
+            window.anodeCart = window.anodeCart || [];
+            window.currentCategory = 'all';
+            
+            // Define displayAnodeCatalog immediately
+            window.displayAnodeCatalog = function() {
+                const grid = document.getElementById('anodeGrid');
+                if (!grid) {
+                    console.error('Anode grid not found');
+                    return;
+                }
+                
+                // Display all anodes initially
+                grid.innerHTML = '';
+                window.anodeCatalog.forEach(anode => {
+                    const anodeDiv = document.createElement('div');
+                    anodeDiv.className = 'anode-item';
+                    anodeDiv.dataset.category = anode.category;
+                    
+                    anodeDiv.innerHTML = `
+                        <div class="anode-name">${anode.name}</div>
+                        <div class="anode-id">ID: ${anode.boatzincs_id || anode.id}</div>
+                        <div class="anode-price">$${anode.list_price.toFixed(2)}</div>
+                        <div class="quantity-controls">
+                            <button onclick="updateAnodeQuantity('${anode.boatzincs_id || anode.id}', -1)">-</button>
+                            <span id="qty-${anode.boatzincs_id || anode.id}">0</span>
+                            <button onclick="updateAnodeQuantity('${anode.boatzincs_id || anode.id}', 1)">+</button>
+                        </div>
+                    `;
+                    
+                    grid.appendChild(anodeDiv);
+                });
+                
+                console.log(`Displayed ${window.anodeCatalog.length} anodes in grid`);
+            };
+            
+            // Define updateAnodeQuantity for cart management
+            window.updateAnodeQuantity = function(anodeId, change) {
+                const anode = window.anodeCatalog.find(a => (a.boatzincs_id || a.id) === anodeId);
+                if (!anode) return;
+                
+                // Find or create cart item
+                let cartItem = window.anodeCart.find(item => item.id === anodeId);
+                if (!cartItem && change > 0) {
+                    cartItem = {
+                        id: anodeId,
+                        name: anode.name,
+                        price: anode.list_price,
+                        quantity: 0
+                    };
+                    window.anodeCart.push(cartItem);
+                }
+                
+                if (cartItem) {
+                    cartItem.quantity += change;
+                    if (cartItem.quantity <= 0) {
+                        window.anodeCart = window.anodeCart.filter(item => item.id !== anodeId);
+                    }
+                    
+                    // Update display
+                    const qtySpan = document.getElementById(`qty-${anodeId}`);
+                    if (qtySpan) {
+                        qtySpan.textContent = cartItem ? cartItem.quantity : 0;
+                    }
+                    
+                    // Update cart display
+                    updateCartDisplay();
+                }
+            };
+            
+            // Define filterAnodes for category filtering
+            window.filterAnodes = function(category) {
+                window.currentCategory = category;
+                const allItems = document.querySelectorAll('.anode-item');
+                
+                allItems.forEach(item => {
+                    if (category === 'all') {
+                        item.style.display = 'block';
+                    } else {
+                        const itemCategory = item.dataset.category;
+                        // Show items that match the category or related categories
+                        if (category === 'shaft' && (itemCategory?.includes('shaft') || itemCategory === 'collar')) {
+                            item.style.display = 'block';
+                        } else if (itemCategory === category || itemCategory?.includes(category)) {
+                            item.style.display = 'block';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    }
+                });
+                
+                // Update active button styling
+                document.querySelectorAll('.category-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                event.target?.classList.add('active');
+            };
+            
+            // Define updateCartDisplay
+            window.updateCartDisplay = function() {
+                const cartItems = document.getElementById('cartItems');
+                const anodeTotal = document.getElementById('anodeTotal');
+                
+                if (cartItems) {
+                    if (window.anodeCart.length === 0) {
+                        cartItems.innerHTML = '<p style="color: #666;">No anodes selected</p>';
+                    } else {
+                        let html = '';
+                        let total = 0;
+                        
+                        window.anodeCart.forEach(item => {
+                            const itemTotal = item.price * item.quantity;
+                            total += itemTotal;
+                            html += `
+                                <div style="padding: 8px; background: #f5f5f5; margin-bottom: 8px; border-radius: 4px;">
+                                    <div style="font-weight: 600;">${item.name}</div>
+                                    <div>Qty: ${item.quantity} × $${item.price.toFixed(2)} = $${itemTotal.toFixed(2)}</div>
+                                </div>
+                            `;
+                        });
+                        
+                        cartItems.innerHTML = html;
+                        
+                        // Calculate with tax and markup
+                        const taxRate = parseFloat(document.getElementById('taxRate')?.value || 10.75) / 100;
+                        const markupRate = parseFloat(document.getElementById('markupRate')?.value || 20) / 100;
+                        const laborPerAnode = parseFloat(document.getElementById('laborCharge')?.value || 15);
+                        const totalAnodes = window.anodeCart.reduce((sum, item) => sum + item.quantity, 0);
+                        
+                        const subtotal = total * (1 + markupRate);
+                        const labor = totalAnodes * laborPerAnode;
+                        const finalTotal = (subtotal + labor) * (1 + taxRate);
+                        
+                        if (anodeTotal) {
+                            anodeTotal.textContent = `$${finalTotal.toFixed(2)}`;
+                        }
+                    }
+                }
+            };
+            
+            // Define loadAnodeCatalog immediately so it's available
+            window.loadAnodeCatalog = async function() {
+                try {
+                    console.log('Loading anode catalog from /full-boatzincs-catalog.json');
+                    let response = await fetch('/full-boatzincs-catalog.json');
+                    if (response.ok) {
+                        const data = await response.json();
+                        // The JSON has an "anodes" property containing the array
+                        window.anodeCatalog = data.anodes || data;
+                        console.log(`Loaded ${window.anodeCatalog.length} anodes from catalog`);
+                        window.displayAnodeCatalog();
+                        window.updateCartDisplay();
+                        return;
+                    }
+                    console.error('Failed to load anode catalog');
+                } catch (error) {
+                    console.error('Error loading anode catalog:', error);
+                }
+            };
+            
+            // Define toggleAnodeSection immediately so it's available when buttons are clicked
+            window.toggleAnodeSection = function() {
+                console.log('toggleAnodeSection called');
+                const section = document.getElementById('anodeSection');
+                if (!section) {
+                    console.error('Anode section not found');
+                    return;
+                }
+                
+                // Toggle visibility
+                if (section.style.display === 'none' || section.style.display === '') {
+                    section.style.display = 'block';
+                    section.classList.add('active');
+                    
+                    // Load anode catalog if not already loaded
+                    if (!window.anodeCatalog || window.anodeCatalog.length === 0) {
+                        console.log('Loading anode catalog...');
+                        window.loadAnodeCatalog();
+                    }
+                    
+                    // Scroll to the section
+                    setTimeout(() => {
+                        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }, 100);
+                } else {
+                    section.style.display = 'none';
+                    section.classList.remove('active');
+                }
+            };
+            
+            // Define renderConsolidatedForm immediately with full functionality
+            window.renderConsolidatedForm = function(isCleaningService, serviceKey) {
+                console.log('renderConsolidatedForm called for', serviceKey);
+                const wizardContent = document.getElementById('wizardContent');
+                if (!wizardContent) return;
+                
+                const service = window.serviceData ? window.serviceData[serviceKey] : null;
+                const serviceName = service ? service.name : 'Service';
+                
+                // Build the form HTML
+                let html = `
+                    <div class="consolidated-form">
+                        <div class="form-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <h2 style="margin: 0; color: #2c3e50;">${serviceName}</h2>
+                            <button onclick="backToServices()" class="back-btn" style="padding: 10px 20px; background: #6c757d; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px;">
+                                ← Back to Services
+                            </button>
+                        </div>
+                        
+                        <div class="form-section" style="background: #f8f9fa; padding: 25px; border-radius: 12px; border: 1px solid #e0e0e0; margin-bottom: 20px;">
+                            <h3 style="margin-top: 0; margin-bottom: 20px; color: #2c3e50; font-size: 20px; font-weight: 600;">Boat Information</h3>
+                            <div class="input-group" style="margin-bottom: 20px;">
+                                <label for="wizardBoatLength" style="display: block; margin-bottom: 8px; font-weight: 600;">Boat Length (feet)</label>
+                                <input type="text" id="wizardBoatLength" placeholder="e.g., 35, 42, 50" value="35" 
+                                       style="font-size: 18px; padding: 14px; width: 100%; border: 2px solid #ddd; border-radius: 8px;">
+                            </div>
+                        </div>
+                `;
+                
+                // Add condition fields for cleaning services
+                if (isCleaningService) {
+                    html += `
+                        <div class="form-section" style="background: #f8f9fa; padding: 25px; border-radius: 12px; border: 1px solid #e0e0e0; margin-bottom: 20px;">
+                            <h3 style="margin-top: 0; margin-bottom: 20px; color: #2c3e50; font-size: 20px; font-weight: 600;">Current Condition</h3>
+                            
+                            <div class="input-group" style="margin-bottom: 20px;">
+                                <label style="display: block; margin-bottom: 8px; font-weight: 600;">Actual Paint Condition</label>
+                                <div class="option-button-group" id="wizardPaintConditionButtons" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                    <button type="button" class="option-button" data-value="good" 
+                                            onclick="selectWizardPaintCondition('good')"
+                                            style="padding: 10px 20px; border: 2px solid #e0e0e0; background: white; border-radius: 8px; cursor: pointer;">
+                                        Good
+                                    </button>
+                                    <button type="button" class="option-button selected" data-value="fair" 
+                                            onclick="selectWizardPaintCondition('fair')"
+                                            style="padding: 10px 20px; border: 2px solid #345475; background: rgba(52, 84, 117, 0.1); border-radius: 8px; cursor: pointer;">
+                                        Fair
+                                    </button>
+                                    <button type="button" class="option-button" data-value="poor" 
+                                            onclick="selectWizardPaintCondition('poor')"
+                                            style="padding: 10px 20px; border: 2px solid #e0e0e0; background: white; border-radius: 8px; cursor: pointer;">
+                                        Poor
+                                    </button>
+                                </div>
+                                <input type="hidden" id="wizardPaintCondition" value="fair">
+                            </div>
+                            
+                            <div class="input-group">
+                                <label style="display: block; margin-bottom: 8px; font-weight: 600;">Actual Growth Level</label>
+                                <div class="option-button-group" id="wizardGrowthLevelButtons" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                    <button type="button" class="option-button" data-value="minimal" 
+                                            onclick="selectWizardGrowthLevel('minimal')"
+                                            style="padding: 10px 20px; border: 2px solid #e0e0e0; background: white; border-radius: 8px; cursor: pointer;">
+                                        Minimal
+                                    </button>
+                                    <button type="button" class="option-button selected" data-value="moderate" 
+                                            onclick="selectWizardGrowthLevel('moderate')"
+                                            style="padding: 10px 20px; border: 2px solid #345475; background: rgba(52, 84, 117, 0.1); border-radius: 8px; cursor: pointer;">
+                                        Moderate
+                                    </button>
+                                    <button type="button" class="option-button" data-value="heavy" 
+                                            onclick="selectWizardGrowthLevel('heavy')"
+                                            style="padding: 10px 20px; border: 2px solid #e0e0e0; background: white; border-radius: 8px; cursor: pointer;">
+                                        Heavy
+                                    </button>
+                                </div>
+                                <input type="hidden" id="wizardGrowthLevel" value="moderate">
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                // Add anodes button
+                const isAnodesOnly = serviceKey === 'anodes_only';
+                html += `
+                    <div class="form-section" style="text-align: center; margin-top: 20px; background: #f8f9fa; padding: 25px; border-radius: 12px; border: 1px solid #e0e0e0;">
+                        <button onclick="if(window.toggleAnodeSection) window.toggleAnodeSection(); else console.error('toggleAnodeSection not defined');" 
+                                class="customer-btn" 
+                                style="background-color: #e67e22; font-size: 16px; padding: 12px 24px; color: white; border: none; border-radius: 8px; cursor: pointer;">
+                            ⚓ ${isAnodesOnly ? 'Select Anodes' : 'Add Anodes to Service'}
+                        </button>
+                        <p style="margin-top: 10px; color: #666; font-size: 14px;">
+                            ${isAnodesOnly ? 'Select zinc anodes for replacement ($150 minimum service fee)' : 'Optional: Add zinc anode replacement to this service'}
+                        </p>
+                    </div>
+                `;
+                
+                html += '</div>';
+                
+                wizardContent.innerHTML = html;
+                
+                // Auto-show anodes for Anodes Only service
+                if (isAnodesOnly) {
+                    setTimeout(() => {
+                        const anodeSection = document.getElementById('anode-section');
+                        if (anodeSection) {
+                            anodeSection.style.display = 'block';
+                        }
+                    }, 500);
+                }
+                
+                // Update pricing
+                setTimeout(() => {
+                    if (window.syncWizardValues) syncWizardValues();
+                    if (window.updateWizardPricing) updateWizardPricing();
+                    if (window.updateChargeSummary) updateChargeSummary();
+                }, 100);
+            };
+        </script>
+        
+        <!-- Hidden compatibility elements -->
+        <div style="display: none;">
+            <div class="service-selection-grid" id="serviceButtons"></div>
+            <p class="variable-info" id="servicePriceExplainer"></p>
         </div>
         
         <!-- Boat Configuration Section (removed - redundant with wizard) -->
@@ -1065,6 +1716,99 @@
             </div>
         </div>
 
+        <!-- Anode Charging Section -->
+        <div id="anodeSection" class="anode-section" style="display: none;">
+            <h2>⚓ Anode Replacement Charging</h2>
+            
+            <!-- Pricing Settings -->
+            <div class="pricing-settings" style="background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+                <h3>Pricing Configuration</h3>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 15px;">
+                    <div>
+                        <label for="taxRate" style="display: block; font-weight: 600; margin-bottom: 8px; color: #333;">Tax Rate (%):</label>
+                        <input type="number" id="taxRate" value="10.75" step="0.01" min="0" max="100" 
+                               style="width: 100%; padding: 10px; font-size: 16px; border: 2px solid #345475; border-radius: 5px;"
+                               onchange="updatePricing()">
+                    </div>
+                    <div>
+                        <label for="markupRate" style="display: block; font-weight: 600; margin-bottom: 8px; color: #333;">Markup (%):</label>
+                        <input type="number" id="markupRate" value="20" step="0.1" min="0" max="200" 
+                               style="width: 100%; padding: 10px; font-size: 16px; border: 2px solid #345475; border-radius: 5px;"
+                               onchange="updatePricing()">
+                    </div>
+                    <div>
+                        <label for="laborCharge" style="display: block; font-weight: 600; margin-bottom: 8px; color: #333;">Labor per Anode ($):</label>
+                        <input type="number" id="laborCharge" value="15" step="0.01" min="0" 
+                               style="width: 100%; padding: 10px; font-size: 16px; border: 2px solid #345475; border-radius: 5px;"
+                               onchange="updatePricing()">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Daily Boat Schedule -->
+            <div class="daily-schedule">
+                <h3>Today's Service Schedule</h3>
+                <div class="schedule-date-selector">
+                    <input type="date" id="scheduleDate" value="">
+                    <button onclick="loadDailySchedule()" class="customer-btn">Load Schedule</button>
+                    <button onclick="uploadScheduleCSV()" class="customer-btn">Upload CSV</button>
+                </div>
+                <div id="boatScheduleList" class="boat-schedule-list">
+                    <!-- Boats will be populated here -->
+                </div>
+            </div>
+            
+            <!-- Anode Selection Interface -->
+            <div id="anodeSelector" class="anode-selector">
+                <h3>Select Anodes for: <span id="selectedBoatName">[Select a boat above or choose anodes directly]</span></h3>
+                
+                <!-- Category Filters -->
+                <div class="anode-categories">
+                    <button class="category-btn active" onclick="filterAnodes('all')">All</button>
+                    <button class="category-btn" onclick="filterAnodes('shaft')">Shaft</button>
+                    <button class="category-btn" onclick="filterAnodes('hull')">Hull</button>
+                    <button class="category-btn" onclick="filterAnodes('engine')">Engine</button>
+                    <button class="category-btn" onclick="filterAnodes('propeller')">Propeller</button>
+                    <button class="category-btn" onclick="filterAnodes('rudder')">Rudder/Trim</button>
+                    <button class="category-btn" onclick="filterAnodes('collar')">Collar</button>
+                    <button class="category-btn" onclick="filterAnodes('outboard')">Outboard</button>
+                </div>
+                
+                <!-- Anode Grid -->
+                <div id="anodeGrid" class="anode-grid">
+                    <!-- Anodes will be populated here -->
+                </div>
+                
+                <!-- Shopping Cart -->
+                <div class="anode-cart">
+                    <h4>Selected Anodes</h4>
+                    <div id="cartItems">
+                        <!-- Cart items will be populated here -->
+                    </div>
+                    <!-- Hidden elements for price calculation compatibility -->
+                    <div style="display: none;">
+                        <span id="anodeSubtotal">$0.00</span>
+                        <span id="laborCount">0</span>
+                        <span id="laborRate">15</span>
+                        <span id="anodeLaborTotal">$0.00</span>
+                        <span id="taxRateDisplay">10.75</span>
+                        <span id="anodeTax">$0.00</span>
+                        <span id="markupRateDisplay">20</span>
+                        <span id="anodeMarkup">$0.00</span>
+                        <span id="anodeTotal">$0.00</span>
+                    </div>
+                    <div style="display: none;">
+                        <button id="chargeAnodeBtn" class="charge-anode-btn" onclick="chargeAnodes()" disabled>
+                            💳 Charge Customer
+                        </button>
+                        <button class="charge-anode-btn" style="background: #6c757d;" onclick="generateQuote()">
+                            📋 Generate Quote
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Boat Details Section (removed - redundant with wizard) -->
         <div class="boat-details" style="display: none !important; /* PERMANENTLY HIDDEN - handled by wizard */">
             <h3>Boat Details</h3>
@@ -1102,16 +1846,10 @@
             </div>
         </div>
 
-        <!-- Service Total Section (removed - redundant with wizard) -->
-        <div class="pricing-display" id="pricingDisplay" style="display: none !important; /* PERMANENTLY HIDDEN - handled by wizard */">
-            <h3>Service Total</h3>
-            <div class="price-breakdown" id="priceBreakdown">
-                <pre id="costBreakdown" style="font-family: inherit; white-space: pre-wrap; margin: 10px 0;"></pre>
-                <div class="total-row" style="font-size: 20px; font-weight: bold; color: #1e3a5f; margin-top: 15px; padding-top: 15px; border-top: 2px solid #dee2e6;">
-                    <span class="total-label">Total:</span>
-                    <span class="total-value" id="totalCostDisplay">$0</span>
-                </div>
-            </div>
+        <!-- Hidden elements for price calculation compatibility -->
+        <div style="display: none;">
+            <pre id="costBreakdown"></pre>
+            <span id="totalCostDisplay">$0</span>
         </div>
 
         <!-- Charge Summary Section -->
@@ -1122,9 +1860,14 @@
                     Select a customer and configure service details
                 </div>
             </div>
-            <button id="chargeButton" class="charge-button" onclick="chargeCustomer()" disabled>
-                Charge Customer
-            </button>
+            <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
+                <button id="chargeButton" class="charge-button" onclick="chargeCustomer()" disabled>
+                    💳 Charge Customer
+                </button>
+                <button class="charge-button" style="background: #6c757d;" onclick="generateCombinedQuote()">
+                    📋 Generate Quote
+                </button>
+            </div>
         </div>
 
         <!-- Result Display -->
@@ -1147,8 +1890,71 @@
         window.wizardCurrentStep = 0;
         window.wizardSteps = [];
         
-        // Make transitionToDetailsForm available globally (will be defined later)
-        window.transitionToDetailsForm = null;
+        // Make transitionToDetailsForm available globally
+        window.transitionToDetailsForm = function(serviceKey) {
+            console.log('transitionToDetailsForm called for:', serviceKey);
+            const serviceSelector = document.querySelector('.service-selector');
+            const serviceGrid = serviceSelector.querySelector('.service-selection-grid');
+            const serviceHeading = serviceSelector.querySelector('h2');
+            const servicePriceExplainer = document.getElementById('servicePriceExplainer');
+            const wizardContainer = document.getElementById('wizardContainer');
+            const boatConfigSection = document.getElementById('boatConfigSection');
+            const boatDetails = document.querySelector('.boat-details');
+            const pricingDisplay = document.getElementById('pricingDisplay');
+            
+            // Hide the old boat config and pricing sections immediately
+            if (boatConfigSection) boatConfigSection.style.display = 'none';
+            if (boatDetails) boatDetails.style.display = 'none';
+            if (pricingDisplay) pricingDisplay.style.display = 'none';
+            if (servicePriceExplainer) servicePriceExplainer.style.display = 'none';
+            
+            // Determine service type for rendering
+            const isCleaningService = serviceKey === 'onetime_cleaning' || serviceKey === 'recurring_cleaning';
+            const service = window.serviceData[serviceKey];
+            
+            // Fade out service buttons and heading
+            serviceGrid.classList.add('service-fade-container', 'fade-out');
+            if (serviceHeading) {
+                serviceHeading.classList.add('service-fade-container', 'fade-out');
+            }
+            
+            setTimeout(() => {
+                // Hide service grid and heading, show wizard
+                serviceGrid.style.display = 'none';
+                if (serviceHeading) {
+                    serviceHeading.style.display = 'none';
+                }
+                wizardContainer.style.display = 'block';
+                wizardContainer.classList.add('service-fade-container', 'fade-in');
+                
+                // Render consolidated form with service key
+                renderConsolidatedForm(isCleaningService, serviceKey);
+                
+                // If "Anodes Only" service, automatically show anode section
+                if (serviceKey === 'anodes_only') {
+                    setTimeout(() => {
+                        const anodeSection = document.getElementById('anode-section');
+                        if (anodeSection) {
+                            anodeSection.style.display = 'block';
+                        }
+                    }, 500);
+                }
+                
+                // Scroll to the top of the service selector section
+                setTimeout(() => {
+                    serviceSelector.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'start',
+                        inline: 'nearest'
+                    });
+                }, 100);
+                
+                // Remove fade classes after animation
+                setTimeout(() => {
+                    wizardContainer.classList.remove('service-fade-container', 'fade-in');
+                }, 600);
+            }, 400);
+        };
         
         // Store the original selectService that will be loaded from script.js
         let selectServiceOriginal = null;
@@ -1237,6 +2043,7 @@
     </script>
     <script src="script.js" type="module"></script>
     <script type="module">
+        console.log('Module script starting execution');
         let selectedCustomer = null;
         let customers = [];
 
@@ -1290,11 +2097,13 @@
 
             // Add enter key support for search
             const searchInput = document.getElementById('customerSearch');
-            searchInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    searchCustomers();
-                }
-            });
+            if (searchInput) {
+                searchInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        searchCustomers();
+                    }
+                });
+            }
             
             // Initial calculations
             if (window.calculateCost) {
@@ -1541,8 +2350,10 @@
         }
         
         // Handle payment form submission
-        document.getElementById('payment-form').addEventListener('submit', async function(event) {
-            event.preventDefault();
+        const paymentForm = document.getElementById('payment-form');
+        if (paymentForm) {
+            paymentForm.addEventListener('submit', async function(event) {
+                event.preventDefault();
             
             if (!window.currentSetupIntent) {
                 alert('Setup not initialized. Please try again.');
@@ -1585,7 +2396,8 @@
                 submitButton.disabled = false;
                 submitButton.textContent = 'Add Card';
             }
-        });
+            });
+        }
         
         // Make functions globally available
         window.searchCustomers = searchCustomers;
@@ -1706,6 +2518,9 @@
             }, 100);
         }
         
+        // Make it globally available
+        window.selectWizardPaintCondition = selectWizardPaintCondition;
+        
         // Growth level selection functions
         function selectGrowthLevel(value) {
             document.querySelectorAll('#growthLevelButtons .option-button').forEach(btn => {
@@ -1748,6 +2563,9 @@
                 updateWizardPricing();
             }, 100);
         }
+        
+        // Make it globally available
+        window.selectWizardGrowthLevel = selectWizardGrowthLevel;
         
         // Make functions globally available
         window.selectPaintCondition = selectPaintCondition;
@@ -1809,6 +2627,16 @@
                 // Render consolidated form with service key
                 renderConsolidatedForm(isCleaningService, serviceKey);
                 
+                // If "Anodes Only" service, automatically show anode section
+                if (serviceKey === 'anodes_only') {
+                    setTimeout(() => {
+                        const anodeSection = document.getElementById('anode-section');
+                        if (anodeSection) {
+                            anodeSection.style.display = 'block';
+                        }
+                    }, 500);
+                }
+                
                 // Scroll to the top of the service selector section
                 setTimeout(() => {
                     serviceSelector.scrollIntoView({ 
@@ -1823,12 +2651,14 @@
                     wizardContainer.classList.remove('service-fade-container', 'fade-in');
                 }, 600);
             }, 400);
-        }
+        } */
         
         // Old wizard step functions removed - replaced by renderConsolidatedForm
         
         // Render consolidated form (all fields in one view)
+        console.log('Defining full renderConsolidatedForm function');
         window.renderConsolidatedForm = function(isCleaningService, serviceKey) {
+            console.log('Full renderConsolidatedForm called for', serviceKey);
             const wizardContent = document.getElementById('wizardContent');
             const service = window.serviceData ? window.serviceData[serviceKey] : null;
             const serviceName = service ? service.name : 'Service';
@@ -1841,6 +2671,10 @@
             const isItemRecovery = serviceKey === 'item_recovery';
             const isUnderwaterInspection = serviceKey === 'underwater_inspection';
             const isPropellerService = serviceKey === 'propeller_service';
+            const isAnodesOnly = serviceKey === 'anodes_only';
+            
+            // Underwater inspection only needs hull type (for pricing)
+            const needsHullTypeOnly = isUnderwaterInspection;
             
             // Clear any existing content to prevent duplication
             wizardContent.innerHTML = '';
@@ -1886,8 +2720,36 @@
                 </div>
             `;
             
+            // Add special hull type section for underwater inspection
+            if (needsHullTypeOnly) {
+                formHTML += `
+                    <div class="form-section">
+                        <h3>Hull Configuration</h3>
+                        
+                        <!-- Hull Type -->
+                        <div class="input-group">
+                            <label>Number of Hulls</label>
+                            <div class="radio-group">
+                                <label class="radio-option">
+                                    <input type="radio" name="wizard_hull_type" value="monohull" checked>
+                                    <span>Monohull</span>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="wizard_hull_type" value="catamaran">
+                                    <span>Catamaran (2 hulls)</span>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="wizard_hull_type" value="trimaran">
+                                    <span>Trimaran (3 hulls)</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
             // Add cleaning-specific fields
-            if (isCleaningService) {
+            else if (isCleaningService) {
                 formHTML += `
                     <div class="form-section">
                         <h3>Boat Configuration</h3>
@@ -1969,16 +2831,31 @@
                 `;
             }
             
-            // Add Service Total section at the bottom
-            formHTML += `
-                <div class="form-section">
-                    <h3>Service Total</h3>
-                    <div class="price-display" id="wizardPriceDisplay">
-                        <div id="wizardCostBreakdown" style="font-family: inherit; white-space: pre-wrap; margin: 10px 0; color: #333;"></div>
-                        <div id="wizardTotalPrice" style="font-size: 24px; font-weight: bold; color: #2c3e50; margin-top: 15px;"></div>
+            // Add the "Add Anodes" button after Current Condition
+            // For "Anodes Only" service, show different message and auto-open
+            if (isAnodesOnly) {
+                formHTML += `
+                    <div class="form-section" style="text-align: center; margin-top: 20px;">
+                        <button onclick="toggleAnodeSection()" class="customer-btn" style="background-color: #e67e22; font-size: 16px; padding: 12px 24px;">
+                            ⚓ Select Anodes
+                        </button>
+                        <p style="margin-top: 10px; color: #666; font-size: 14px;">
+                            Select zinc anodes for replacement ($150 minimum service fee)
+                        </p>
                     </div>
-                </div>
-            `;
+                `;
+            } else {
+                formHTML += `
+                    <div class="form-section" style="text-align: center; margin-top: 20px;">
+                        <button onclick="toggleAnodeSection()" class="customer-btn" style="background-color: #e67e22; font-size: 16px; padding: 12px 24px;">
+                            ⚓ Add Anodes to Service
+                        </button>
+                        <p style="margin-top: 10px; color: #666; font-size: 14px;">
+                            Optional: Add zinc anode replacement to this service
+                        </p>
+                    </div>
+                `;
+            }
             
             formHTML += '</div>';
             
@@ -2239,35 +3116,106 @@
         // Function to go back to service selection
         function backToServices() {
             const serviceSelector = document.querySelector('.service-selector');
-            const serviceGrid = serviceSelector.querySelector('.service-selection-grid');
             const serviceHeading = serviceSelector.querySelector('h2');
             const wizardContainer = document.getElementById('wizardContainer');
+            const simpleButtons = document.getElementById('simpleServiceButtons');
             
             // Hide wizard
             wizardContainer.style.display = 'none';
             wizardContainer.innerHTML = '';
             
-            // Show service grid
-            serviceGrid.style.display = 'grid';
-            serviceGrid.classList.remove('service-fade-container', 'fade-out');
+            // Show simple service buttons
+            if (simpleButtons) {
+                simpleButtons.style.display = 'flex';
+            }
+            
+            // Show heading
             if (serviceHeading) {
                 serviceHeading.style.display = 'block';
             }
             
             // Reset selected service
             window.currentServiceKey = null;
-            document.querySelectorAll('.service-option').forEach(btn => {
-                btn.classList.remove('selected', 'expanded');
-            });
+            window.selectedServiceKey = null;
             
-            // Repopulate service buttons
-            if (window.populateServiceButtons) {
-                window.populateServiceButtons();
+            // Update charge summary
+            if (typeof updateChargeSummary === 'function') {
+                updateChargeSummary();
             }
         }
         
         // Make backToServices globally available
         window.backToServices = backToServices;
+        
+        // Direct service selection (skips the two-click behavior)
+        window.selectServiceDirect = function(serviceKey) {
+            console.log('Direct service selection:', serviceKey);
+            
+            // Update service state
+            window.currentServiceKey = serviceKey;
+            window.selectedServiceKey = serviceKey;
+            
+            // Use the existing transitionToDetailsForm function if available
+            if (typeof window.transitionToDetailsForm === 'function') {
+                window.transitionToDetailsForm(serviceKey);
+            } else {
+                // Fallback: manually show the form
+                console.log('Using fallback transition');
+                
+                // Hide the simple service buttons
+                const simpleButtons = document.getElementById('simpleServiceButtons');
+                if (simpleButtons) {
+                    simpleButtons.style.display = 'none';
+                }
+                
+                // Update the heading
+                const serviceHeading = document.querySelector('.service-selector h2');
+                if (serviceHeading) {
+                    serviceHeading.style.display = 'none';
+                }
+                
+                // Show the wizard container
+                const wizardContainer = document.getElementById('wizardContainer');
+                if (wizardContainer) {
+                    wizardContainer.style.display = 'block';
+                    
+                    // Try to render the form if function exists
+                    const isCleaningService = serviceKey === 'onetime_cleaning' || serviceKey === 'recurring_cleaning';
+                    if (typeof window.renderConsolidatedForm === 'function') {
+                        window.renderConsolidatedForm(isCleaningService, serviceKey);
+                    } else {
+                        // Basic fallback content
+                        const wizardContent = document.getElementById('wizardContent');
+                        if (wizardContent) {
+                            wizardContent.innerHTML = `
+                                <div style="padding: 20px;">
+                                    <h3>Loading service details...</h3>
+                                    <p>Service: ${serviceKey}</p>
+                                    <button onclick="backToServices()" style="padding: 10px 20px; background: #6c757d; color: white; border: none; border-radius: 8px;">
+                                        ← Back to Services
+                                    </button>
+                                </div>
+                            `;
+                        }
+                    }
+                    
+                    // Auto-show anode section for "Anodes Only" service
+                    if (serviceKey === 'anodes_only') {
+                        setTimeout(() => {
+                            const anodeSection = document.getElementById('anode-section');
+                            if (anodeSection) {
+                                anodeSection.style.display = 'block';
+                            }
+                        }, 500);
+                    }
+                    
+                    // Update charge summary if function exists
+                    if (typeof window.updateChargeSummary === 'function') {
+                        window.updateChargeSummary();
+                    }
+                }
+            }
+        };
         
         // Wait for buttons to be created and override their handlers
         setTimeout(() => {
@@ -2338,7 +3286,7 @@
             console.log('Replaced click handlers for', serviceButtons.length, 'service buttons');
         }, 500); // Wait for buttons to be populated
 
-        // Update charge summary
+        // Update charge summary to include both services and anodes
         function updateChargeSummary() {
             const chargeDetails = document.getElementById('chargeDetails');
             const chargeButton = document.getElementById('chargeButton');
@@ -2353,17 +3301,47 @@
                 return;
             }
 
-            // Get price from the results section (total value)
-            // The totalCostDisplay element directly holds the value
+            // Get service info and price
             const totalElement = document.getElementById('totalCostDisplay');
-            const price = totalElement ? parseFloat(totalElement.textContent.replace('$', '').replace(',', '')) : 0;
+            const servicePrice = totalElement ? parseFloat(totalElement.textContent.replace('$', '').replace(',', '')) : 0;
             
-            // Get selected service from the service buttons
             const selectedServiceEl = document.querySelector('.service-option.selected');
             const serviceTitleEl = selectedServiceEl ? selectedServiceEl.querySelector('.service-title') : null;
             const serviceName = serviceTitleEl ? serviceTitleEl.textContent : '';
+            
+            // Check if this is "Anodes Only" service
+            const isAnodesOnlyService = window.selectedServiceKey === 'anodes_only';
+            
+            // Get anode info
+            const anodeItems = Object.values(window.anodeCart || {});
+            let anodeSubtotal = 0;
+            let anodeLaborTotal = 0;
+            let anodeMarkup = 0;
+            let anodeTax = 0;
+            let anodeTotalWithMarkupAndTax = 0;
+            
+            if (anodeItems.length > 0) {
+                // Get configurable rates
+                const taxRate = parseFloat(document.getElementById('taxRate').value) / 100 || 0.1075;
+                const markupRate = parseFloat(document.getElementById('markupRate').value) / 100 || 0.20;
+                const laborCharge = parseFloat(document.getElementById('laborCharge').value) || 15;
+                
+                // Calculate anode costs
+                anodeSubtotal = anodeItems.reduce((sum, item) => sum + (item.list_price * item.quantity), 0);
+                const totalAnodes = anodeItems.reduce((sum, item) => sum + item.quantity, 0);
+                anodeLaborTotal = totalAnodes * laborCharge;
+                const anodeSubtotalWithLabor = anodeSubtotal + anodeLaborTotal;
+                anodeMarkup = anodeSubtotalWithLabor * markupRate;
+                const anodeSubtotalWithMarkup = anodeSubtotalWithLabor + anodeMarkup;
+                anodeTax = anodeSubtotalWithMarkup * taxRate;
+                anodeTotalWithMarkupAndTax = anodeSubtotalWithMarkup + anodeTax;
+            }
+            
+            // Calculate combined total
+            const combinedTotal = servicePrice + anodeTotalWithMarkupAndTax;
 
-            chargeDetails.innerHTML = `
+            // Build the charge details HTML
+            let detailsHTML = `
                 <div class="charge-detail-row">
                     <span>Customer:</span>
                     <span>${selectedCustomer.name || 'Unnamed'}</span>
@@ -2380,16 +3358,74 @@
                             'No card on file'}
                     </span>
                 </div>
-                <div class="charge-detail-row">
-                    <span>Service:</span>
-                    <span>${serviceName}</span>
-                </div>
-                <div class="charge-detail-row">
+            `;
+            
+            // Add breakdown if there are charges
+            if (serviceName || anodeItems.length > 0) {
+                detailsHTML += `<hr style="margin: 10px 0; border-color: #e0e0e0;">`;
+                
+                // Service details
+                if (serviceName) {
+                    if (isAnodesOnlyService) {
+                        // For "Anodes Only" service, show it as a flat fee
+                        detailsHTML += `
+                            <div class="charge-detail-row">
+                                <span>${serviceName} (Service Fee):</span>
+                                <span>$${servicePrice.toFixed(2)}</span>
+                            </div>
+                        `;
+                    } else if (servicePrice > 0) {
+                        // Regular service with calculated price
+                        detailsHTML += `
+                            <div class="charge-detail-row">
+                                <span>${serviceName}:</span>
+                                <span>$${servicePrice.toFixed(2)}</span>
+                            </div>
+                        `;
+                    }
+                }
+                
+                // Anode details
+                if (anodeItems.length > 0) {
+                    const totalAnodes = anodeItems.reduce((sum, item) => sum + item.quantity, 0);
+                    
+                    detailsHTML += `
+                        <div class="charge-detail-row" style="margin-top: 10px; font-weight: 600;">
+                            <span>Zinc Anodes (${totalAnodes} items):</span>
+                            <span></span>
+                        </div>
+                        <div class="charge-detail-row" style="padding-left: 20px; font-size: 0.95em;">
+                            <span>Parts Cost:</span>
+                            <span>$${anodeSubtotal.toFixed(2)}</span>
+                        </div>
+                        <div class="charge-detail-row" style="padding-left: 20px; font-size: 0.95em;">
+                            <span>Labor (${totalAnodes} × $${parseFloat(document.getElementById('laborCharge').value || 15).toFixed(2)}):</span>
+                            <span>$${anodeLaborTotal.toFixed(2)}</span>
+                        </div>
+                        <div class="charge-detail-row" style="padding-left: 20px; font-size: 0.95em;">
+                            <span>Markup (${(parseFloat(document.getElementById('markupRate').value) || 20)}%):</span>
+                            <span>$${anodeMarkup.toFixed(2)}</span>
+                        </div>
+                        <div class="charge-detail-row" style="padding-left: 20px; font-size: 0.95em;">
+                            <span>Tax (${(parseFloat(document.getElementById('taxRate').value) || 10.75)}%):</span>
+                            <span>$${anodeTax.toFixed(2)}</span>
+                        </div>
+                        <div class="charge-detail-row" style="padding-left: 20px; font-weight: 600;">
+                            <span>Anode Total:</span>
+                            <span>$${anodeTotalWithMarkupAndTax.toFixed(2)}</span>
+                        </div>
+                    `;
+                }
+                
+                detailsHTML += `<hr style="margin: 10px 0; border-color: #345475;">`;
+            
+            detailsHTML += `
+                <div class="charge-detail-row" style="font-size: 1.1em; font-weight: bold;">
                     <span>Total Amount:</span>
                     <span>
                         $<input type="number" 
                                id="editableAmount" 
-                               value="${price.toFixed(2)}" 
+                               value="${combinedTotal.toFixed(2)}" 
                                step="0.01" 
                                min="0" 
                                style="width: 100px; border: 1px solid #ddd; padding: 4px; border-radius: 4px;"
@@ -2398,11 +3434,13 @@
                 </div>
             `;
             
+            chargeDetails.innerHTML = detailsHTML;
+            
             // Update charge button based on editable amount
             const editableAmount = parseFloat(document.getElementById('editableAmount')?.value || 0);
             chargeButton.disabled = !selectedCustomer.payment_method || editableAmount === 0;
             chargeButton.textContent = selectedCustomer.payment_method ? 
-                `Charge $${editableAmount.toFixed(2)}` : 'No Payment Method Available';
+                `💳 Charge $${editableAmount.toFixed(2)}` : 'No Payment Method Available';
         }
 
         // Charge the customer
@@ -2579,6 +3617,452 @@
             setTimeout(() => {
                 resultEl.style.display = 'none';
             }, 5000);
+        }
+        
+        // Anode Charging Functions
+        let anodeCart = {};
+        let selectedBoat = null;
+        let anodeCatalog = [];
+        let currentCategory = 'all';
+        
+        // Toggle anode section visibility
+        window.toggleAnodeSection = function() {
+            const section = document.getElementById('anodeSection');
+            if (!section) {
+                console.error('Anode section not found');
+                return;
+            }
+            
+            // Toggle visibility
+            if (section.style.display === 'none' || section.style.display === '') {
+                section.style.display = 'block';
+                section.classList.add('active');
+                
+                // Load anode catalog if not already loaded
+                if (anodeCatalog.length === 0) {
+                    console.log('Loading anode catalog...');
+                    loadAnodeCatalog();
+                }
+                
+                // Set today's date
+                const scheduleDate = document.getElementById('scheduleDate');
+                if (scheduleDate) {
+                    scheduleDate.value = new Date().toISOString().split('T')[0];
+                }
+                
+                // Scroll to the section
+                setTimeout(() => {
+                    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
+                
+            } else {
+                section.style.display = 'none';
+                section.classList.remove('active');
+            }
+        }
+        
+        // Load anode catalog from JSON file
+        async function loadAnodeCatalog() {
+            try {
+                // Try to load the full comprehensive catalog first
+                let response = await fetch('/full-boatzincs-catalog.json');
+                if (!response.ok) {
+                    // Try the other comprehensive catalog
+                    response = await fetch('/complete-zinc-catalog.json');
+                    if (!response.ok) {
+                        // Try zinc anodes catalog
+                        response = await fetch('/zinc-anodes-catalog.json');
+                        if (!response.ok) {
+                            // Fallback to original catalog
+                            response = await fetch('/anode-catalog.json');
+                        }
+                    }
+                }
+                const data = await response.json();
+                anodeCatalog = data.anodes || data;
+                console.log(`Loaded ${anodeCatalog.length} anodes from catalog`);
+                displayAnodes();
+                updateCategoryButtons();
+            } catch (error) {
+                console.error('Failed to load anode catalog:', error);
+                // Use hardcoded catalog as fallback
+                anodeCatalog = [
+                    { boatzincs_id: "ZSC-1", name: "Shaft Collar Zinc - 1\"", category: "shaft", list_price: 22.99 },
+                    { boatzincs_id: "ZSC-1.25", name: "Shaft Collar Zinc - 1.25\"", category: "shaft", list_price: 24.99 },
+                    { boatzincs_id: "ZSC-1.5", name: "Shaft Collar Zinc - 1.5\"", category: "shaft", list_price: 27.99 },
+                    { boatzincs_id: "ZHB-3", name: "Hull Bolt-On Zinc - 3 lb", category: "hull", list_price: 54.99 },
+                    { boatzincs_id: "ZHB-6", name: "Hull Bolt-On Zinc - 6 lb", category: "hull", list_price: 82.99 },
+                    { boatzincs_id: "ZPN-1/2", name: "Engine Pencil Zinc - 1/2\" NPT", category: "engine", list_price: 6.99 },
+                    { boatzincs_id: "ZPN-3/4", name: "Engine Pencil Zinc - 3/4\" NPT", category: "engine", list_price: 8.99 },
+                    { boatzincs_id: "ZPH-A", name: "Propeller Hub Zinc - Alpha", category: "propeller", list_price: 18.99 },
+                    { boatzincs_id: "ZRD-2", name: "Rudder Zinc - 2\"", category: "rudder", list_price: 45.99 },
+                    { boatzincs_id: "ZTT-M", name: "Trim Tab Zinc - Medium", category: "trim_tab", list_price: 16.99 }
+                ];
+                displayAnodes();
+            }
+        }
+        
+        // Display anodes in grid
+        function displayAnodes() {
+            const grid = document.getElementById('anodeGrid');
+            let filtered;
+            
+            if (currentCategory === 'all') {
+                filtered = anodeCatalog;
+            } else if (currentCategory === 'shaft') {
+                // Include all shaft categories
+                filtered = anodeCatalog.filter(a => 
+                    a.category === 'shaft' || 
+                    a.category === 'shaft_anodes_standard' || 
+                    a.category === 'shaft_anodes_metric' ||
+                    a.category.includes('shaft')
+                );
+            } else if (currentCategory === 'hull') {
+                // Include all hull categories
+                filtered = anodeCatalog.filter(a => 
+                    a.category === 'hull' || 
+                    a.category === 'hull_anodes_bolt_on' || 
+                    a.category === 'hull_anodes_weld_on' ||
+                    a.category.includes('hull')
+                );
+            } else if (currentCategory === 'engine') {
+                // Include all engine categories
+                filtered = anodeCatalog.filter(a => 
+                    a.category === 'engine' || 
+                    a.category === 'engine_anodes' ||
+                    a.category.includes('engine')
+                );
+            } else if (currentCategory === 'rudder') {
+                // Include both rudder and trim_tab categories
+                filtered = anodeCatalog.filter(a => 
+                    a.category === 'rudder' || 
+                    a.category === 'trim_tab' ||
+                    a.category.includes('rudder') ||
+                    a.category.includes('trim')
+                );
+            } else {
+                filtered = anodeCatalog.filter(a => 
+                    a.category === currentCategory ||
+                    a.category.includes(currentCategory)
+                );
+            }
+            
+            grid.innerHTML = filtered.map(anode => `
+                <div class="anode-item" data-id="${anode.boatzincs_id}">
+                    <div class="anode-name">${anode.name}</div>
+                    <div class="anode-price">$${anode.list_price.toFixed(2)}</div>
+                    <div class="anode-quantity">
+                        <button class="quantity-btn" onclick="updateAnodeQuantity('${anode.boatzincs_id}', -1)">-</button>
+                        <input type="number" class="quantity-input" id="qty-${anode.boatzincs_id}" 
+                               value="${anodeCart[anode.boatzincs_id]?.quantity || 0}" 
+                               onchange="setAnodeQuantity('${anode.boatzincs_id}', this.value)" min="0" max="99">
+                        <button class="quantity-btn" onclick="updateAnodeQuantity('${anode.boatzincs_id}', 1)">+</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Update category button counts
+        function updateCategoryButtons() {
+            const counts = {
+                all: anodeCatalog.length,
+                shaft: anodeCatalog.filter(a => a.category.includes('shaft')).length,
+                hull: anodeCatalog.filter(a => a.category.includes('hull')).length,
+                engine: anodeCatalog.filter(a => a.category.includes('engine')).length,
+                propeller: anodeCatalog.filter(a => a.category.includes('propeller')).length,
+                rudder: anodeCatalog.filter(a => a.category.includes('rudder') || a.category.includes('trim')).length,
+                collar: anodeCatalog.filter(a => a.category.includes('collar')).length,
+                outboard: anodeCatalog.filter(a => a.category.includes('outboard')).length
+            };
+            
+            // Update button text with counts
+            document.querySelector('.category-btn[onclick="filterAnodes(\'all\')"]').textContent = `All (${counts.all})`;
+            document.querySelector('.category-btn[onclick="filterAnodes(\'shaft\')"]').textContent = `Shaft (${counts.shaft})`;
+            document.querySelector('.category-btn[onclick="filterAnodes(\'hull\')"]').textContent = `Hull (${counts.hull})`;
+            document.querySelector('.category-btn[onclick="filterAnodes(\'engine\')"]').textContent = `Engine (${counts.engine})`;
+            document.querySelector('.category-btn[onclick="filterAnodes(\'propeller\')"]').textContent = `Propeller (${counts.propeller})`;
+            document.querySelector('.category-btn[onclick="filterAnodes(\'rudder\')"]').textContent = `Rudder/Trim (${counts.rudder})`;
+            document.querySelector('.category-btn[onclick="filterAnodes(\'collar\')"]').textContent = `Collar (${counts.collar})`;
+            document.querySelector('.category-btn[onclick="filterAnodes(\'outboard\')"]').textContent = `Outboard (${counts.outboard})`;
+        }
+        
+        // Filter anodes by category
+        window.filterAnodes = function(category) {
+            currentCategory = category;
+            
+            // Update button states
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            displayAnodes();
+        }
+        
+        // Update anode quantity
+        window.updateAnodeQuantity = function(anodeId, change) {
+            const anode = anodeCatalog.find(a => a.boatzincs_id === anodeId);
+            if (!anode) return;
+            
+            if (!anodeCart[anodeId]) {
+                anodeCart[anodeId] = { ...anode, quantity: 0 };
+            }
+            
+            anodeCart[anodeId].quantity = Math.max(0, anodeCart[anodeId].quantity + change);
+            
+            if (anodeCart[anodeId].quantity === 0) {
+                delete anodeCart[anodeId];
+            }
+            
+            document.getElementById(`qty-${anodeId}`).value = anodeCart[anodeId]?.quantity || 0;
+            updateCart();
+        }
+        
+        // Set anode quantity directly
+        window.setAnodeQuantity = function(anodeId, value) {
+            const quantity = parseInt(value) || 0;
+            if (quantity === 0) {
+                delete anodeCart[anodeId];
+            } else {
+                const anode = anodeCatalog.find(a => a.boatzincs_id === anodeId);
+                if (anode) {
+                    anodeCart[anodeId] = { ...anode, quantity };
+                }
+            }
+            updateCart();
+        }
+        
+        // Update cart display and totals
+        function updateCart() {
+            const cartItems = document.getElementById('cartItems');
+            const items = Object.values(anodeCart);
+            
+            if (items.length === 0) {
+                cartItems.innerHTML = '<p style="text-align: center; color: #999;">No anodes selected</p>';
+                document.getElementById('anodeSubtotal').textContent = '$0.00';
+                document.getElementById('anodeLaborTotal').textContent = '$0.00';
+                document.getElementById('anodeTax').textContent = '$0.00';
+                document.getElementById('anodeMarkup').textContent = '$0.00';
+                document.getElementById('anodeTotal').textContent = '$0.00';
+                document.getElementById('laborCount').textContent = '0';
+                document.getElementById('chargeAnodeBtn').disabled = true;
+                return;
+            }
+            
+            // Display cart items
+            cartItems.innerHTML = items.map(item => `
+                <div class="cart-item">
+                    <span>${item.quantity}x ${item.name}</span>
+                    <span>$${(item.list_price * item.quantity).toFixed(2)}</span>
+                </div>
+            `).join('');
+            
+            // Get configurable rates
+            const taxRate = parseFloat(document.getElementById('taxRate').value) / 100 || 0.1075;
+            const markupRate = parseFloat(document.getElementById('markupRate').value) / 100 || 0.20;
+            const laborCharge = parseFloat(document.getElementById('laborCharge').value) || 15;
+            
+            // Calculate totals
+            const subtotal = items.reduce((sum, item) => sum + (item.list_price * item.quantity), 0);
+            const totalAnodes = items.reduce((sum, item) => sum + item.quantity, 0);
+            const laborTotal = totalAnodes * laborCharge;
+            const subtotalWithLabor = subtotal + laborTotal;
+            const markup = subtotalWithLabor * markupRate;  // Markup BEFORE tax
+            const subtotalWithMarkup = subtotalWithLabor + markup;
+            const tax = subtotalWithMarkup * taxRate;  // Tax on marked-up amount
+            const total = subtotalWithMarkup + tax;
+            
+            // Update display
+            document.getElementById('anodeSubtotal').textContent = `$${subtotal.toFixed(2)}`;
+            document.getElementById('laborCount').textContent = totalAnodes;
+            document.getElementById('laborRate').textContent = laborCharge.toFixed(2);
+            document.getElementById('anodeLaborTotal').textContent = `$${laborTotal.toFixed(2)}`;
+            document.getElementById('taxRateDisplay').textContent = (taxRate * 100).toFixed(2);
+            document.getElementById('anodeTax').textContent = `$${tax.toFixed(2)}`;
+            document.getElementById('markupRateDisplay').textContent = (markupRate * 100).toFixed(1);
+            document.getElementById('anodeMarkup').textContent = `$${markup.toFixed(2)}`;
+            document.getElementById('anodeTotal').textContent = `$${total.toFixed(2)}`;
+            
+            document.getElementById('chargeAnodeBtn').disabled = !selectedCustomer;
+            
+            // Also update the main charge summary to include anodes
+            updateChargeSummary();
+        }
+        
+        // Add updatePricing function to recalculate when rates change
+        function updatePricing() {
+            updateCart();
+        }
+        
+        
+        // Load daily schedule (mock for now)
+        window.loadDailySchedule = function() {
+            const date = document.getElementById('scheduleDate').value;
+            const scheduleList = document.getElementById('boatScheduleList');
+            
+            // Mock data - in production, this would fetch from database
+            const mockSchedule = [
+                { boat_id: '1', boat_name: 'Serenity', customer_name: 'John Smith', completed: false },
+                { boat_id: '2', boat_name: 'Wind Dancer', customer_name: 'Sarah Johnson', completed: false },
+                { boat_id: '3', boat_name: 'Blue Horizon', customer_name: 'Mike Wilson', completed: true }
+            ];
+            
+            scheduleList.innerHTML = mockSchedule.map(boat => `
+                <div class="boat-schedule-item ${boat.completed ? 'completed' : ''}" 
+                     onclick="selectBoatFromSchedule('${boat.boat_id}', '${boat.boat_name}', '${boat.customer_name}')">
+                    <div class="boat-info">
+                        <div class="boat-name">${boat.boat_name}</div>
+                        <div class="boat-customer">${boat.customer_name}</div>
+                    </div>
+                    ${boat.completed ? '<div class="boat-status">✓ Completed</div>' : ''}
+                </div>
+            `).join('');
+        }
+        
+        // Select boat from schedule
+        window.selectBoatFromSchedule = function(boatId, boatName, customerName) {
+            selectedBoat = { id: boatId, name: boatName, customer: customerName };
+            
+            // Update UI
+            document.querySelectorAll('.boat-schedule-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+            
+            // Show anode selector
+            document.getElementById('anodeSelector').style.display = 'block';
+            document.getElementById('selectedBoatName').textContent = boatName;
+            
+            // Clear cart for new boat
+            anodeCart = {};
+            displayAnodes();
+            updateCart();
+        }
+        
+        // Upload schedule CSV
+        window.uploadScheduleCSV = function() {
+            alert('CSV upload feature coming soon. For now, use the manual schedule entry.');
+        }
+        
+        // Generate quote for customer (anodes only)
+        window.generateQuote = function() {
+            const taxRate = parseFloat(document.getElementById('taxRate').value) || 10.75;
+            const laborCharge = parseFloat(document.getElementById('laborCharge').value) || 15;
+            
+            // Build URL parameters
+            const params = new URLSearchParams();
+            params.append('tax', taxRate);
+            params.append('labor', laborCharge);
+            
+            if (selectedCustomer) {
+                params.append('customer', selectedCustomer.name || selectedCustomer.email || '');
+            }
+            
+            if (selectedBoat) {
+                params.append('boat', selectedBoat.name || '');
+            }
+            
+            // Open quote page in new tab
+            window.open('/anode-quote.html?' + params.toString(), '_blank');
+        }
+        
+        // Generate combined quote for services and anodes
+        window.generateCombinedQuote = function() {
+            // Get all current data
+            const boatLengthEl = document.getElementById('boatLength');
+            const boatLength = boatLengthEl ? boatLengthEl.value : '';
+            
+            const selectedServiceEl = document.querySelector('.service-option.selected');
+            const serviceTitleEl = selectedServiceEl ? selectedServiceEl.querySelector('.service-title') : null;
+            const serviceName = serviceTitleEl ? serviceTitleEl.textContent : '';
+            const serviceKey = selectedServiceEl ? selectedServiceEl.dataset.service : '';
+            
+            const totalElement = document.getElementById('totalCostDisplay');
+            const servicePrice = totalElement ? parseFloat(totalElement.textContent.replace('$', '').replace(',', '')) : 0;
+            
+            // Build quote data
+            const quoteData = {
+                customer: selectedCustomer ? (selectedCustomer.name || selectedCustomer.email || '') : '',
+                boat: selectedBoat ? selectedBoat.name : '',
+                boatLength: boatLength,
+                service: {
+                    name: serviceName,
+                    key: serviceKey,
+                    price: servicePrice
+                },
+                anodes: Object.values(window.anodeCart || {}),
+                anodeConfig: {
+                    taxRate: parseFloat(document.getElementById('taxRate')?.value || 10.75),
+                    markupRate: parseFloat(document.getElementById('markupRate')?.value || 20),
+                    laborCharge: parseFloat(document.getElementById('laborCharge')?.value || 15)
+                }
+            };
+            
+            // Store quote data in localStorage
+            localStorage.setItem('currentQuote', JSON.stringify(quoteData));
+            
+            // Open comprehensive quote page
+            window.open('/comprehensive-quote.html?load=current', '_blank');
+        }
+        
+        // Charge customer for anodes
+        window.chargeAnodes = async function() {
+            if (!selectedCustomer || Object.keys(anodeCart).length === 0) return;
+            
+            // Get configurable rates
+            const taxRate = parseFloat(document.getElementById('taxRate').value) / 100 || 0.1075;
+            const markupRate = parseFloat(document.getElementById('markupRate').value) / 100 || 0.20;
+            const laborCharge = parseFloat(document.getElementById('laborCharge').value) || 15;
+            
+            const items = Object.values(anodeCart);
+            const subtotal = items.reduce((sum, item) => sum + (item.list_price * item.quantity), 0);
+            const totalAnodes = items.reduce((sum, item) => sum + item.quantity, 0);
+            const laborTotal = totalAnodes * laborCharge;
+            const subtotalWithLabor = subtotal + laborTotal;
+            const markup = subtotalWithLabor * markupRate;  // Markup BEFORE tax
+            const subtotalWithMarkup = subtotalWithLabor + markup;
+            const tax = subtotalWithMarkup * taxRate;  // Tax on marked-up amount
+            const total = subtotalWithMarkup + tax;
+            
+            const description = items.map(item => 
+                `${item.quantity}x ${item.name}`
+            ).join(', ') + ` (includes $${laborTotal.toFixed(2)} labor)`;
+            
+            try {
+                const response = await fetch('http://localhost:3001/api/charge-anode', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        customerId: selectedCustomer.stripe_customer_id,
+                        amount: Math.round(total * 100), // Convert to cents
+                        description: `Anode Replacement: ${description}`,
+                        metadata: {
+                            boat_id: selectedBoat?.id,
+                            boat_name: selectedBoat?.name,
+                            items: JSON.stringify(items),
+                            subtotal: subtotal.toFixed(2),
+                            labor: laborTotal.toFixed(2),
+                            tax: tax.toFixed(2),
+                            markup: markup.toFixed(2),
+                            tax_rate: (taxRate * 100).toFixed(2) + '%',
+                            markup_rate: (markupRate * 100).toFixed(1) + '%',
+                            labor_per_anode: laborCharge.toFixed(2)
+                        }
+                    })
+                });
+                
+                if (response.ok) {
+                    showResult('success', `Successfully charged $${total.toFixed(2)} for anode replacement`);
+                    // Clear cart
+                    anodeCart = {};
+                    updateCart();
+                    displayAnodes();
+                } else {
+                    throw new Error('Charge failed');
+                }
+            } catch (error) {
+                showResult('error', 'Failed to charge customer: ' + error.message);
+            }
         }
     </script>
 </body>

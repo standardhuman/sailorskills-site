@@ -341,6 +341,73 @@ app.post('/api/charge-customer', async (req, res) => {
   }
 });
 
+// Charge customer for anode replacements
+app.post('/api/charge-anode', async (req, res) => {
+  try {
+    const { customerId, amount, description, metadata } = req.body;
+
+    if (!customerId || !amount) {
+      return res.status(400).json({ 
+        success: false,
+        error: 'Customer ID and amount are required' 
+      });
+    }
+
+    // Get payment methods for customer
+    const paymentMethods = await stripe.paymentMethods.list({
+      customer: customerId,
+      type: 'card',
+    });
+
+    if (!paymentMethods.data || paymentMethods.data.length === 0) {
+      return res.status(400).json({ 
+        success: false,
+        error: 'No payment method found for customer' 
+      });
+    }
+
+    // Create and confirm payment intent for anode replacement
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: amount, // Amount in cents
+      currency: 'usd',
+      customer: customerId,
+      payment_method: paymentMethods.data[0].id,
+      description: description || 'Anode Replacement',
+      metadata: {
+        type: 'anode_replacement',
+        ...metadata
+      },
+      confirm: true,
+      automatic_payment_methods: {
+        enabled: true,
+        allow_redirects: 'never'
+      }
+    });
+
+    if (paymentIntent.status === 'succeeded') {
+      res.json({ 
+        success: true, 
+        paymentIntent: {
+          id: paymentIntent.id,
+          amount: paymentIntent.amount,
+          status: paymentIntent.status
+        }
+      });
+    } else {
+      res.json({ 
+        success: false, 
+        error: `Payment status: ${paymentIntent.status}` 
+      });
+    }
+  } catch (error) {
+    console.error('Error charging for anodes:', error);
+    res.status(500).json({ 
+      success: false,
+      error: error.message || 'Failed to charge for anodes' 
+    });
+  }
+});
+
 // For Vercel serverless deployment
 export default app;
 

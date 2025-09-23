@@ -28,6 +28,12 @@ const serviceData = {
         name: "Propeller Removal/Installation",
         type: 'flat',
         description: "Professional propeller removal or installation service. $349 per propeller for either service. Includes proper handling, alignment, and torque specifications."
+    },
+    anodes_only: {
+        rate: 150,
+        name: "Anodes Only",
+        type: 'flat',
+        description: "Zinc anode inspection and replacement service. $150 minimum service charge plus cost of anodes. Perfect for boats that only need anode replacement without hull cleaning."
     }
 };
 const minimumCharge = 150;
@@ -171,7 +177,7 @@ function populateServiceButtons() {
     serviceButtons.innerHTML = '';
     
     // Define the order to display services
-    const serviceOrder = ['recurring_cleaning', 'onetime_cleaning', 'item_recovery', 'underwater_inspection', 'propeller_service'];
+    const serviceOrder = ['recurring_cleaning', 'onetime_cleaning', 'item_recovery', 'underwater_inspection', 'propeller_service', 'anodes_only'];
     
     console.log('Populating service buttons with click handlers...');
     
@@ -274,12 +280,45 @@ function selectService(serviceKey) {
     // Check if this service is already selected
     const wasAlreadySelected = selectedServiceKey === serviceKey;
     
-    // If already selected, perform fade transition to next step (only in admin interface)
+    // If already selected, perform fade transition to next step
     if (wasAlreadySelected) {
         console.log('Service already selected, transitioning to details form');
-        // Only call transitionToDetailsForm if it exists (admin interface)
+        // Check if in admin interface
         if (typeof window.transitionToDetailsForm === 'function') {
             window.transitionToDetailsForm(serviceKey);
+        } else {
+            // For public diving page, proceed to next step
+            const service = serviceData[serviceKey];
+            if (service) {
+                // Hide service selection
+                const step0 = document.getElementById('step-0');
+                if (step0) {
+                    step0.classList.remove('active');
+                    step0.style.display = 'none';
+                }
+                
+                // Show appropriate next step based on service type
+                if (service.type === 'per_foot') {
+                    // For per-foot services, go to step 1 (boat details)
+                    const step1 = document.getElementById('step-1');
+                    if (step1) {
+                        step1.classList.add('active');
+                        step1.style.display = 'block';
+                        currentStep = 1; // Set current step
+                    }
+                } else {
+                    // For flat rate services, skip boat details and go to anodes
+                    const step7 = document.getElementById('step-7');
+                    if (step7) {
+                        step7.classList.add('active');
+                        step7.style.display = 'block';
+                        currentStep = 7; // Set current step
+                    }
+                }
+                
+                // Update navigation
+                renderCurrentStep();
+            }
         }
         return;
     }
@@ -449,8 +488,8 @@ function renderCurrentStep() {
         if (isPerFootService) {
             nextButton.textContent = 'Next (Boat Length)';
         } else if (selectedServiceKey) { // Flat rate service selected
-            // For recovery/inspection, go straight to estimate
-            if (selectedServiceKey === 'item_recovery' || selectedServiceKey === 'underwater_inspection') {
+            // For recovery, go straight to estimate
+            if (selectedServiceKey === 'item_recovery') {
                 nextButton.textContent = 'View Estimate';
             } else {
                 nextButton.textContent = 'Next (Anodes)';
@@ -458,6 +497,11 @@ function renderCurrentStep() {
         } else {
             nextButton.textContent = 'Next'; // Default if no service selected yet
         }
+    } else if (nextButton && selectedServiceKey === 'underwater_inspection') {
+        // Special handling for underwater inspection navigation
+        if (currentStep === 1) nextButton.textContent = 'Next (Hull Type)';
+        else if (currentStep === 3) nextButton.textContent = 'View Estimate';
+        else nextButton.textContent = 'Next';
     } else if (nextButton && isPerFootService) {
         if (currentStep === 1) nextButton.textContent = 'Next (Boat Type)';
         else if (currentStep === 2) nextButton.textContent = 'Next (Hull Type)';
@@ -522,12 +566,22 @@ function handleNextClick() {
     let nextStep = numericCurrentStep + 1;
     // console.log('handleNextClick - Initial nextStep:', nextStep);
 
+    // Special handling for underwater inspection - go to boat length, then hull type, then results
+    if (selectedServiceKey === 'underwater_inspection') {
+        if (numericCurrentStep === 0) {
+            nextStep = 1; // Go to boat length
+        } else if (numericCurrentStep === 1) {
+            nextStep = 3; // Skip boat type, go to hull type
+        } else if (numericCurrentStep === 3) {
+            nextStep = 8; // Go to results
+        }
+    }
     // Skip per-foot steps if service is flat rate, ONLY when starting from step 0
-    if (serviceType === 'flat' && numericCurrentStep === 0) {
-        // For recovery and inspection services, skip anodes and go straight to results
-        if (selectedServiceKey === 'item_recovery' || selectedServiceKey === 'underwater_inspection') {
+    else if (serviceType === 'flat' && numericCurrentStep === 0) {
+        // For recovery services, skip anodes and go straight to results
+        if (selectedServiceKey === 'item_recovery') {
             nextStep = 8; // Skip directly to Results
-            // console.log('handleNextClick - Recovery/Inspection service, skipping to results. nextStep:', nextStep);
+            // console.log('handleNextClick - Recovery service, skipping to results. nextStep:', nextStep);
         } else {
             nextStep = 7; // Skip to Anodes (Step 7) for other flat rate services
             // console.log('handleNextClick - Flat rate service, skipping to step 7. nextStep:', nextStep);
@@ -562,9 +616,19 @@ function handleBackClick() {
         if (currentStep === 7) {
             prevStep = 0;
         }
-        // If on Results (step 8) for recovery/inspection, go back to Service Selection (step 0)
-        else if (currentStep === 8 && (selectedServiceKey === 'item_recovery' || selectedServiceKey === 'underwater_inspection')) {
+        // If on Results (step 8) for recovery, go back to Service Selection (step 0)
+        else if (currentStep === 8 && selectedServiceKey === 'item_recovery') {
             prevStep = 0;
+        }
+        // For underwater inspection, navigate back through boat length and hull type
+        else if (selectedServiceKey === 'underwater_inspection') {
+            if (currentStep === 8) {
+                prevStep = 3; // Back to hull type
+            } else if (currentStep === 3) {
+                prevStep = 1; // Back to boat length
+            } else if (currentStep === 1) {
+                prevStep = 0; // Back to service selection
+            }
         }
     }
     
@@ -799,15 +863,20 @@ function calculateCost() {
             variableDetails += `  - Twin Engine Surcharge (+10%): $${surcharge.toFixed(2)}\n`;
         }
         
-        let actualPaintSurchargeAmount = initialBaseCost * paintSurchargePercent;  // Use actual cost
-        variableSurchargeTotal += actualPaintSurchargeAmount;
-        // Use "Actual" prefix when direct conditions are used, "Est." otherwise
-        const conditionPrefix = (actualPaintCondition && actualGrowthLevel) ? "Actual" : "Est.";
-        variableDetails += `  - ${conditionPrefix} Paint (${estimatedPaintConditionBaseLabel}): +${(paintSurchargePercent * 100).toFixed(2)}% ($${actualPaintSurchargeAmount.toFixed(2)})\n`;
+        // Only add paint and growth surcharges for cleaning services
+        const isCleaningService = selectedServiceKey === 'onetime_cleaning' || selectedServiceKey === 'recurring_cleaning';
         
-        let actualGrowthSurchargeAmount = initialBaseCost * growthSurchargePercent;  // Use actual cost
-        variableSurchargeTotal += actualGrowthSurchargeAmount;
-        variableDetails += `  - ${conditionPrefix} Growth (${estimatedGrowthLevelBaseLabel}): +${(growthSurchargePercent * 100).toFixed(0)}% ($${actualGrowthSurchargeAmount.toFixed(2)})\n`;
+        if (isCleaningService) {
+            let actualPaintSurchargeAmount = initialBaseCost * paintSurchargePercent;  // Use actual cost
+            variableSurchargeTotal += actualPaintSurchargeAmount;
+            // Use "Actual" prefix when direct conditions are used, "Est." otherwise
+            const conditionPrefix = (actualPaintCondition && actualGrowthLevel) ? "Actual" : "Est.";
+            variableDetails += `  - ${conditionPrefix} Paint (${estimatedPaintConditionBaseLabel}): +${(paintSurchargePercent * 100).toFixed(2)}% ($${actualPaintSurchargeAmount.toFixed(2)})\n`;
+            
+            let actualGrowthSurchargeAmount = initialBaseCost * growthSurchargePercent;  // Use actual cost
+            variableSurchargeTotal += actualGrowthSurchargeAmount;
+            variableDetails += `  - ${conditionPrefix} Growth (${estimatedGrowthLevelBaseLabel}): +${(growthSurchargePercent * 100).toFixed(0)}% ($${actualGrowthSurchargeAmount.toFixed(2)})\n`;
+        }
         
         calculatedSubtotal = initialBaseCost + variableSurchargeTotal;  // Use actual cost as base
         if (variableDetails) {
@@ -1201,10 +1270,18 @@ async function handleOrderSubmission() {
         billingState: document.getElementById('billing-state').value,
         billingZip: document.getElementById('billing-zip').value,
         customerBirthday: document.getElementById('customer-birthday').value,
+        customerNotes: document.getElementById('customer-notes').value,
         estimate: orderData.estimate,
         service: orderData.service,
         serviceDetails: orderData.serviceDetails
     };
+    
+    // Add item recovery fields if applicable
+    if (selectedServiceKey === 'item_recovery') {
+        formData.recoveryLocation = document.getElementById('recovery-location').value;
+        formData.itemDescription = document.getElementById('item-description').value;
+        formData.dropDate = document.getElementById('drop-date').value;
+    }
     
     try {
         // Call Supabase Edge Function to create payment intent

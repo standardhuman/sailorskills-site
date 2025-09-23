@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diving Services | Sailor Skills</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://js.stripe.com/v3/"></script>
+</head>
+<body>
+    <!-- Navigation Header -->
+    <header class="navigation-header">
+        <div class="nav-container">
+            <a href="https://www.sailorskills.com/" class="nav-logo">SAILOR SKILLS</a>
+            <nav class="nav-links">
+                <a href="https://www.sailorskills.com/">HOME</a>
+                <a href="https://www.sailorskills.com/training">TRAINING</a>
+                <a href="https://www.sailorskills.com/diving" class="active">DIVING</a>
+                <a href="https://www.sailorskills.com/detailing">DETAILING</a>
+                <a href="https://www.sailorskills.com/deliveries">DELIVERIES</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Hero Header -->
+        <div class="hero-header">
+            <div class="hero-content">
+                <div class="hero-brand">SAILOR SKILLS</div>
+                <h1 class="hero-service">DIVING</h1>
+                <div class="hero-tagline">UNDERWATER VESSEL CARE</div>
+                <div class="hero-subtitle">Formerly Bottom Service</div>
+            </div>
+        </div>
+        
+        <div class="calculator-container">
+        <!-- Step 0: Service Selection -->
+        <div id="step-0" class="form-step active">
+            <h2>Select a service to see more details</h2>
+            <div class="input-group">
+                <div class="service-selection-grid" id="serviceButtons">
+                    <!-- Service buttons will be populated by JS -->
+                </div>
+                <p class="variable-info" style="margin-top: 15px; color: #2c3e50; font-weight: 500;">
+                    All prices shown are for labor only. Materials are additional.
+                </p>
+                <p class="variable-info" style="margin-top: 8px; color: #7f8c8d;">
+                    $150 minimum service fee applies to all services.
+                </p>
+                <p class="variable-info" id="servicePriceExplainer" style="margin-top: 10px;"></p>
+            </div>
+        </div>
+
+        <!-- Step 1: Boat Length -->
+        <div id="step-1" class="form-step" style="display: none;">
+            <h2>Boat Length</h2>
+            <div class="input-group">
+                <label for="boatLength">Boat Length (feet):</label>
+                <input type="number" id="boatLength" value="30" min="1">
+                 <p class="variable-info" id="boatLengthError" style="color: #d32f2f; display: none; margin-top: 5px;">Please enter a valid boat length.</p>
+            </div>
+            </div>
+
+        <!-- Step 2: Boat Type -->
+        <div id="step-2" class="form-step" style="display: none;">
+            <h2>Boat Type</h2>
+            <div class="input-group">
+                <label class="group-title">Select Boat Type:</label>
+                <div class="radio-group-item"><input type="radio" id="boat_type_sailboat" name="boat_type" value="sailboat" checked><label for="boat_type_sailboat" class="radio-label"><span class="radio-custom"></span>Sailboat</label></div>
+                <div class="radio-group-item"><input type="radio" id="boat_type_powerboat" name="boat_type" value="powerboat"><label for="boat_type_powerboat" class="radio-label"><span class="radio-custom"></span>Powerboat</label></div>
+            </div>
+            </div>
+
+        <!-- Step 3: Hull Type -->
+        <div id="step-3" class="form-step" style="display: none;">
+            <h2>Hull Type</h2>
+            <div class="input-group">
+                <label class="group-title">Select Hull Type:</label>
+                <div class="radio-group-item"><input type="radio" id="hull_monohull" name="hull_type" value="monohull" checked><label for="hull_monohull" class="radio-label"><span class="radio-custom"></span>Monohull</label></div>
+                <div class="radio-group-item"><input type="radio" id="hull_catamaran" name="hull_type" value="catamaran"><label for="hull_catamaran" class="radio-label"><span class="radio-custom"></span>Catamaran</label></div>
+                <div class="radio-group-item"><input type="radio" id="hull_trimaran" name="hull_type" value="trimaran"><label for="hull_trimaran" class="radio-label"><span class="radio-custom"></span>Trimaran</label></div>
+            </div>
+            </div>
+            
+        <!-- Step 4: Engine Configuration -->
+        <div id="step-4" class="form-step" style="display: none;">
+            <h2>Engine Configuration</h2>
+            <div class="input-group">
+                <!-- <label class="group-title">Select Engine Configuration:</label> --> <!-- No longer a group title needed for one checkbox -->
+                <!-- <div class="radio-group-item"><input type="radio" id="engine_single" name="engine_config" value="single" checked><label for="engine_single" class="radio-label"><span class="radio-custom"></span>Single Engine</label></div>
+                <div class="radio-group-item"><input type="radio" id="engine_twin" name="engine_config" value="twin"><label for="engine_twin" class="radio-label"><span class="radio-custom"></span>Twin Engines</label></div> -->
+
+                <!-- New Checkbox Implementation -->
+                <div class="checkbox-group-item" style="display: flex; align-items: center; padding: 12px 15px; border: 1px solid #d0d9e0; border-radius: 6px; background-color: #fff;">
+                    <input type="checkbox" id="has_twin_engines" name="has_twin_engines" value="true" style="width: 20px; height: 20px; margin-right: 12px; accent-color: #3f51b5;">
+                    <label for="has_twin_engines" style="margin-bottom: 0; font-weight: normal; cursor:pointer;">Click here if the boat has twin engines, otherwise click Next.</label>
+                </div>
+            </div>
+            </div>
+            
+        <!-- Step 5: Last Painted Time -->
+        <div id="step-5" class="form-step" style="display: none;">
+            <h2>Bottom Paint Age</h2>
+            <div class="input-group">
+                <label for="lastPaintedTime">When was the bottom last painted?</label>
+                <select id="lastPaintedTime">
+                    <option value="0-6_months" selected>Within 6 months</option>
+                    <option value="7-12_months">7-12 months ago</option>
+                    <option value="13-21_months">13-21 months ago</option>
+                    <option value="22-24_months">22-24 months ago</option>
+                    <option value="over_24_months">Over 24 months ago</option>
+                    <option value="unsure_paint">Unsure</option>
+                </select>
+                <p class="variable-info" id="paintExplainerText">The age of your boat's bottom paint helps us estimate its current condition.</p>
+            </div>
+            </div>
+
+        <!-- Step 6: Last Cleaned Time -->
+        <div id="step-6" class="form-step" style="display: none;">
+            <h2>Last Cleaning</h2>
+            <div class="input-group">
+                <label for="lastCleanedTime">When was it last cleaned?</label>
+                <select id="lastCleanedTime">
+                    <option value="0-2_months" selected>Within 2 months</option>
+                    <option value="3-4_months">3-4 months ago</option>
+                    <option value="5-6_months">5-6 months ago</option>
+                    <option value="7-8_months">7-8 months ago</option>
+                    <option value="9-12_months">9-12 months ago</option>
+                    <option value="13-24_months">13-24 months ago</option>
+                    <option value="over_24_months_unsure">Over 24 months ago / Unsure</option>
+                </select>
+                <p class="variable-info" id="growthExplainerText">The time since your last hull cleaning is a key factor in estimating marine growth.</p>
+            </div>
+        </div>
+
+        <!-- Step 7: Anode Installation (was step-2) -->
+        <div id="step-7" class="form-step" style="display: none;">
+            <h2>Anode Check & Optional Installation</h2>
+            <label for="anodesToInstall">If you'd like us to replace anodes, how many should we plan for?</label>
+            <input type="number" id="anodesToInstall" value="0" min="0">
+            <p class="variable-info" style="margin-top:5px;">This is optional. If you want anodes replaced, enter the quantity. We charge $15 per anode for installation (cost of anodes themselves is separate). Leave at 0 if unsure or no replacement needed now.</p>
+        </div>
+        
+        <!-- Step 8: Result (was step-3) -->
+        <div id="step-8" class="result-section form-step" style="display: none;"> <!-- Added form-step for consistency -->
+            <h3>Estimated Cost:</h3>
+            <p class="total-cost-display" id="totalCostDisplay">$0.00</p>
+            <p class="variable-info">$150 minimum for all services.</p>
+            <!-- Checkout button will be inserted here dynamically -->
+            <div id="costBreakdown"></div>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="navigation-buttons">
+            <button id="nextButton" type="button">Next</button>
+            <button id="backButton" type="button">Back</button>
+        </div>
+
+        <!-- Checkout Section (hidden by default) -->
+        <div id="checkout-section" class="checkout-section" style="display: none;">
+            <h2>Complete Your Service Order</h2>
+            
+            <!-- Boat Information (for non-item-recovery services) -->
+            <div class="checkout-form" id="boat-info-section">
+                <h3>Boat Information</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="boat-name">Boat Name*</label>
+                        <input type="text" id="boat-name" name="boat-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="boat-length-checkout">Boat Length (feet)*</label>
+                        <input type="text" id="boat-length-checkout" name="boat-length-checkout" readonly>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="boat-make">Boat Make*</label>
+                        <input type="text" id="boat-make" name="boat-make" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="boat-model">Boat Model*</label>
+                        <input type="text" id="boat-model" name="boat-model" required>
+                    </div>
+                </div>
+                
+                <h3>Marina Information</h3>
+                <div class="form-group">
+                    <label for="marina-name">Marina Name*</label>
+                    <input type="text" id="marina-name" name="marina-name" required>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="dock">Dock*</label>
+                        <input type="text" id="dock" name="dock" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="slip-number">Slip Number*</label>
+                        <input type="text" id="slip-number" name="slip-number" required>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Item Recovery Location Information (only for item recovery service) -->
+            <div class="checkout-form" id="item-recovery-section" style="display: none;">
+                <h3>Recovery Location Information</h3>
+                <div class="form-group">
+                    <label for="recovery-location">Location Details*</label>
+                    <textarea id="recovery-location" name="recovery-location" rows="6" required 
+                        placeholder="Please describe the recovery location in detail. Include:&#10;• Marina name and address&#10;• Slip number (if applicable)&#10;• Boat name (if item is near a boat)&#10;• Exact location where the item was dropped&#10;• Any landmarks or reference points"></textarea>
+                    <p class="field-help">Please lower a weighted line into the water as close to where the item was last seen as possible. This will help us locate the item more quickly.</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="item-description">Item Description*</label>
+                    <input type="text" id="item-description" name="item-description" required 
+                        placeholder="Describe the item (e.g., keys on blue floaty, iPhone 14 Pro, prescription sunglasses)">
+                </div>
+                
+                <div class="form-group">
+                    <label for="drop-date">When was the item dropped?*</label>
+                    <input type="datetime-local" id="drop-date" name="drop-date" required>
+                </div>
+            </div>
+            
+            <div class="checkout-form">
+                <div id="service-interval-section">
+                    <h3>Service Interval</h3>
+                    <div class="form-group">
+                        <label>Select your preferred service interval:</label>
+                        <div class="service-interval-grid">
+                        <div class="interval-option" data-interval="1">
+                            <strong>Monthly</strong>
+                            <div>Every month</div>
+                        </div>
+                        <div class="interval-option recommended" data-interval="2">
+                            <strong>Bi-Monthly</strong>
+                            <div>Every 2 months</div>
+                        </div>
+                        <div class="interval-option" data-interval="3">
+                            <strong>Quarterly</strong>
+                            <div>Every 3 months</div>
+                        </div>
+                        <div class="interval-option" data-interval="6">
+                            <strong>Semi-Annual</strong>
+                            <div>Every 6 months</div>
+                        </div>
+                        <div class="interval-option" data-interval="one-time">
+                            <strong>One-Time</strong>
+                            <div>Single service</div>
+                        </div>
+                    </div>
+                </div>
+                </div>
+                
+                <h3>Contact Information</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="customer-name">Full Name*</label>
+                        <input type="text" id="customer-name" name="customer-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="customer-email">Email*</label>
+                        <input type="email" id="customer-email" name="customer-email" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="customer-phone">Phone Number*</label>
+                    <input type="tel" id="customer-phone" name="customer-phone" required>
+                </div>
+                
+                <h3>Billing Address</h3>
+                <div class="form-group">
+                    <label for="billing-address">Street Address*</label>
+                    <input type="text" id="billing-address" name="billing-address" required>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="billing-city">City*</label>
+                        <input type="text" id="billing-city" name="billing-city" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="billing-state">State*</label>
+                        <select id="billing-state" name="billing-state" required>
+                            <option value="">Select State</option>
+                            <option value="CA">California</option>
+                            <option value="WA">Washington</option>
+                            <option value="OR">Oregon</option>
+                            <option value="AZ">Arizona</option>
+                            <option value="NV">Nevada</option>
+                            <option value="FL">Florida</option>
+                            <option value="TX">Texas</option>
+                            <option value="NY">New York</option>
+                            <option value="Other">Other State</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="billing-zip">ZIP Code*</label>
+                        <input type="text" id="billing-zip" name="billing-zip" pattern="[0-9]{5}" required>
+                    </div>
+                </div>
+                
+                <h3>Additional Notes</h3>
+                <div class="form-group" style="max-width: 100%;">
+                    <label for="customer-notes">Is there anything else you'd like us to know?</label>
+                    <textarea id="customer-notes" name="customer-notes" rows="4" style="width: 100%;"
+                        placeholder="Please include any scheduling preferences, time-sensitive needs, access instructions, or other special requests. For example: 'Need service before weekend trip on Friday' or 'Gate code is 1234'"></textarea>
+                    <p class="field-help">Include any scheduling or time-sensitive needs here</p>
+                </div>
+                
+                <h3>Payment Information</h3>
+                <div class="form-group">
+                    <label for="card-element">Credit or Debit Card</label>
+                    <div id="card-element"></div>
+                    <div id="card-errors" role="alert"></div>
+                </div>
+                
+                <!-- Service Agreement -->
+                <div class="agreement-section">
+                    <h4>Important Service Agreement</h4>
+                    <p><strong>Billing:</strong> Your card will be charged only after service completion.</p>
+                    <p><strong>Estimate Notice:</strong> The final amount may vary from the provided estimate based on actual conditions found during service. Common variations include:</p>
+                    <ul>
+                        <li>Unexpected marine growth levels</li>
+                        <li>Additional anode replacements needed</li>
+                    </ul>
+                    <p>Any variations and their reasons will be documented in your service logs and underwater video.</p>
+                    
+                    <div class="agreement-checkbox">
+                        <input type="checkbox" id="service-agreement" name="service-agreement" required>
+                        <label for="service-agreement">
+                            I understand and agree to be billed for the service at time of completion, and that the final amount may vary from the estimate provided.
+                        </label>
+                    </div>
+                </div>
+                
+                <button type="button" id="submit-order" class="submit-button" disabled>Complete Order</button>
+                
+                <div style="text-align: center; margin-top: 20px;">
+                    <button type="button" id="back-to-calculator" style="background: none; border: none; color: #116DFF; text-decoration: underline; cursor: pointer; font-size: 1em;">← Back to Calculator</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Service Information Section -->
+        <div class="service-info-section">
+            <h2>Why Choose Sailor Skills Diving?</h2>
+            <div class="service-features">
+                <div class="feature-item">
+                    <h3>100% Satisfaction Guarantee</h3>
+                    <p>We stand behind our work with a complete satisfaction guarantee on all services.</p>
+                </div>
+                <div class="feature-item">
+                    <h3>Dependable Communication</h3>
+                    <p>Stay informed with regular updates before, during, and after each service.</p>
+                </div>
+                <div class="feature-item">
+                    <h3>Easy Account Management</h3>
+                    <p>Manage your service schedule and history through our convenient online portal.</p>
+                </div>
+                <div class="feature-item">
+                    <h3>Predictable Scheduling</h3>
+                    <p>Set it and forget it - we'll maintain your boat on a reliable schedule.</p>
+                </div>
+                <div class="feature-item">
+                    <h3>4K Underwater Video</h3>
+                    <p>Receive detailed video documentation of your hull's condition with each service.</p>
+                </div>
+                <div class="feature-item">
+                    <h3>Online Service Logs</h3>
+                    <p>Access complete service history and reports anytime through your account.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    </main>
+
+    <script src="script.js" type="module"></script>
+</body>
+</html>
