@@ -1270,8 +1270,70 @@
             </div>
         </div>
         
-        <!-- Define selectServiceDirect function immediately -->
+        <!-- Define selectServiceDirect and wizard functions immediately -->
         <script>
+            // Define wizard paint condition selection function
+            window.selectWizardPaintCondition = function(value) {
+                document.querySelectorAll('#wizardPaintConditionButtons .option-button').forEach(btn => {
+                    btn.classList.remove('selected');
+                });
+                const selectedBtn = document.querySelector(`#wizardPaintConditionButtons [data-value="${value}"]`);
+                if (selectedBtn) {
+                    selectedBtn.classList.add('selected');
+                }
+                const wizardInput = document.getElementById('wizardPaintCondition');
+                if (wizardInput) {
+                    wizardInput.value = value;
+                }
+
+                // Sync with main form
+                const mainCondition = document.getElementById('actualPaintCondition');
+                if (mainCondition) {
+                    mainCondition.value = value;
+                    if (window.selectPaintCondition) {
+                        window.selectPaintCondition(value);
+                    }
+                }
+
+                // Update pricing
+                setTimeout(() => {
+                    if (window.calculateCost) window.calculateCost();
+                    if (window.updateWizardPricing) window.updateWizardPricing();
+                    if (window.updateChargeSummary) window.updateChargeSummary();
+                }, 100);
+            };
+
+            // Define wizard growth level selection function
+            window.selectWizardGrowthLevel = function(value) {
+                document.querySelectorAll('#wizardGrowthLevelButtons .option-button').forEach(btn => {
+                    btn.classList.remove('selected');
+                });
+                const selectedBtn = document.querySelector(`#wizardGrowthLevelButtons [data-value="${value}"]`);
+                if (selectedBtn) {
+                    selectedBtn.classList.add('selected');
+                }
+                const wizardInput = document.getElementById('wizardGrowthLevel');
+                if (wizardInput) {
+                    wizardInput.value = value;
+                }
+
+                // Sync with main form
+                const mainGrowth = document.getElementById('actualGrowthLevel');
+                if (mainGrowth) {
+                    mainGrowth.value = value;
+                    if (window.selectGrowthLevel) {
+                        window.selectGrowthLevel(value);
+                    }
+                }
+
+                // Update pricing
+                setTimeout(() => {
+                    if (window.calculateCost) window.calculateCost();
+                    if (window.updateWizardPricing) window.updateWizardPricing();
+                    if (window.updateChargeSummary) window.updateChargeSummary();
+                }, 100);
+            };
+
             window.selectServiceDirect = function(serviceKey) {
                 console.log('Direct service selection:', serviceKey);
                 
@@ -2543,40 +2605,7 @@
             updateChargeSummary();
         }
         
-        function selectWizardPaintCondition(value) {
-            document.querySelectorAll('#wizardPaintConditionButtons .option-button').forEach(btn => {
-                btn.classList.remove('selected');
-            });
-            const selectedBtn = document.querySelector(`#wizardPaintConditionButtons [data-value="${value}"]`);
-            if (selectedBtn) {
-                selectedBtn.classList.add('selected');
-            }
-            document.getElementById('wizardPaintCondition').value = value;
-            
-            // Sync with main form
-            const mainCondition = document.getElementById('actualPaintCondition');
-            if (mainCondition) {
-                mainCondition.value = value;
-                selectPaintCondition(value);
-            }
-            
-            // Also sync with paint_condition hidden input for metadata
-            const paintConditionHidden = document.getElementById('paint_condition');
-            if (paintConditionHidden) {
-                paintConditionHidden.value = value;
-            }
-            
-            // Update wizard pricing display and charge summary
-            setTimeout(() => {
-                if (window.calculateCost) window.calculateCost();
-                updateWizardPricing();
-                if (window.updateChargeSummary) window.updateChargeSummary();
-            }, 100);
-        }
-        
-        // Make it globally available
-        window.selectWizardPaintCondition = selectWizardPaintCondition;
-        console.log('Assigned selectWizardPaintCondition to window');
+        // Note: selectWizardPaintCondition is already defined in the earlier script block
         
         // Growth level selection functions
         function selectGrowthLevel(value) {
@@ -2592,46 +2621,13 @@
             updateChargeSummary();
         }
         
-        function selectWizardGrowthLevel(value) {
-            document.querySelectorAll('#wizardGrowthLevelButtons .option-button').forEach(btn => {
-                btn.classList.remove('selected');
-            });
-            const selectedBtn = document.querySelector(`#wizardGrowthLevelButtons [data-value="${value}"]`);
-            if (selectedBtn) {
-                selectedBtn.classList.add('selected');
-            }
-            document.getElementById('wizardGrowthLevel').value = value;
-            
-            // Sync with main form
-            const mainGrowth = document.getElementById('actualGrowthLevel');
-            if (mainGrowth) {
-                mainGrowth.value = value;
-                selectGrowthLevel(value);
-            }
-            
-            // Also sync with growth_level hidden input for metadata
-            const growthLevelHidden = document.getElementById('growth_level');
-            if (growthLevelHidden) {
-                growthLevelHidden.value = value;
-            }
-            
-            // Update wizard pricing display and charge summary
-            setTimeout(() => {
-                if (window.calculateCost) window.calculateCost();
-                updateWizardPricing();
-                if (window.updateChargeSummary) window.updateChargeSummary();
-            }, 100);
-        }
-        
-        // Make it globally available
-        window.selectWizardGrowthLevel = selectWizardGrowthLevel;
-        console.log('Assigned selectWizardGrowthLevel to window');
+        // Note: selectWizardGrowthLevel is already defined in the earlier script block
         
         // Make functions globally available
         window.selectPaintCondition = selectPaintCondition;
-        window.selectWizardPaintCondition = selectWizardPaintCondition;
+        // Note: selectWizardPaintCondition is already defined in the earlier script block
         window.selectGrowthLevel = selectGrowthLevel;
-        window.selectWizardGrowthLevel = selectWizardGrowthLevel;
+        // Note: selectWizardGrowthLevel is already defined in the earlier script block
         
         // Function to update boat config visibility (deprecated - handled by wizard now)
         function updateBoatConfigVisibility(serviceKey) {
