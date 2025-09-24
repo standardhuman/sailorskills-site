@@ -18,6 +18,10 @@
       "use": "@vercel/static"
     },
     {
+      "src": "*.json",
+      "use": "@vercel/static"
+    },
+    {
       "src": "images/**",
       "use": "@vercel/static"
     },
@@ -29,7 +33,7 @@
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/server.js" },
     { "source": "/diving", "destination": "/diving.html" },
-    { "source": "/admin", "destination": "/admin-new.html" },
+    { "source": "/admin", "destination": "/admin.html" },
     { "source": "/booking", "destination": "/booking.html" },
     { "source": "/anode-quote", "destination": "/anode-quote.html" },
     { "source": "/comprehensive-quote", "destination": "/comprehensive-quote.html" },
