@@ -13,11 +13,26 @@ const PORT = process.env.PORT || 3000;
 // Middleware for parsing JSON
 app.use(express.json());
 
-// API routes
-app.use(quoteRoutes);
+// API routes - wrapped to handle errors gracefully
+try {
+    app.use(quoteRoutes);
+} catch (error) {
+    console.warn('Quote routes not available:', error.message);
+}
 
-// Serve static files (disable directory redirect)
-app.use(express.static(__dirname, { redirect: false }));
+// Serve static files with proper MIME types
+app.use(express.static(__dirname, {
+    redirect: false,
+    setHeaders: (res, filePath) => {
+        if (filePath.endsWith('.js')) {
+            res.setHeader('Content-Type', 'application/javascript');
+        } else if (filePath.endsWith('.mjs')) {
+            res.setHeader('Content-Type', 'application/javascript');
+        } else if (filePath.endsWith('.css')) {
+            res.setHeader('Content-Type', 'text/css');
+        }
+    }
+}));
 
 // URL rewriting - serve HTML files without extension
 app.get('/diving', (req, res) => {
