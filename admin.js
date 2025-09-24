@@ -406,11 +406,9 @@ export class AdminApp {
                     <div class="anode-categories">
                         <button class="category-btn active" onclick="adminApp.filterByCategory('all')">All</button>
                         <button class="category-btn" onclick="adminApp.filterByCategory('shaft')">Shaft</button>
-                        <button class="category-btn" onclick="adminApp.filterByCategory('prop')">Prop</button>
-                        <button class="category-btn" onclick="adminApp.filterByCategory('rudder')">Rudder</button>
-                        <button class="category-btn" onclick="adminApp.filterByCategory('trim-tab')">Trim Tab</button>
+                        <button class="category-btn" onclick="adminApp.filterByCategory('propeller')">Propeller</button>
                         <button class="category-btn" onclick="adminApp.filterByCategory('hull')">Hull</button>
-                        <button class="category-btn" onclick="adminApp.filterByCategory('engine')">Engine</button>
+                        <button class="category-btn" onclick="adminApp.filterByCategory('engine')">Engine/Outboard</button>
                     </div>
 
                     <div id="anodeGrid" class="anode-grid" style="max-height: 400px; overflow-y: auto;">
@@ -478,7 +476,7 @@ export class AdminApp {
 
     openAnodeWizard() {
         // Save current wizard state
-        const currentWizard = document.getElementById('wizardContent').innerHTML;
+        this.savedWizardState = document.getElementById('wizardContent').innerHTML;
 
         // Load anode selector interface
         document.getElementById('wizardContent').innerHTML = `
@@ -495,11 +493,9 @@ export class AdminApp {
                     <div class="anode-categories">
                         <button class="category-btn active" onclick="adminApp.filterByCategory('all')">All</button>
                         <button class="category-btn" onclick="adminApp.filterByCategory('shaft')">Shaft</button>
-                        <button class="category-btn" onclick="adminApp.filterByCategory('prop')">Prop</button>
-                        <button class="category-btn" onclick="adminApp.filterByCategory('rudder')">Rudder</button>
-                        <button class="category-btn" onclick="adminApp.filterByCategory('trim-tab')">Trim Tab</button>
+                        <button class="category-btn" onclick="adminApp.filterByCategory('propeller')">Propeller</button>
                         <button class="category-btn" onclick="adminApp.filterByCategory('hull')">Hull</button>
-                        <button class="category-btn" onclick="adminApp.filterByCategory('engine')">Engine</button>
+                        <button class="category-btn" onclick="adminApp.filterByCategory('engine')">Engine/Outboard</button>
                     </div>
 
                     <div id="anodeGrid" class="anode-grid" style="max-height: 400px; overflow-y: auto;">
@@ -512,12 +508,13 @@ export class AdminApp {
                     <div id="selectedAnodesList"></div>
                     <div class="anode-total">
                         <strong>Anodes Subtotal: $<span id="anodeSubtotal">0.00</span></strong>
+                        <br><small>Labor: $15 per anode</small>
                     </div>
                 </div>
 
                 <div class="wizard-actions">
-                    <button onclick="adminApp.closeAnodeWizard('${btoa(currentWizard)}')" class="btn-secondary">← Back to Service</button>
-                    <button onclick="adminApp.confirmAnodeSelection('${btoa(currentWizard)}')" class="btn-primary">✓ Add Selected Anodes</button>
+                    <button onclick="adminApp.closeAnodeWizard()" class="btn-secondary">← Back to Service</button>
+                    <button onclick="adminApp.confirmAnodeSelection()" class="btn-primary">✓ Add Selected Anodes</button>
                 </div>
             </div>
         `;
@@ -526,13 +523,15 @@ export class AdminApp {
         this.loadAnodeCatalog();
     }
 
-    closeAnodeWizard(encodedWizard) {
+    closeAnodeWizard() {
         // Restore previous wizard state
-        document.getElementById('wizardContent').innerHTML = atob(encodedWizard);
-        this.updateFromWizard();
+        if (this.savedWizardState) {
+            document.getElementById('wizardContent').innerHTML = this.savedWizardState;
+            this.updateFromWizard();
+        }
     }
 
-    confirmAnodeSelection(encodedWizard) {
+    confirmAnodeSelection() {
         // Store selected anodes count and calculate pricing
         const selectedAnodes = this.getSelectedAnodes();
         document.getElementById('anodesToInstall').value = selectedAnodes.count;
@@ -541,8 +540,10 @@ export class AdminApp {
         this.anodeDetails = selectedAnodes;
 
         // Restore wizard and update pricing
-        document.getElementById('wizardContent').innerHTML = atob(encodedWizard);
-        this.updateFromWizard();
+        if (this.savedWizardState) {
+            document.getElementById('wizardContent').innerHTML = this.savedWizardState;
+            this.updateFromWizard();
+        }
     }
 
     async loadAnodeCatalog() {
@@ -573,7 +574,18 @@ export class AdminApp {
         if (category !== 'all') {
             filtered = filtered.filter(anode => {
                 const cat = (anode.category || '').toLowerCase();
-                return cat.includes(category);
+                // Map button categories to actual catalog categories
+                if (category === 'shaft') {
+                    return cat.includes('shaft_anodes');
+                } else if (category === 'prop' || category === 'propeller') {
+                    return cat.includes('propeller');
+                } else if (category === 'hull') {
+                    return cat.includes('hull_anodes');
+                } else if (category === 'engine') {
+                    return cat.includes('engine') || cat.includes('outboard');
+                } else {
+                    return cat.includes(category);
+                }
             });
         }
 
