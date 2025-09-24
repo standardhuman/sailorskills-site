@@ -17,7 +17,7 @@ app.get('/diving', (req, res) => {
 });
 
 app.get(['/admin', '/admin/'], (req, res) => {
-    res.sendFile(path.join(__dirname, 'admin.html'));
+    res.sendFile(path.join(__dirname, 'admin-new.html'));
 });
 
 app.get('/booking', (req, res) => {
