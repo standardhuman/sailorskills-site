@@ -1446,26 +1446,32 @@ export class AdminApp {
         }
 
         try {
-            // Save quote to Supabase
-            const saveResponse = await fetch('/api/quotes', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(quoteData)
-            });
+            // Try to save quote to Supabase
+            let quoteSaved = false;
+            let onlineUrl = `${window.location.origin}/quote/${quoteNumber}`;
 
-            if (!saveResponse.ok) {
-                const errorData = await saveResponse.json();
-                throw new Error(errorData.error || 'Failed to save quote');
+            try {
+                const saveResponse = await fetch('/api/quotes', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(quoteData)
+                });
+
+                if (saveResponse.ok) {
+                    const saveResult = await saveResponse.json();
+                    console.log('Quote saved to database:', saveResult);
+                    quoteSaved = true;
+                } else {
+                    console.warn('Could not save to database, continuing without persistence');
+                }
+            } catch (dbError) {
+                console.warn('Database not available, continuing without persistence:', dbError);
             }
-
-            const saveResult = await saveResponse.json();
-            console.log('Quote saved to database:', saveResult);
 
             // Show success message
             if (resultDiv) {
-                const onlineUrl = `${window.location.origin}/quote/${quoteNumber}`;
                 resultDiv.innerHTML = `
                     <div class="success-result">
                         <h3>✅ Quote Generated Successfully!</h3>
@@ -1475,13 +1481,13 @@ export class AdminApp {
                             <p><strong>Boat:</strong> ${customerInfo.boatName}</p>
                             <p><strong>Total:</strong> $${this.calculateTotalCost().toFixed(2)}</p>
                             <p><strong>Valid Until:</strong> ${expiryDate.toLocaleDateString()}</p>
-                            ${sendEmail ? `<p>📧 Quote sent to ${customerInfo.email}</p>` : ''}
                             ${generatePDF ? `<p>📄 PDF available for download</p>` : ''}
-                            <p><strong>Online Quote:</strong> <a href="${onlineUrl}" target="_blank">${onlineUrl}</a></p>
+                            ${quoteSaved ? `<p>✅ Quote saved to database</p>` : `<p>⚠️ Quote generated locally (database unavailable)</p>`}
+                            ${quoteSaved ? `<p><strong>Online Quote:</strong> <a href="${onlineUrl}" target="_blank">${onlineUrl}</a></p>` : ''}
                         </div>
                         <div class="quote-actions">
                             ${generatePDF ? `<button onclick="adminApp.downloadQuotePDF('${quoteNumber}')" class="btn-primary">📥 Download PDF</button>` : ''}
-                            <button onclick="adminApp.viewQuoteOnline('${quoteNumber}')" class="btn-secondary">🌐 View Online</button>
+                            ${quoteSaved ? `<button onclick="adminApp.viewQuoteOnline('${quoteNumber}')" class="btn-secondary">🌐 View Online</button>` : ''}
                             <button onclick="adminApp.createNewQuote()" class="btn-secondary">📋 New Quote</button>
                         </div>
                     </div>
