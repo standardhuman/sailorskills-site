@@ -1311,6 +1311,314 @@ export class AdminApp {
         this.closeCustomerModal();
         this.updateChargeSummary();
     }
+
+    // Quote Generation Functions
+    generateQuote() {
+        console.log('Generate quote clicked');
+
+        // Check if we have pricing data
+        const totalCost = this.calculateTotalCost();
+        if (!totalCost || totalCost <= 0) {
+            alert('Please select a service and configure options first');
+            return;
+        }
+
+        // Check if we have a customer selected
+        if (this.selectedCustomer) {
+            // We have customer info, proceed directly to quote generation
+            this.proceedWithQuote();
+        } else {
+            // Show modal to collect customer information
+            this.openQuoteModal();
+        }
+    }
+
+    openQuoteModal() {
+        const modal = document.getElementById('quoteCustomerModal');
+        if (!modal) {
+            console.error('Quote modal not found');
+            return;
+        }
+
+        // Clear previous values
+        document.getElementById('quoteCustName').value = '';
+        document.getElementById('quoteCustEmail').value = '';
+        document.getElementById('quoteCustPhone').value = '';
+        document.getElementById('quoteBoatName').value = '';
+        document.getElementById('quoteBoatMake').value = '';
+        document.getElementById('quoteMarina').value = '';
+        document.getElementById('quoteSlip').value = '';
+        document.getElementById('quoteSendEmail').checked = true;
+        document.getElementById('quoteGeneratePDF').checked = true;
+        document.getElementById('quoteValidDays').value = '30';
+
+        // Show modal
+        modal.style.display = 'block';
+    }
+
+    closeQuoteModal() {
+        const modal = document.getElementById('quoteCustomerModal');
+        if (modal) {
+            modal.style.display = 'none';
+        }
+    }
+
+    async proceedWithQuote() {
+        console.log('Proceeding with quote generation');
+
+        // Gather customer info from modal or existing customer
+        let customerInfo;
+
+        if (this.selectedCustomer) {
+            // Use existing customer info
+            customerInfo = {
+                name: this.selectedCustomer.name,
+                email: this.selectedCustomer.email,
+                phone: this.selectedCustomer.phone,
+                boatName: this.selectedCustomer.boat_name || '',
+                boatMake: this.selectedCustomer.boat_make || '',
+                marina: this.selectedCustomer.marina || '',
+                slip: this.selectedCustomer.slip || ''
+            };
+        } else {
+            // Get info from modal
+            const name = document.getElementById('quoteCustName')?.value;
+            const email = document.getElementById('quoteCustEmail')?.value;
+            const phone = document.getElementById('quoteCustPhone')?.value;
+            const boatName = document.getElementById('quoteBoatName')?.value;
+            const boatMake = document.getElementById('quoteBoatMake')?.value;
+            const marina = document.getElementById('quoteMarina')?.value;
+            const slip = document.getElementById('quoteSlip')?.value;
+
+            // Validate required fields
+            if (!name || !email || !phone || !boatName) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            customerInfo = {
+                name, email, phone, boatName, boatMake, marina, slip
+            };
+        }
+
+        // Get quote options
+        const sendEmail = document.getElementById('quoteSendEmail')?.checked ?? true;
+        const generatePDF = document.getElementById('quoteGeneratePDF')?.checked ?? true;
+        const validDays = parseInt(document.getElementById('quoteValidDays')?.value || '30');
+
+        // Generate quote number
+        const quoteNumber = this.generateQuoteNumber();
+        const quoteDate = new Date();
+        const expiryDate = new Date();
+        expiryDate.setDate(expiryDate.getDate() + validDays);
+
+        // Build quote data
+        const quoteData = {
+            quoteNumber,
+            quoteDate: quoteDate.toISOString(),
+            expiryDate: expiryDate.toISOString(),
+            validDays,
+            customer: customerInfo,
+            service: this.buildServiceDetails(),
+            anodes: this.buildAnodeDetails(),
+            pricing: this.buildPricingDetails(),
+            options: {
+                sendEmail,
+                generatePDF
+            }
+        };
+
+        console.log('Quote data prepared:', quoteData);
+
+        // Close modal if open
+        this.closeQuoteModal();
+
+        // Show loading indicator
+        const resultDiv = document.getElementById('chargeResult');
+        if (resultDiv) {
+            resultDiv.innerHTML = `
+                <div class="success-result">
+                    <h3>📋 Generating Quote #${quoteNumber}...</h3>
+                    <div class="loading-spinner"></div>
+                </div>
+            `;
+            resultDiv.style.display = 'block';
+        }
+
+        try {
+            // For now, simulate quote generation
+            // In production, this would call API to:
+            // 1. Save quote to database
+            // 2. Generate PDF if requested
+            // 3. Send email if requested
+            // 4. Return quote URL
+
+            await this.simulateQuoteGeneration(quoteData);
+
+            // Show success message
+            if (resultDiv) {
+                const onlineUrl = `https://sailorskills.com/quotes/${quoteNumber}`;
+                resultDiv.innerHTML = `
+                    <div class="success-result">
+                        <h3>✅ Quote Generated Successfully!</h3>
+                        <div class="quote-details">
+                            <p><strong>Quote Number:</strong> ${quoteNumber}</p>
+                            <p><strong>Customer:</strong> ${customerInfo.name}</p>
+                            <p><strong>Boat:</strong> ${customerInfo.boatName}</p>
+                            <p><strong>Total:</strong> $${this.calculateTotalCost().toFixed(2)}</p>
+                            <p><strong>Valid Until:</strong> ${expiryDate.toLocaleDateString()}</p>
+                            ${sendEmail ? `<p>📧 Quote sent to ${customerInfo.email}</p>` : ''}
+                            ${generatePDF ? `<p>📄 PDF available for download</p>` : ''}
+                            <p><strong>Online Quote:</strong> <a href="${onlineUrl}" target="_blank">${onlineUrl}</a></p>
+                        </div>
+                        <div class="quote-actions">
+                            ${generatePDF ? `<button onclick="adminApp.downloadQuotePDF('${quoteNumber}')" class="btn-primary">📥 Download PDF</button>` : ''}
+                            <button onclick="adminApp.viewQuoteOnline('${quoteNumber}')" class="btn-secondary">🌐 View Online</button>
+                            <button onclick="adminApp.createNewQuote()" class="btn-secondary">📋 New Quote</button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Store quote data for later use
+            this.lastQuote = quoteData;
+
+        } catch (error) {
+            console.error('Error generating quote:', error);
+            if (resultDiv) {
+                resultDiv.innerHTML = `
+                    <div class="error-result">
+                        <h3>❌ Error Generating Quote</h3>
+                        <p>${error.message || 'An unexpected error occurred'}</p>
+                        <button onclick="adminApp.generateQuote()" class="btn-primary">Try Again</button>
+                    </div>
+                `;
+            }
+        }
+    }
+
+    generateQuoteNumber() {
+        // Generate quote number: QT-YYYYMMDD-XXXX
+        const date = new Date();
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const random = String(Math.floor(Math.random() * 10000)).padStart(4, '0');
+        return `QT-${year}${month}${day}-${random}`;
+    }
+
+    buildServiceDetails() {
+        const service = window.serviceData[this.currentServiceKey];
+        if (!service) return null;
+
+        const boatLength = parseFloat(document.getElementById('boatLength')?.value || 0);
+        const paintCondition = document.getElementById('actualPaintCondition')?.value || '';
+        const growthLevel = document.getElementById('actualGrowthLevel')?.value || '';
+        const hasEngines = document.getElementById('has_twin_engines')?.value === 'true';
+
+        return {
+            type: this.currentServiceKey,
+            name: service.name,
+            boatLength,
+            paintCondition,
+            growthLevel,
+            hasTwinEngines: hasEngines,
+            additionalHulls: parseInt(document.getElementById('additionalHulls')?.value || 0)
+        };
+    }
+
+    buildAnodeDetails() {
+        const anodeList = [];
+
+        for (const [sku, quantity] of Object.entries(this.selectedAnodes)) {
+            if (quantity > 0 && this.anodeDetails && this.anodeDetails[sku]) {
+                const anode = this.anodeDetails[sku];
+                anodeList.push({
+                    sku,
+                    name: anode.name,
+                    quantity,
+                    unitPrice: anode.price,
+                    totalPrice: quantity * anode.price
+                });
+            }
+        }
+
+        return anodeList;
+    }
+
+    buildPricingDetails() {
+        const totalCost = this.calculateTotalCost();
+        const service = window.serviceData[this.currentServiceKey];
+        const boatLength = parseFloat(document.getElementById('boatLength')?.value || 0);
+        const baseRate = service?.pricing?.base || 0;
+        const basePrice = boatLength * baseRate;
+
+        // Calculate anode costs
+        let anodeCost = 0;
+        let anodeLaborCost = 0;
+        for (const [sku, quantity] of Object.entries(this.selectedAnodes)) {
+            if (quantity > 0 && this.anodeDetails && this.anodeDetails[sku]) {
+                anodeCost += quantity * this.anodeDetails[sku].price;
+                anodeLaborCost += quantity * 15; // $15 per anode labor
+            }
+        }
+
+        return {
+            basePrice,
+            boatLength,
+            ratePerFoot: baseRate,
+            anodeCost,
+            anodeLaborCost,
+            totalCost,
+            currency: 'USD'
+        };
+    }
+
+    async simulateQuoteGeneration(quoteData) {
+        // Simulate API delay
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                console.log('Quote generated:', quoteData);
+                resolve(quoteData);
+            }, 2000);
+        });
+    }
+
+    downloadQuotePDF(quoteNumber) {
+        console.log('Download PDF for quote:', quoteNumber);
+        // In production, this would trigger PDF download
+        alert(`PDF download for quote ${quoteNumber} would start here`);
+    }
+
+    viewQuoteOnline(quoteNumber) {
+        console.log('View online quote:', quoteNumber);
+        // In production, this would open the quote URL
+        const url = `https://sailorskills.com/quotes/${quoteNumber}`;
+        window.open(url, '_blank');
+    }
+
+    createNewQuote() {
+        // Reset form for new quote
+        document.getElementById('chargeResult').style.display = 'none';
+        this.selectedCustomer = null;
+        this.selectedAnodes = {};
+        this.currentServiceKey = null;
+
+        // Reset UI
+        document.getElementById('selectedCustomerInfo').textContent = '';
+        document.getElementById('simpleServiceButtons').style.display = 'flex';
+        document.getElementById('wizardContainer').style.display = 'none';
+        this.updateChargeSummary();
+    }
+
+    calculateTotalCost() {
+        const totalDisplay = document.getElementById('totalCostDisplay');
+        if (totalDisplay) {
+            const text = totalDisplay.textContent || '$0';
+            return parseFloat(text.replace('$', '').replace(',', '')) || 0;
+        }
+        return 0;
+    }
 }
 
 // Initialize app

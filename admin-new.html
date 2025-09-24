@@ -109,6 +109,92 @@
         </div>
     </div>
 
+    <!-- Quote Customer Info Modal -->
+    <div id="quoteCustomerModal" class="modal" style="display: none;">
+        <div class="modal-content quote-modal">
+            <span class="close" onclick="adminApp.closeQuoteModal()">&times;</span>
+            <h2>📋 Complete Customer Information for Quote</h2>
+            <p class="modal-subtitle">Please provide the following details to generate the quote:</p>
+
+            <div class="quote-form">
+                <div class="form-section">
+                    <h3>Customer Information</h3>
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label for="quoteCustName">Customer Name *</label>
+                            <input type="text" id="quoteCustName" placeholder="John Smith" required>
+                        </div>
+                        <div class="form-field">
+                            <label for="quoteCustEmail">Email Address *</label>
+                            <input type="email" id="quoteCustEmail" placeholder="john@example.com" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label for="quoteCustPhone">Phone Number *</label>
+                            <input type="tel" id="quoteCustPhone" placeholder="(555) 123-4567" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Boat Information</h3>
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label for="quoteBoatName">Boat Name *</label>
+                            <input type="text" id="quoteBoatName" placeholder="Sea Breeze" required>
+                        </div>
+                        <div class="form-field">
+                            <label for="quoteBoatMake">Make/Model</label>
+                            <input type="text" id="quoteBoatMake" placeholder="Catalina 34">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label for="quoteMarina">Marina</label>
+                            <input type="text" id="quoteMarina" placeholder="Harbor Marina">
+                        </div>
+                        <div class="form-field">
+                            <label for="quoteSlip">Slip Number</label>
+                            <input type="text" id="quoteSlip" placeholder="A-42">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Quote Options</h3>
+                    <div class="form-row">
+                        <div class="form-field checkbox-field">
+                            <label>
+                                <input type="checkbox" id="quoteSendEmail" checked>
+                                Send quote via email
+                            </label>
+                        </div>
+                        <div class="form-field checkbox-field">
+                            <label>
+                                <input type="checkbox" id="quoteGeneratePDF" checked>
+                                Generate PDF version
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label for="quoteValidDays">Quote valid for (days)</label>
+                            <input type="number" id="quoteValidDays" value="30" min="7" max="90">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button class="btn-secondary" onclick="adminApp.closeQuoteModal()">Cancel</button>
+                    <button class="btn-primary" onclick="adminApp.proceedWithQuote()">
+                        📋 Generate Quote
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Hidden fields for boat configuration -->
     <input type="hidden" id="boatLength" value="">
     <input type="hidden" id="actualPaintCondition" value="">
