@@ -1612,7 +1612,22 @@
                         </div>
                     `;
                 }
-                
+
+                // Add pricing display section for cleaning services
+                if (isCleaningService || serviceKey === 'underwater_inspection') {
+                    html += `
+                        <div class="form-section" style="background: #e8f4fd; padding: 25px; border-radius: 12px; border: 2px solid #345475; margin-bottom: 20px;">
+                            <h3 style="margin-top: 0; margin-bottom: 15px; color: #2c3e50; font-size: 20px; font-weight: 600;">💰 Pricing Summary</h3>
+                            <div id="wizardCostBreakdown" style="font-size: 16px; line-height: 1.8; color: #34495e; margin-bottom: 15px;">
+                                Calculating...
+                            </div>
+                            <div id="wizardTotalPrice" style="font-size: 24px; font-weight: bold; color: #345475; padding-top: 15px; border-top: 2px solid #345475;">
+                                Total: $0.00
+                            </div>
+                        </div>
+                    `;
+                }
+
                 // Add anodes button
                 const isAnodesOnly = serviceKey === 'anodes_only';
                 html += `
@@ -2527,9 +2542,11 @@
                 paintConditionHidden.value = value;
             }
             
-            // Update wizard pricing display
+            // Update wizard pricing display and charge summary
             setTimeout(() => {
+                if (window.calculateCost) window.calculateCost();
                 updateWizardPricing();
+                if (window.updateChargeSummary) window.updateChargeSummary();
             }, 100);
         }
         
@@ -2573,9 +2590,11 @@
                 growthLevelHidden.value = value;
             }
             
-            // Update wizard pricing display
+            // Update wizard pricing display and charge summary
             setTimeout(() => {
+                if (window.calculateCost) window.calculateCost();
                 updateWizardPricing();
+                if (window.updateChargeSummary) window.updateChargeSummary();
             }, 100);
         }
         
@@ -2931,14 +2950,15 @@
             const wizardCostBreakdown = document.getElementById('wizardCostBreakdown');
             const wizardTotalPrice = document.getElementById('wizardTotalPrice');
             const costBreakdown = document.getElementById('costBreakdown');
-            const totalPriceElement = document.getElementById('totalPrice');
-            
+            const totalCostDisplay = document.getElementById('totalCostDisplay');
+
             if (wizardCostBreakdown && costBreakdown) {
                 wizardCostBreakdown.innerHTML = costBreakdown.innerHTML || 'Calculating...';
             }
-            
-            if (wizardTotalPrice && totalPriceElement) {
-                wizardTotalPrice.innerHTML = totalPriceElement.innerHTML || '';
+
+            if (wizardTotalPrice && totalCostDisplay) {
+                const totalText = totalCostDisplay.textContent || '$0.00';
+                wizardTotalPrice.innerHTML = `Total: ${totalText}`;
             }
         }
         
