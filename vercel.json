@@ -2,58 +2,42 @@
   "version": 2,
   "builds": [
     {
-      "src": "server.js",
-      "use": "@vercel/node"
+      "src": "*.html",
+      "use": "@vercel/static"
     },
     {
-      "src": "!(server|api)/**",
+      "src": "*.js",
       "use": "@vercel/static"
+    },
+    {
+      "src": "*.css",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "server.js",
+      "use": "@vercel/node"
     }
   ],
   "routes": [
     {
-      "src": "/api/quotes",
-      "methods": ["GET", "POST"],
+      "src": "/api/(.*)",
       "dest": "/server.js"
     },
     {
-      "src": "/api/quotes/(.*)",
-      "dest": "/server.js"
-    },
-    {
-      "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|svg|ico|json|pdf))",
+      "src": "/(.*\\.js)",
       "dest": "/$1"
     },
     {
-      "src": "/quote/(.*)",
-      "dest": "/server.js"
+      "src": "/(.*\\.css)",
+      "dest": "/$1"
     },
     {
-      "src": "/admin",
-      "dest": "/server.js"
+      "src": "/(.*\\.html)",
+      "dest": "/$1"
     },
     {
-      "src": "/diving",
-      "dest": "/server.js"
-    },
-    {
-      "src": "/booking",
-      "dest": "/server.js"
-    },
-    {
-      "src": "/anode-quote",
-      "dest": "/server.js"
-    },
-    {
-      "src": "/comprehensive-quote",
-      "dest": "/server.js"
-    },
-    {
-      "src": "/",
+      "src": "/(.*)",
       "dest": "/server.js"
     }
-  ],
-  "env": {
-    "NODE_ENV": "production"
-  }
+  ]
 }
