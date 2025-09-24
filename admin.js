@@ -1,6 +1,4 @@
 // Admin Application Module
-import { jsPDF } from 'jspdf';
-
 export class AdminApp {
     constructor() {
         this.selectedCustomer = null;
@@ -1587,7 +1585,7 @@ export class AdminApp {
     }
 
     generatePDF(quoteData) {
-        const doc = new jsPDF();
+        const doc = new window.jspdf.jsPDF();
 
         // Company header
         doc.setFontSize(24);
