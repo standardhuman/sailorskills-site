@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Item Recovery - No Anode Step</title>
+</head>
+<body>
+    <h1>Test Item Recovery Flow</h1>
+    <p>Open the console to see debug messages.</p>
+    <button onclick="testFlow()">Test Item Recovery Flow</button>
+
+    <div id="result"></div>
+
+    <script>
+        async function testFlow() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Testing... Check console for details.';
+
+            // Open diving page in iframe to test
+            const iframe = document.createElement('iframe');
+            iframe.src = 'http://localhost:3000/diving';
+            iframe.style.width = '100%';
+            iframe.style.height = '600px';
+            document.body.appendChild(iframe);
+
+            iframe.onload = function() {
+                const iframeWindow = iframe.contentWindow;
+                const iframeDoc = iframe.contentDocument;
+
+                // Wait a bit for JS to load
+                setTimeout(() => {
+                    console.log('Testing Item Recovery flow...');
+
+                    // Check if selectedServiceKey is accessible
+                    console.log('Current selectedServiceKey:', iframeWindow.selectedServiceKey);
+
+                    // Simulate clicking Item Recovery
+                    const buttons = iframeDoc.querySelectorAll('.service-btn');
+                    buttons.forEach(btn => {
+                        if (btn.textContent.includes('Item Recovery')) {
+                            console.log('Found Item Recovery button, clicking...');
+                            btn.click();
+                        }
+                    });
+
+                    setTimeout(() => {
+                        console.log('After selecting Item Recovery:');
+                        console.log('- selectedServiceKey:', iframeWindow.selectedServiceKey);
+                        console.log('- currentStep:', iframeWindow.currentStep);
+
+                        // Click Next
+                        const nextBtn = iframeDoc.getElementById('nextButton');
+                        if (nextBtn) {
+                            console.log('Clicking Next button...');
+                            nextBtn.click();
+
+                            setTimeout(() => {
+                                console.log('After clicking Next:');
+                                console.log('- currentStep:', iframeWindow.currentStep);
+
+                                // Check which step is visible
+                                const visibleStep = iframeDoc.querySelector('.form-step[style*="block"]');
+                                if (visibleStep) {
+                                    console.log('Visible step ID:', visibleStep.id);
+                                    const heading = visibleStep.querySelector('h2');
+                                    if (heading) {
+                                        console.log('Step heading:', heading.textContent);
+
+                                        if (heading.textContent.includes('Anode')) {
+                                            resultDiv.innerHTML = '<span style="color: red;">❌ FAILED: Anode step is showing!</span>';
+                                        } else if (heading.textContent.includes('Estimated Cost')) {
+                                            resultDiv.innerHTML = '<span style="color: green;">✅ SUCCESS: Correctly skipped to results!</span>';
+                                        } else {
+                                            resultDiv.innerHTML = '<span style="color: orange;">⚠️ Unknown step: ' + heading.textContent + '</span>';
+                                        }
+                                    }
+                                }
+                            }, 500);
+                        }
+                    }, 500);
+                }, 1000);
+            };
+        }
+    </script>
+</body>
+</html>

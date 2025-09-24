@@ -15,7 +15,7 @@ const serviceData = {
         rate: 199, 
         name: "Item Recovery", 
         type: 'flat',
-        description: "Professional recovery of dropped items like phones, keys, tools, or dinghies. Quick response to minimize water damage. Service includes up to 45 minutes of searching time. Recovery is not guaranteed."
+        description: "Professional recovery of lost items like phones, keys, tools, or dinghies. Quick response to minimize water damage. Service includes up to 45 minutes of searching time. Recovery is not guaranteed."
     },
     underwater_inspection: { 
         rate: 4, 
