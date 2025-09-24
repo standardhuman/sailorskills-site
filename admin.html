@@ -1657,11 +1657,14 @@
                     }, 500);
                 }
                 
-                // Update pricing
+                // Update pricing and sync values
                 setTimeout(() => {
                     if (window.syncWizardValues) syncWizardValues();
-                    if (window.updateWizardPricing) updateWizardPricing();
-                    if (window.updateChargeSummary) updateChargeSummary();
+                    if (window.calculateCost) window.calculateCost();
+                    setTimeout(() => {
+                        if (window.updateWizardPricing) window.updateWizardPricing();
+                        if (window.updateChargeSummary) window.updateChargeSummary();
+                    }, 100);
                 }, 100);
             };
         </script>
@@ -2963,12 +2966,14 @@
             const totalCostDisplay = document.getElementById('totalCostDisplay');
 
             if (wizardCostBreakdown && costBreakdown) {
-                wizardCostBreakdown.innerHTML = costBreakdown.innerHTML || 'Calculating...';
+                // Use textContent for <pre> element, and format it nicely
+                const breakdown = costBreakdown.textContent || 'Calculating...';
+                wizardCostBreakdown.innerHTML = breakdown.replace(/\n/g, '<br>').replace(/•/g, '<br>•');
             }
 
             if (wizardTotalPrice && totalCostDisplay) {
                 const totalText = totalCostDisplay.textContent || '$0.00';
-                wizardTotalPrice.innerHTML = `Total: ${totalText}`;
+                wizardTotalPrice.innerHTML = `<strong>Total: ${totalText}</strong>`;
             }
         }
         
