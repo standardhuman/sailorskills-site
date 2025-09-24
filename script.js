@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     populateServiceButtons();
     
-    // Only add event listeners if the buttons exist (not on charge-customer page)
+    // Only add event listeners if the buttons exist (not on admin page)
     if (nextButton) {
         nextButton.addEventListener('click', handleNextClick);
     }
@@ -412,7 +412,7 @@ function selectService(serviceKey) {
     calculateCost();
     console.log('calculateCost finished');
     
-    // Update charge summary if on charge-customer page
+    // Update charge summary if on admin page
     if (typeof window.updateChargeSummary === 'function') {
         console.log('Calling updateChargeSummary...');
         window.updateChargeSummary();
@@ -420,7 +420,7 @@ function selectService(serviceKey) {
 }
 
 function updateServicePriceExplainer() {
-    // Check if servicePriceExplainer exists (might not exist on charge-customer page)
+    // Check if servicePriceExplainer exists (might not exist on admin page)
     if (servicePriceExplainer) {
         if (selectedServiceKey && serviceData[selectedServiceKey]) {
             const service = serviceData[selectedServiceKey];
@@ -709,7 +709,7 @@ function resetForm() {
 function calculateCost() {
     console.log('calculateCost - starting with selectedServiceKey:', selectedServiceKey);
     
-    // Re-initialize elements if they're null (for charge-customer page)
+    // Re-initialize elements if they're null (for admin page)
     if (!costBreakdownEl) {
         costBreakdownEl = document.getElementById('costBreakdown');
         console.log('Initialized costBreakdownEl:', costBreakdownEl ? 'found' : 'not found');
@@ -745,12 +745,12 @@ function calculateCost() {
     if (costBreakdownEl) costBreakdownEl.innerHTML = ""; // Clear previous results
     if (totalCostDisplayEl) totalCostDisplayEl.innerText = "$0.00"; 
 
-    // Check if we're on the charge-customer page with direct condition dropdowns
+    // Check if we're on the admin page with direct condition dropdowns
     const actualPaintCondition = document.getElementById('actualPaintCondition');
     const actualGrowthLevel = document.getElementById('actualGrowthLevel');
     
     if (actualPaintCondition && actualGrowthLevel) {
-        // Direct condition mode (charge-customer page)
+        // Direct condition mode (admin page)
         const paintValue = actualPaintCondition.value;
         const growthValue = actualGrowthLevel.value;
         
@@ -800,7 +800,7 @@ function calculateCost() {
             } else if (estimatedGrowthLevelBaseLabel === estGrowthLabels.HEAVY) {
                 growthExplainerMsg += `Potential surcharge: <strong>+25-50%</strong>.`;
             } else if (estimatedGrowthLevelBaseLabel === estGrowthLabels.SEVERE) {
-                growthExplainerMsg += `Potential surcharge: <strong>+50-100%</strong>.`;
+                growthExplainerMsg += `Potential surcharge: <strong>+200%</strong>.`;
             }
 
             if (growthExplainerEl) {
@@ -996,7 +996,7 @@ function calculateCost() {
     }
 }
 
-// Get paint surcharge based on actual condition (for charge-customer page)
+// Get paint surcharge based on actual condition (for admin page)
 function getDirectPaintSurcharge(paintCondition) {
     switch(paintCondition) {
         case paintConditions.EXCELLENT:
@@ -1012,7 +1012,7 @@ function getDirectPaintSurcharge(paintCondition) {
     }
 }
 
-// Get growth surcharge based on actual condition (for charge-customer page)
+// Get growth surcharge based on actual condition (for admin page)
 function getDirectGrowthSurcharge(growthLevel) {
     switch(growthLevel) {
         case estGrowthLabels.MINIMAL:
@@ -1022,13 +1022,13 @@ function getDirectGrowthSurcharge(growthLevel) {
         case estGrowthLabels.HEAVY:
             return 0.35; // 35% surcharge (average of 25-50%)
         case estGrowthLabels.SEVERE:
-            return 1.00; // 100% surcharge
+            return 2.00; // 200% surcharge
         default:
             return 0;
     }
 }
 
-// Calculate cost with direct paint/growth values (for charge-customer page)
+// Calculate cost with direct paint/growth values (for admin page)
 function calculateCostDirect() {
     calculateCost(); // Just use regular calculateCost, it will detect the actual dropdowns
 }
@@ -1541,7 +1541,7 @@ function updateGrowthSurchargeDisplay() {
     } else if (estimatedGrowthLevel === "Heavy") {
         growthExplainerMsg += `Potential surcharge: <strong>+25-50%</strong>.`;
     } else if (estimatedGrowthLevel === "Severe") {
-        growthExplainerMsg += `Potential surcharge: <strong>+50-100%</strong>.`;
+        growthExplainerMsg += `Potential surcharge: <strong>+200%</strong>.`;
     }
     
     growthExplainerEl.innerHTML = growthExplainerMsg;
