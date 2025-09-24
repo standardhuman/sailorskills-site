@@ -97,8 +97,19 @@ export class AdminApp {
         const service = window.serviceData[serviceKey];
         if (!service) return;
 
-        // For per-foot services, show the wizard
-        if (service.type === 'per_foot') {
+        // Special handling for Anodes Only service - open anode selector directly
+        if (serviceKey === 'anodes_only') {
+            // Hide service buttons
+            document.getElementById('simpleServiceButtons').style.display = 'none';
+
+            // Show wizard container
+            const wizardContainer = document.getElementById('wizardContainer');
+            wizardContainer.style.display = 'block';
+
+            // Open anode selector directly
+            this.openAnodeWizardForAnodesOnly();
+        } else if (service.type === 'per_foot') {
+            // For per-foot services, show the wizard
             // Hide service buttons
             document.getElementById('simpleServiceButtons').style.display = 'none';
 
@@ -377,6 +388,92 @@ export class AdminApp {
         window.currentServiceKey = null;
         window.selectedServiceKey = null;
         this.updateChargeSummary();
+    }
+
+    openAnodeWizardForAnodesOnly() {
+        // Load anode selector interface for Anodes Only service
+        document.getElementById('wizardContent').innerHTML = `
+            <div class="admin-wizard">
+                <h3>⚓ Select Zinc Anodes</h3>
+
+                <div class="anode-selector">
+                    <div class="wizard-field">
+                        <input type="text" id="anodeSearch" class="search-input"
+                               placeholder="Search anodes by name or SKU..."
+                               oninput="adminApp.filterAnodes(this.value)">
+                    </div>
+
+                    <div class="anode-categories">
+                        <button class="category-btn active" onclick="adminApp.filterByCategory('all')">All</button>
+                        <button class="category-btn" onclick="adminApp.filterByCategory('shaft')">Shaft</button>
+                        <button class="category-btn" onclick="adminApp.filterByCategory('prop')">Prop</button>
+                        <button class="category-btn" onclick="adminApp.filterByCategory('rudder')">Rudder</button>
+                        <button class="category-btn" onclick="adminApp.filterByCategory('trim-tab')">Trim Tab</button>
+                        <button class="category-btn" onclick="adminApp.filterByCategory('hull')">Hull</button>
+                        <button class="category-btn" onclick="adminApp.filterByCategory('engine')">Engine</button>
+                    </div>
+
+                    <div id="anodeGrid" class="anode-grid" style="max-height: 400px; overflow-y: auto;">
+                        <!-- Anodes will be populated here -->
+                    </div>
+                </div>
+
+                <div class="selected-anodes">
+                    <h4>Selected Anodes: <span id="selectedCount">0</span></h4>
+                    <div id="selectedAnodesList"></div>
+                    <div class="anode-total">
+                        <strong>Anodes Subtotal: $<span id="anodeSubtotal">0.00</span></strong>
+                        <br><small>Labor: $15 per anode</small>
+                    </div>
+                </div>
+
+                <div class="wizard-actions">
+                    <button onclick="adminApp.closeAnodesOnlyWizard()" class="btn-secondary">← Back to Services</button>
+                    <button onclick="adminApp.confirmAnodesOnlySelection()" class="btn-primary">✓ Confirm Selection</button>
+                </div>
+            </div>
+        `;
+
+        // Load anode catalog
+        this.loadAnodeCatalog();
+    }
+
+    closeAnodesOnlyWizard() {
+        // Go back to service selection
+        document.getElementById('simpleServiceButtons').style.display = 'flex';
+        document.getElementById('wizardContainer').style.display = 'none';
+        this.currentServiceKey = null;
+        window.currentServiceKey = null;
+        window.selectedServiceKey = null;
+        this.updateChargeSummary();
+    }
+
+    confirmAnodesOnlySelection() {
+        // Store selected anodes and calculate pricing
+        const selectedAnodes = this.getSelectedAnodes();
+
+        // Set base price for anodes only service (minimum $150)
+        const basePrice = 150;
+        const anodesCost = selectedAnodes.totalPrice;
+        const laborCost = selectedAnodes.count * 15;
+        const totalPrice = Math.max(basePrice, anodesCost + laborCost);
+
+        // Store anode details for charge summary
+        this.anodeDetails = selectedAnodes;
+
+        // Update the display price
+        const displayEl = document.getElementById('totalCostDisplay');
+        if (displayEl) {
+            displayEl.textContent = `$${totalPrice.toFixed(2)}`;
+        }
+
+        // Keep the service selected but close the wizard
+        document.getElementById('wizardContainer').style.display = 'none';
+        document.getElementById('simpleServiceButtons').style.display = 'flex';
+
+        // Update charge summary
+        this.updateChargeSummary();
+        alert('Anodes selected! Check the charge summary below.');
     }
 
     openAnodeWizard() {
