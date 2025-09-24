@@ -460,18 +460,54 @@
             border-color: #2a3f5f;
         }
         
-        /* Paint condition specific colors */
-        .paint-excellent.selected { background-color: #27ae60; border-color: #27ae60; color: white !important; }
-        .paint-good.selected { background-color: #3498db; border-color: #3498db; color: white !important; }
-        .paint-fair.selected { background-color: #f39c12; border-color: #f39c12; color: white !important; }
-        .paint-poor.selected { background-color: #e67e22; border-color: #e67e22; color: white !important; }
-        .paint-missing.selected { background-color: #e74c3c; border-color: #e74c3c; color: white !important; }
+        /* Paint condition specific colors - higher specificity */
+        .option-button.paint-excellent.selected {
+            background-color: #27ae60 !important;
+            border-color: #27ae60 !important;
+            color: white !important;
+        }
+        .option-button.paint-good.selected {
+            background-color: #3498db !important;
+            border-color: #3498db !important;
+            color: white !important;
+        }
+        .option-button.paint-fair.selected {
+            background-color: #f39c12 !important;
+            border-color: #f39c12 !important;
+            color: white !important;
+        }
+        .option-button.paint-poor.selected {
+            background-color: #e67e22 !important;
+            border-color: #e67e22 !important;
+            color: white !important;
+        }
+        .option-button.paint-missing.selected {
+            background-color: #e74c3c !important;
+            border-color: #e74c3c !important;
+            color: white !important;
+        }
         
-        /* Growth level specific colors */
-        .growth-minimal.selected { background-color: #27ae60; border-color: #27ae60; color: white !important; }
-        .growth-moderate.selected { background-color: #f39c12; border-color: #f39c12; color: white !important; }
-        .growth-heavy.selected { background-color: #e67e22; border-color: #e67e22; color: white !important; }
-        .growth-severe.selected { background-color: #e74c3c; border-color: #e74c3c; color: white !important; }
+        /* Growth level specific colors - higher specificity */
+        .option-button.growth-minimal.selected {
+            background-color: #27ae60 !important;
+            border-color: #27ae60 !important;
+            color: white !important;
+        }
+        .option-button.growth-moderate.selected {
+            background-color: #f39c12 !important;
+            border-color: #f39c12 !important;
+            color: white !important;
+        }
+        .option-button.growth-heavy.selected {
+            background-color: #e67e22 !important;
+            border-color: #e67e22 !important;
+            color: white !important;
+        }
+        .option-button.growth-severe.selected {
+            background-color: #e74c3c !important;
+            border-color: #e74c3c !important;
+            color: white !important;
+        }
 
         /* Growth level slider styles */
         .growth-slider-container {
@@ -1801,29 +1837,24 @@
                             <div class="input-group" style="margin-bottom: 20px;">
                                 <label style="display: block; margin-bottom: 8px; font-weight: 600;">Actual Paint Condition</label>
                                 <div class="option-button-group" id="wizardPaintConditionButtons" style="display: flex; gap: 10px; flex-wrap: wrap;">
-                                    <button type="button" class="option-button" data-value="excellent"
-                                            onclick="selectWizardPaintCondition('excellent')"
-                                            style="padding: 10px 20px; border: 2px solid #e0e0e0; background: white; border-radius: 8px; cursor: pointer;">
+                                    <button type="button" class="option-button paint-excellent" data-value="excellent"
+                                            onclick="selectWizardPaintCondition('excellent')">
                                         Excellent
                                     </button>
-                                    <button type="button" class="option-button selected" data-value="good"
-                                            onclick="selectWizardPaintCondition('good')"
-                                            style="padding: 10px 20px; border: 2px solid #345475; background: rgba(52, 84, 117, 0.1); border-radius: 8px; cursor: pointer;">
+                                    <button type="button" class="option-button paint-good selected" data-value="good"
+                                            onclick="selectWizardPaintCondition('good')">
                                         Good
                                     </button>
-                                    <button type="button" class="option-button" data-value="fair"
-                                            onclick="selectWizardPaintCondition('fair')"
-                                            style="padding: 10px 20px; border: 2px solid #e0e0e0; background: white; border-radius: 8px; cursor: pointer;">
+                                    <button type="button" class="option-button paint-fair" data-value="fair"
+                                            onclick="selectWizardPaintCondition('fair')">
                                         Fair
                                     </button>
-                                    <button type="button" class="option-button" data-value="poor"
-                                            onclick="selectWizardPaintCondition('poor')"
-                                            style="padding: 10px 20px; border: 2px solid #e0e0e0; background: white; border-radius: 8px; cursor: pointer;">
+                                    <button type="button" class="option-button paint-poor" data-value="poor"
+                                            onclick="selectWizardPaintCondition('poor')">
                                         Poor
                                     </button>
-                                    <button type="button" class="option-button" data-value="missing"
-                                            onclick="selectWizardPaintCondition('missing')"
-                                            style="padding: 10px 20px; border: 2px solid #e0e0e0; background: white; border-radius: 8px; cursor: pointer;">
+                                    <button type="button" class="option-button paint-missing" data-value="missing"
+                                            onclick="selectWizardPaintCondition('missing')">
                                         Missing
                                     </button>
                                 </div>
