@@ -20,19 +20,8 @@ try {
     console.warn('Quote routes not available:', error.message);
 }
 
-// Serve static files with proper MIME types
-app.use(express.static(__dirname, {
-    redirect: false,
-    setHeaders: (res, filePath) => {
-        if (filePath.endsWith('.js')) {
-            res.setHeader('Content-Type', 'application/javascript');
-        } else if (filePath.endsWith('.mjs')) {
-            res.setHeader('Content-Type', 'application/javascript');
-        } else if (filePath.endsWith('.css')) {
-            res.setHeader('Content-Type', 'text/css');
-        }
-    }
-}));
+// Serve static files
+app.use(express.static(__dirname));
 
 // URL rewriting - serve HTML files without extension
 app.get('/diving', (req, res) => {
