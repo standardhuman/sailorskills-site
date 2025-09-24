@@ -5,6 +5,8 @@ export class AdminApp {
         this.customers = [];
         this.currentServiceKey = null;
         this.modalSelectedCustomerId = null;
+        this.selectedAnodes = {};
+        this.anodeDetails = null;
 
         this.init();
     }
@@ -614,19 +616,23 @@ export class AdminApp {
 
         // Display anodes
         grid.innerHTML = filtered.map(anode => {
-            const quantity = this.selectedAnodes[anode.sku]?.quantity || 0;
+            const anodeId = anode.boatzincs_id || anode.sku;
+            const quantity = this.selectedAnodes[anodeId]?.quantity || 0;
             const price = typeof anode.list_price === 'string' ?
                 parseFloat(anode.list_price.replace('$', '')) :
                 anode.list_price;
+
+            // Store anode data for button clicks
+            const dataAttr = btoa(JSON.stringify({ id: anodeId, price, name: anode.name }));
 
             return `
                 <div class="anode-item">
                     <div class="anode-name">${anode.name}</div>
                     <div class="anode-price">$${price.toFixed(2)}</div>
                     <div class="anode-controls">
-                        <button onclick="adminApp.updateAnodeQuantity('${anode.sku}', -1, ${price}, '${anode.name}')">−</button>
+                        <button data-anode="${dataAttr}" data-change="-1" onclick="adminApp.handleAnodeClick(this)">−</button>
                         <span class="quantity">${quantity}</span>
-                        <button onclick="adminApp.updateAnodeQuantity('${anode.sku}', 1, ${price}, '${anode.name}')">+</button>
+                        <button data-anode="${dataAttr}" data-change="1" onclick="adminApp.handleAnodeClick(this)">+</button>
                     </div>
                 </div>
             `;
@@ -723,26 +729,40 @@ export class AdminApp {
 
         // Display anodes
         grid.innerHTML = filtered.map(anode => {
-            const quantity = this.selectedAnodes[anode.sku]?.quantity || 0;
+            const anodeId = anode.boatzincs_id || anode.sku;
+            const quantity = this.selectedAnodes[anodeId]?.quantity || 0;
             const price = typeof anode.list_price === 'string' ?
                 parseFloat(anode.list_price.replace('$', '')) :
                 anode.list_price;
+
+            // Store anode data for button clicks
+            const dataAttr = btoa(JSON.stringify({ id: anodeId, price, name: anode.name }));
 
             return `
                 <div class="anode-item">
                     <div class="anode-name">${anode.name}</div>
                     <div class="anode-price">$${price.toFixed(2)}</div>
                     <div class="anode-controls">
-                        <button onclick="adminApp.updateAnodeQuantity('${anode.sku}', -1, ${price}, '${anode.name}')">−</button>
+                        <button data-anode="${dataAttr}" data-change="-1" onclick="adminApp.handleAnodeClick(this)">−</button>
                         <span class="quantity">${quantity}</span>
-                        <button onclick="adminApp.updateAnodeQuantity('${anode.sku}', 1, ${price}, '${anode.name}')">+</button>
+                        <button data-anode="${dataAttr}" data-change="1" onclick="adminApp.handleAnodeClick(this)">+</button>
                     </div>
                 </div>
             `;
         }).join('');
     }
 
+    handleAnodeClick(button) {
+        const anodeData = JSON.parse(atob(button.dataset.anode));
+        const change = parseInt(button.dataset.change);
+        this.updateAnodeQuantity(anodeData.id, change, anodeData.price, anodeData.name);
+    }
+
     updateAnodeQuantity(sku, change, price, name) {
+        if (!this.selectedAnodes) {
+            this.selectedAnodes = {};
+        }
+
         if (!this.selectedAnodes[sku]) {
             this.selectedAnodes[sku] = { quantity: 0, price, name };
         }
@@ -755,9 +775,30 @@ export class AdminApp {
 
         // Update display
         this.updateAnodeSelection();
+
+        // Refresh the current view
         const searchTerm = document.getElementById('anodeSearch')?.value || '';
         const activeCategory = document.querySelector('.category-btn.active')?.textContent.toLowerCase() || 'all';
-        this.displayAnodes(activeCategory, searchTerm);
+
+        // Check if we're in shaft subfilter mode
+        const shaftSubfilter = document.getElementById('shaftSubfilter');
+        if (shaftSubfilter && shaftSubfilter.style.display !== 'none') {
+            const activeSubfilter = document.querySelector('.subfilter-btn.active');
+            if (activeSubfilter) {
+                const subfilterText = activeSubfilter.textContent.toLowerCase();
+                if (subfilterText.includes('standard')) {
+                    this.displayAnodesWithShaftType('standard', searchTerm);
+                } else if (subfilterText.includes('metric')) {
+                    this.displayAnodesWithShaftType('metric', searchTerm);
+                } else {
+                    this.displayAnodes('shaft', searchTerm);
+                }
+            } else {
+                this.displayAnodes(activeCategory, searchTerm);
+            }
+        } else {
+            this.displayAnodes(activeCategory, searchTerm);
+        }
     }
 
     updateAnodeSelection() {
@@ -765,10 +806,13 @@ export class AdminApp {
         const countEl = document.getElementById('selectedCount');
         const subtotalEl = document.getElementById('anodeSubtotal');
 
+        // If elements don't exist, we're not in anode selection mode
+        if (!list || !countEl || !subtotalEl) return;
+
         let totalCount = 0;
         let totalPrice = 0;
 
-        const items = Object.entries(this.selectedAnodes).filter(([_, data]) => data.quantity > 0);
+        const items = Object.entries(this.selectedAnodes || {}).filter(([_, data]) => data.quantity > 0);
 
         if (items.length === 0) {
             list.innerHTML = '<div style="color: #999;">No anodes selected</div>';
@@ -787,6 +831,11 @@ export class AdminApp {
 
         countEl.textContent = totalCount;
         subtotalEl.textContent = totalPrice.toFixed(2);
+
+        // Update charge summary if in service mode
+        if (this.currentServiceKey) {
+            this.updateChargeSummary();
+        }
     }
 
     getSelectedAnodes() {
