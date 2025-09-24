@@ -1291,6 +1291,39 @@
                 }
             }
 
+            // Back to services function
+            window.backToServices = function() {
+                const serviceSelector = document.querySelector('.service-selector');
+                const serviceHeading = serviceSelector ? serviceSelector.querySelector('h2') : null;
+                const wizardContainer = document.getElementById('wizardContainer');
+                const simpleButtons = document.getElementById('simpleServiceButtons');
+
+                // Hide wizard
+                if (wizardContainer) {
+                    wizardContainer.style.display = 'none';
+                    wizardContainer.innerHTML = '';
+                }
+
+                // Show simple service buttons
+                if (simpleButtons) {
+                    simpleButtons.style.display = 'flex';
+                }
+
+                // Show heading
+                if (serviceHeading) {
+                    serviceHeading.style.display = 'block';
+                }
+
+                // Reset selected service
+                window.currentServiceKey = null;
+                window.selectedServiceKey = null;
+
+                // Update charge summary
+                if (window.updateChargeSummary) {
+                    window.updateChargeSummary();
+                }
+            }
+
             // Define wizard paint condition selection function
             window.selectWizardPaintCondition = function(value) {
                 document.querySelectorAll('#wizardPaintConditionButtons .option-button').forEach(btn => {
