@@ -1,4 +1,6 @@
 // Admin Application Module
+import { jsPDF } from 'jspdf';
+
 export class AdminApp {
     constructor() {
         this.selectedCustomer = null;
@@ -1584,10 +1586,195 @@ export class AdminApp {
         });
     }
 
+    generatePDF(quoteData) {
+        const doc = new jsPDF();
+
+        // Company header
+        doc.setFontSize(24);
+        doc.setTextColor(41, 98, 255);
+        doc.text('SAILOR SKILLS', 105, 20, { align: 'center' });
+
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+        doc.text('Professional Underwater Services', 105, 27, { align: 'center' });
+
+        // Quote header
+        doc.setFontSize(18);
+        doc.setTextColor(0);
+        doc.text('SERVICE QUOTE', 105, 40, { align: 'center' });
+
+        // Quote number and date
+        doc.setFontSize(10);
+        doc.setTextColor(60);
+        doc.text(`Quote #: ${quoteData.quoteNumber}`, 20, 55);
+        doc.text(`Date: ${new Date(quoteData.quoteDate).toLocaleDateString()}`, 20, 62);
+        doc.text(`Valid Until: ${new Date(quoteData.expiryDate).toLocaleDateString()}`, 20, 69);
+
+        // Customer info section
+        doc.setFontSize(12);
+        doc.setTextColor(0);
+        doc.text('CUSTOMER INFORMATION', 20, 85);
+        doc.setLineWidth(0.5);
+        doc.line(20, 87, 190, 87);
+
+        doc.setFontSize(10);
+        doc.text(`Name: ${quoteData.customer.name}`, 20, 95);
+        doc.text(`Email: ${quoteData.customer.email}`, 20, 102);
+        doc.text(`Phone: ${quoteData.customer.phone}`, 20, 109);
+
+        // Boat info
+        doc.text(`Boat: ${quoteData.customer.boatName}`, 120, 95);
+        if (quoteData.customer.boatMake) {
+            doc.text(`Make/Model: ${quoteData.customer.boatMake}`, 120, 102);
+        }
+        if (quoteData.customer.marina) {
+            doc.text(`Marina: ${quoteData.customer.marina}`, 120, 109);
+        }
+        if (quoteData.customer.slip) {
+            doc.text(`Slip: ${quoteData.customer.slip}`, 120, 116);
+        }
+
+        // Service details section
+        let yPos = 130;
+        doc.setFontSize(12);
+        doc.text('SERVICE DETAILS', 20, yPos);
+        doc.line(20, yPos + 2, 190, yPos + 2);
+
+        yPos += 10;
+        doc.setFontSize(10);
+
+        if (quoteData.service) {
+            doc.text(`Service Type: ${quoteData.service.name}`, 20, yPos);
+            yPos += 7;
+            doc.text(`Boat Length: ${quoteData.service.boatLength} ft`, 20, yPos);
+            yPos += 7;
+
+            if (quoteData.service.paintCondition) {
+                doc.text(`Paint Condition: ${quoteData.service.paintCondition}`, 20, yPos);
+                yPos += 7;
+            }
+            if (quoteData.service.growthLevel) {
+                doc.text(`Growth Level: ${quoteData.service.growthLevel}`, 20, yPos);
+                yPos += 7;
+            }
+            if (quoteData.service.hasTwinEngines) {
+                doc.text(`Twin Engines: Yes`, 20, yPos);
+                yPos += 7;
+            }
+            if (quoteData.service.additionalHulls > 0) {
+                doc.text(`Additional Hulls: ${quoteData.service.additionalHulls}`, 20, yPos);
+                yPos += 7;
+            }
+        }
+
+        // Anodes section if applicable
+        if (quoteData.anodes && quoteData.anodes.length > 0) {
+            yPos += 10;
+            doc.setFontSize(12);
+            doc.text('ZINC ANODES', 20, yPos);
+            doc.line(20, yPos + 2, 190, yPos + 2);
+
+            yPos += 10;
+            doc.setFontSize(10);
+
+            quoteData.anodes.forEach(anode => {
+                const lineText = `${anode.quantity}x ${anode.name}`;
+                const priceText = `$${anode.totalPrice.toFixed(2)}`;
+                doc.text(lineText, 20, yPos);
+                doc.text(priceText, 170, yPos, { align: 'right' });
+                yPos += 7;
+            });
+        }
+
+        // Pricing breakdown
+        yPos += 10;
+        doc.setFontSize(12);
+        doc.text('PRICING BREAKDOWN', 20, yPos);
+        doc.line(20, yPos + 2, 190, yPos + 2);
+
+        yPos += 10;
+        doc.setFontSize(10);
+
+        if (quoteData.pricing) {
+            if (quoteData.pricing.basePrice > 0) {
+                doc.text(`Service (${quoteData.pricing.boatLength}ft × $${quoteData.pricing.ratePerFoot}/ft):`, 20, yPos);
+                doc.text(`$${quoteData.pricing.basePrice.toFixed(2)}`, 170, yPos, { align: 'right' });
+                yPos += 7;
+            }
+
+            if (quoteData.pricing.anodeCost > 0) {
+                doc.text(`Anodes:`, 20, yPos);
+                doc.text(`$${quoteData.pricing.anodeCost.toFixed(2)}`, 170, yPos, { align: 'right' });
+                yPos += 7;
+            }
+
+            if (quoteData.pricing.anodeLaborCost > 0) {
+                doc.text(`Anode Installation:`, 20, yPos);
+                doc.text(`$${quoteData.pricing.anodeLaborCost.toFixed(2)}`, 170, yPos, { align: 'right' });
+                yPos += 7;
+            }
+
+            // Total
+            yPos += 5;
+            doc.setLineWidth(0.5);
+            doc.line(120, yPos, 190, yPos);
+            yPos += 7;
+
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'bold');
+            doc.text(`TOTAL:`, 20, yPos);
+            doc.text(`$${quoteData.pricing.totalCost.toFixed(2)}`, 170, yPos, { align: 'right' });
+            doc.setFont(undefined, 'normal');
+        }
+
+        // Footer
+        doc.setFontSize(8);
+        doc.setTextColor(100);
+        doc.text('This quote is valid for the period specified above.', 105, 280, { align: 'center' });
+        doc.text('Terms and conditions apply. Payment due upon completion of service.', 105, 285, { align: 'center' });
+
+        return doc;
+    }
+
     downloadQuotePDF(quoteNumber) {
-        console.log('Download PDF for quote:', quoteNumber);
-        // In production, this would trigger PDF download
-        alert(`PDF download for quote ${quoteNumber} would start here`);
+        console.log('Generating PDF for quote:', quoteNumber);
+
+        if (!this.lastQuote) {
+            console.error('No quote data available');
+            return;
+        }
+
+        try {
+            const doc = this.generatePDF(this.lastQuote);
+
+            // Generate filename
+            const filename = `quote-${quoteNumber}.pdf`;
+
+            // Check if we can use native share API (mobile)
+            if (navigator.share && /mobile|android|ios/i.test(navigator.userAgent)) {
+                // Convert PDF to blob for sharing
+                const pdfBlob = doc.output('blob');
+                const file = new File([pdfBlob], filename, { type: 'application/pdf' });
+
+                navigator.share({
+                    title: `Quote ${quoteNumber}`,
+                    text: `Service quote for ${this.lastQuote.customer.name}`,
+                    files: [file]
+                }).then(() => {
+                    console.log('Quote shared successfully');
+                }).catch((error) => {
+                    console.log('Share cancelled or failed, downloading instead:', error);
+                    // Fallback to download
+                    doc.save(filename);
+                });
+            } else {
+                // Desktop - just download
+                doc.save(filename);
+            }
+        } catch (error) {
+            console.error('Error generating PDF:', error);
+            alert('Error generating PDF. Please try again.');
+        }
     }
 
     viewQuoteOnline(quoteNumber) {
