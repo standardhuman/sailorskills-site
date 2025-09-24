@@ -177,7 +177,7 @@ function populateServiceButtons() {
     serviceButtons.innerHTML = '';
     
     // Define the order to display services
-    const serviceOrder = ['recurring_cleaning', 'onetime_cleaning', 'item_recovery', 'underwater_inspection', 'propeller_service', 'anodes_only'];
+    const serviceOrder = ['recurring_cleaning', 'onetime_cleaning', 'underwater_inspection', 'anodes_only', 'item_recovery', 'propeller_service'];
     
     console.log('Populating service buttons with click handlers...');
     
@@ -188,6 +188,10 @@ function populateServiceButtons() {
         // Add special class for cleaning services
         if (key === 'recurring_cleaning' || key === 'onetime_cleaning') {
             button.className += ' cleaning-service';
+        }
+        // Add special class for underwater inspection to make it full-width
+        if (key === 'underwater_inspection') {
+            button.className += ' full-width-service';
         }
         button.dataset.serviceKey = key;
         

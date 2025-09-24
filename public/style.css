@@ -606,8 +606,8 @@ input[type="tel"]:focus {
     grid-column: 1 / -1;
 }
 
-/* Make propeller service (5th child) span full width like cleaning services */
-.service-option:nth-child(5) {
+/* Make underwater inspection span full width */
+.service-option.full-width-service {
     grid-column: 1 / -1;
 }
 
