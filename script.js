@@ -869,18 +869,18 @@ function calculateCost() {
         if (isCleaningService) {
             let actualPaintSurchargeAmount = initialBaseCost * paintSurchargePercent;  // Use actual cost
             variableSurchargeTotal += actualPaintSurchargeAmount;
-            // Use "Actual" prefix when direct conditions are used, "Est." otherwise
-            const conditionPrefix = (actualPaintCondition && actualGrowthLevel) ? "Actual" : "Est.";
-            variableDetails += `  - ${conditionPrefix} Paint (${estimatedPaintConditionBaseLabel}): +${(paintSurchargePercent * 100).toFixed(2)}% ($${actualPaintSurchargeAmount.toFixed(2)})\n`;
+            // Remove "Actual" prefix - just use condition names
+            const conditionPrefix = (actualPaintCondition && actualGrowthLevel) ? "" : "Est. ";
+            variableDetails += `  - ${conditionPrefix}Paint (${estimatedPaintConditionBaseLabel}): +${(paintSurchargePercent * 100).toFixed(2)}% ($${actualPaintSurchargeAmount.toFixed(2)})\n`;
             
             let actualGrowthSurchargeAmount = initialBaseCost * growthSurchargePercent;  // Use actual cost
             variableSurchargeTotal += actualGrowthSurchargeAmount;
-            variableDetails += `  - ${conditionPrefix} Growth (${estimatedGrowthLevelBaseLabel}): +${(growthSurchargePercent * 100).toFixed(0)}% ($${actualGrowthSurchargeAmount.toFixed(2)})\n`;
+            variableDetails += `  - ${conditionPrefix}Growth (${estimatedGrowthLevelBaseLabel}): +${(growthSurchargePercent * 100).toFixed(0)}% ($${actualGrowthSurchargeAmount.toFixed(2)})\n`;
         }
         
         calculatedSubtotal = initialBaseCost + variableSurchargeTotal;  // Use actual cost as base
         if (variableDetails) {
-            const surchargeHeaderText = (actualPaintCondition && actualGrowthLevel) ? "Variable Surcharges Applied (Actual Conditions):\n" : "Variable Surcharges Applied (Estimates):\n";
+            const surchargeHeaderText = (actualPaintCondition && actualGrowthLevel) ? "Variable Surcharges Applied:\n" : "Variable Surcharges Applied (Estimates):\n";
             breakdown += surchargeHeaderText + variableDetails; // variableDetails already has \n for its items
         }
         breakdown += `- Subtotal for Diving Service: $${calculatedSubtotal.toFixed(2)}\n`;
