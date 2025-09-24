@@ -1924,8 +1924,12 @@
         window.transitionToDetailsForm = function(serviceKey) {
             console.log('transitionToDetailsForm called for:', serviceKey);
             const serviceSelector = document.querySelector('.service-selector');
-            const serviceGrid = serviceSelector.querySelector('.service-selection-grid');
-            const serviceHeading = serviceSelector.querySelector('h2');
+            // For admin page, use simpleServiceButtons instead of service-selection-grid
+            let serviceGrid = document.getElementById('simpleServiceButtons');
+            if (!serviceGrid) {
+                serviceGrid = serviceSelector ? serviceSelector.querySelector('.service-selection-grid') : null;
+            }
+            const serviceHeading = serviceSelector ? serviceSelector.querySelector('h2') : null;
             const servicePriceExplainer = document.getElementById('servicePriceExplainer');
             const wizardContainer = document.getElementById('wizardContainer');
             const boatConfigSection = document.getElementById('boatConfigSection');
@@ -2552,6 +2556,7 @@
         
         // Make it globally available
         window.selectWizardPaintCondition = selectWizardPaintCondition;
+        console.log('Assigned selectWizardPaintCondition to window');
         
         // Growth level selection functions
         function selectGrowthLevel(value) {
@@ -2600,6 +2605,7 @@
         
         // Make it globally available
         window.selectWizardGrowthLevel = selectWizardGrowthLevel;
+        console.log('Assigned selectWizardGrowthLevel to window');
         
         // Make functions globally available
         window.selectPaintCondition = selectPaintCondition;
@@ -2625,8 +2631,12 @@
         window.transitionToDetailsForm = function(serviceKey) {
             console.log('transitionToDetailsForm called for:', serviceKey);
             const serviceSelector = document.querySelector('.service-selector');
-            const serviceGrid = serviceSelector.querySelector('.service-selection-grid');
-            const serviceHeading = serviceSelector.querySelector('h2');
+            // For admin page, use simpleServiceButtons instead of service-selection-grid
+            let serviceGrid = document.getElementById('simpleServiceButtons');
+            if (!serviceGrid) {
+                serviceGrid = serviceSelector ? serviceSelector.querySelector('.service-selection-grid') : null;
+            }
+            const serviceHeading = serviceSelector ? serviceSelector.querySelector('h2') : null;
             const servicePriceExplainer = document.getElementById('servicePriceExplainer');
             const wizardContainer = document.getElementById('wizardContainer');
             const boatConfigSection = document.getElementById('boatConfigSection');
@@ -2962,6 +2972,10 @@
             }
         }
         
+        // Make updateWizardPricing globally available
+        window.updateWizardPricing = updateWizardPricing;
+        console.log('Assigned updateWizardPricing to window');
+
         // Sync wizard values with hidden form inputs
         function syncWizardValues() {
             // Sync boat name
@@ -3096,7 +3110,11 @@
         function completeWizard() {
             const wizardContainer = document.getElementById('wizardContainer');
             const serviceSelector = document.querySelector('.service-selector');
-            const serviceGrid = serviceSelector.querySelector('.service-selection-grid');
+            // For admin page, use simpleServiceButtons instead of service-selection-grid
+            let serviceGrid = document.getElementById('simpleServiceButtons');
+            if (!serviceGrid) {
+                serviceGrid = serviceSelector ? serviceSelector.querySelector('.service-selection-grid') : null;
+            }
             const serviceHeading = serviceSelector.querySelector('h2');
             const servicePriceExplainer = document.getElementById('servicePriceExplainer');
             const pricingDisplay = document.getElementById('pricingDisplay');
