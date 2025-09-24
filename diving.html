@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
     <title>Diving Services | Sailor Skills</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -163,46 +164,49 @@
         <!-- Checkout Section (hidden by default) -->
         <div id="checkout-section" class="checkout-section" style="display: none;">
             <h2>Complete Your Service Order</h2>
-            
+
+            <!-- Form wrapper for proper browser security recognition -->
+            <form id="checkout-form" autocomplete="on">
+
             <!-- Boat Information (for non-item-recovery services) -->
             <div class="checkout-form" id="boat-info-section">
                 <h3>Boat Information</h3>
                 <div class="form-row">
                     <div class="form-group">
                         <label for="boat-name">Boat Name*</label>
-                        <input type="text" id="boat-name" name="boat-name" required>
+                        <input type="text" id="boat-name" name="boat-name" autocomplete="off" required>
                     </div>
                     <div class="form-group">
                         <label for="boat-length-checkout">Boat Length (feet)*</label>
-                        <input type="text" id="boat-length-checkout" name="boat-length-checkout" readonly>
+                        <input type="text" id="boat-length-checkout" name="boat-length-checkout" autocomplete="off" readonly>
                     </div>
                 </div>
                 
                 <div class="form-row">
                     <div class="form-group">
                         <label for="boat-make">Boat Make*</label>
-                        <input type="text" id="boat-make" name="boat-make" required>
+                        <input type="text" id="boat-make" name="boat-make" autocomplete="off" required>
                     </div>
                     <div class="form-group">
                         <label for="boat-model">Boat Model*</label>
-                        <input type="text" id="boat-model" name="boat-model" required>
+                        <input type="text" id="boat-model" name="boat-model" autocomplete="off" required>
                     </div>
                 </div>
                 
                 <h3>Marina Information</h3>
                 <div class="form-group">
                     <label for="marina-name">Marina Name*</label>
-                    <input type="text" id="marina-name" name="marina-name" required>
+                    <input type="text" id="marina-name" name="marina-name" autocomplete="off" required>
                 </div>
                 
                 <div class="form-row">
                     <div class="form-group">
                         <label for="dock">Dock*</label>
-                        <input type="text" id="dock" name="dock" required>
+                        <input type="text" id="dock" name="dock" autocomplete="off" required>
                     </div>
                     <div class="form-group">
                         <label for="slip-number">Slip Number*</label>
-                        <input type="text" id="slip-number" name="slip-number" required>
+                        <input type="text" id="slip-number" name="slip-number" autocomplete="off" required>
                     </div>
                 </div>
             </div>
@@ -263,33 +267,33 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label for="customer-name">Full Name*</label>
-                        <input type="text" id="customer-name" name="customer-name" required>
+                        <input type="text" id="customer-name" name="customer-name" autocomplete="name" required>
                     </div>
                     <div class="form-group">
                         <label for="customer-email">Email*</label>
-                        <input type="email" id="customer-email" name="customer-email" required>
+                        <input type="email" id="customer-email" name="customer-email" autocomplete="email" required>
                     </div>
                 </div>
                 
                 <div class="form-group">
                     <label for="customer-phone">Phone Number*</label>
-                    <input type="tel" id="customer-phone" name="customer-phone" required>
+                    <input type="tel" id="customer-phone" name="customer-phone" autocomplete="tel" required>
                 </div>
                 
                 <h3>Billing Address</h3>
                 <div class="form-group">
                     <label for="billing-address">Street Address*</label>
-                    <input type="text" id="billing-address" name="billing-address" required>
+                    <input type="text" id="billing-address" name="billing-address" autocomplete="street-address" required>
                 </div>
                 
                 <div class="form-row">
                     <div class="form-group">
                         <label for="billing-city">City*</label>
-                        <input type="text" id="billing-city" name="billing-city" required>
+                        <input type="text" id="billing-city" name="billing-city" autocomplete="address-level2" required>
                     </div>
                     <div class="form-group">
                         <label for="billing-state">State*</label>
-                        <select id="billing-state" name="billing-state" required>
+                        <select id="billing-state" name="billing-state" autocomplete="address-level1" required>
                             <option value="">Select State</option>
                             <option value="CA">California</option>
                             <option value="WA">Washington</option>
@@ -307,7 +311,7 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label for="billing-zip">ZIP Code*</label>
-                        <input type="text" id="billing-zip" name="billing-zip" pattern="[0-9]{5}" required>
+                        <input type="text" id="billing-zip" name="billing-zip" autocomplete="postal-code" pattern="[0-9]{5}" required>
                     </div>
                 </div>
                 
@@ -351,6 +355,7 @@
                     <button type="button" id="back-to-calculator" style="background: none; border: none; color: #116DFF; text-decoration: underline; cursor: pointer; font-size: 1em;">← Back to Calculator</button>
                 </div>
             </div>
+            </form>
         </div>
 
         <!-- Service Information Section -->
