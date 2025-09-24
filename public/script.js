@@ -435,12 +435,18 @@ function updateServicePriceExplainer() {
 function renderCurrentStep() {
     // console.log('renderCurrentStep - currentStep:', currentStep);
     // console.log('renderCurrentStep - stepElements.length:', stepElements.length);
-    
+
     // Skip if we're on a page without step navigation
     if (!stepElements || stepElements.length === 0) {
         return;
     }
-    
+
+    // Safety check: Never show anode step (7) for item recovery
+    if (selectedServiceKey === 'item_recovery' && currentStep === 7) {
+        console.warn('Warning: Attempted to show anode step for item recovery. Skipping to results.');
+        currentStep = 8;
+    }
+
     stepElements.forEach((stepEl, index) => {
         if (!stepEl) {
             console.error(`Step element at index ${index} is null!`);
@@ -581,7 +587,7 @@ function handleNextClick() {
         // For recovery services, skip anodes and go straight to results
         if (selectedServiceKey === 'item_recovery') {
             nextStep = 8; // Skip directly to Results
-            // console.log('handleNextClick - Recovery service, skipping to results. nextStep:', nextStep);
+            console.log('handleNextClick - Item Recovery service detected, skipping anodes, going directly to step 8');
         } else {
             nextStep = 7; // Skip to Anodes (Step 7) for other flat rate services
             // console.log('handleNextClick - Flat rate service, skipping to step 7. nextStep:', nextStep);
