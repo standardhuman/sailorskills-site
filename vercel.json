@@ -4,6 +4,10 @@
     {
       "src": "server.js",
       "use": "@vercel/node"
+    },
+    {
+      "src": "!(server|api)/**",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
@@ -17,11 +21,35 @@
       "dest": "/server.js"
     },
     {
+      "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|svg|ico|json|pdf))",
+      "dest": "/$1"
+    },
+    {
       "src": "/quote/(.*)",
       "dest": "/server.js"
     },
     {
-      "src": "/(.*)",
+      "src": "/admin",
+      "dest": "/server.js"
+    },
+    {
+      "src": "/diving",
+      "dest": "/server.js"
+    },
+    {
+      "src": "/booking",
+      "dest": "/server.js"
+    },
+    {
+      "src": "/anode-quote",
+      "dest": "/server.js"
+    },
+    {
+      "src": "/comprehensive-quote",
+      "dest": "/server.js"
+    },
+    {
+      "src": "/",
       "dest": "/server.js"
     }
   ],
