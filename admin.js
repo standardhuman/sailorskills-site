@@ -1034,17 +1034,28 @@ export class AdminApp {
                     detailsHTML += `
                 <div class="charge-detail-row" style="font-size: 12px; color: #666;">
                     <span>Paint Condition:</span>
-                    <span>${paintLabel} (recorded for service log)</span>
+                    <span>${paintLabel}</span>
                 </div>`;
                 }
             }
 
             // Add anode details if any are selected
             if (this.anodeDetails && this.anodeDetails.count > 0) {
+                // Show individual anode types
+                if (this.anodeDetails.items && this.anodeDetails.items.length > 0) {
+                    this.anodeDetails.items.forEach(item => {
+                        detailsHTML += `
+                        <div class="charge-detail-row" style="font-size: 11px; color: #666; padding-left: 10px;">
+                            <span>${item.quantity}× ${item.name}</span>
+                            <span>$${item.subtotal.toFixed(2)}</span>
+                        </div>`;
+                    });
+                }
+
                 detailsHTML += `
                 <div class="charge-detail-row" style="font-size: 12px; color: #666;">
-                    <span>Anodes (${this.anodeDetails.count} items):</span>
-                    <span>$${this.anodeDetails.totalPrice.toFixed(2)}</span>
+                    <span><strong>Anodes Subtotal (${this.anodeDetails.count} items):</strong></span>
+                    <span><strong>$${this.anodeDetails.totalPrice.toFixed(2)}</strong></span>
                 </div>`;
 
                 // Add labor for anode installation (15 per anode)
