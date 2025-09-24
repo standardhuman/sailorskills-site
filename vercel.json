@@ -2,14 +2,37 @@
   "version": 2,
   "builds": [
     {
+      "src": "*.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "*.css",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "*.js",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "*.mjs",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "images/**",
+      "use": "@vercel/static"
+    },
+    {
       "src": "server.js",
       "use": "@vercel/node"
     }
   ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/server.js"
-    }
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/server.js" },
+    { "source": "/diving", "destination": "/diving.html" },
+    { "source": "/admin", "destination": "/admin-new.html" },
+    { "source": "/booking", "destination": "/booking.html" },
+    { "source": "/anode-quote", "destination": "/anode-quote.html" },
+    { "source": "/comprehensive-quote", "destination": "/comprehensive-quote.html" },
+    { "source": "/quote/:quoteNumber", "destination": "/quote-viewer.html" }
   ]
 }
