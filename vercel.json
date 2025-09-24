@@ -4,12 +4,76 @@
     {
       "src": "server.js",
       "use": "@vercel/node"
+    },
+    {
+      "src": "style.css",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "admin.css",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "*.js",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "*.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "images/**",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
     {
-      "src": "/(.*)",
-      "dest": "server.js"
+      "src": "/style\\.css",
+      "dest": "/style.css"
+    },
+    {
+      "src": "/admin\\.css",
+      "dest": "/admin.css"
+    },
+    {
+      "src": "/(.*\\.js)",
+      "dest": "/$1"
+    },
+    {
+      "src": "/images/(.*)",
+      "dest": "/images/$1"
+    },
+    {
+      "src": "/api/(.*)",
+      "dest": "/server.js"
+    },
+    {
+      "src": "/diving",
+      "dest": "/server.js"
+    },
+    {
+      "src": "/admin/?",
+      "dest": "/server.js"
+    },
+    {
+      "src": "/booking",
+      "dest": "/server.js"
+    },
+    {
+      "src": "/anode-quote",
+      "dest": "/server.js"
+    },
+    {
+      "src": "/comprehensive-quote",
+      "dest": "/server.js"
+    },
+    {
+      "src": "/quote/(.*)",
+      "dest": "/server.js"
+    },
+    {
+      "src": "/",
+      "dest": "/server.js"
     }
   ]
 }
