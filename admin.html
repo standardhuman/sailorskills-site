@@ -1554,45 +1554,60 @@
                             <div class="input-group" style="margin-bottom: 20px;">
                                 <label style="display: block; margin-bottom: 8px; font-weight: 600;">Actual Paint Condition</label>
                                 <div class="option-button-group" id="wizardPaintConditionButtons" style="display: flex; gap: 10px; flex-wrap: wrap;">
-                                    <button type="button" class="option-button" data-value="good" 
-                                            onclick="selectWizardPaintCondition('good')"
+                                    <button type="button" class="option-button" data-value="excellent"
+                                            onclick="selectWizardPaintCondition('excellent')"
                                             style="padding: 10px 20px; border: 2px solid #e0e0e0; background: white; border-radius: 8px; cursor: pointer;">
+                                        Excellent
+                                    </button>
+                                    <button type="button" class="option-button selected" data-value="good"
+                                            onclick="selectWizardPaintCondition('good')"
+                                            style="padding: 10px 20px; border: 2px solid #345475; background: rgba(52, 84, 117, 0.1); border-radius: 8px; cursor: pointer;">
                                         Good
                                     </button>
-                                    <button type="button" class="option-button selected" data-value="fair" 
+                                    <button type="button" class="option-button" data-value="fair"
                                             onclick="selectWizardPaintCondition('fair')"
-                                            style="padding: 10px 20px; border: 2px solid #345475; background: rgba(52, 84, 117, 0.1); border-radius: 8px; cursor: pointer;">
+                                            style="padding: 10px 20px; border: 2px solid #e0e0e0; background: white; border-radius: 8px; cursor: pointer;">
                                         Fair
                                     </button>
-                                    <button type="button" class="option-button" data-value="poor" 
+                                    <button type="button" class="option-button" data-value="poor"
                                             onclick="selectWizardPaintCondition('poor')"
                                             style="padding: 10px 20px; border: 2px solid #e0e0e0; background: white; border-radius: 8px; cursor: pointer;">
                                         Poor
                                     </button>
+                                    <button type="button" class="option-button" data-value="missing"
+                                            onclick="selectWizardPaintCondition('missing')"
+                                            style="padding: 10px 20px; border: 2px solid #e0e0e0; background: white; border-radius: 8px; cursor: pointer;">
+                                        Missing
+                                    </button>
                                 </div>
-                                <input type="hidden" id="wizardPaintCondition" value="fair">
+                                <input type="hidden" id="wizardPaintCondition" value="good">
                             </div>
                             
                             <div class="input-group">
                                 <label style="display: block; margin-bottom: 8px; font-weight: 600;">Actual Growth Level</label>
                                 <div class="option-button-group" id="wizardGrowthLevelButtons" style="display: flex; gap: 10px; flex-wrap: wrap;">
-                                    <button type="button" class="option-button" data-value="minimal" 
+                                    <button type="button" class="option-button selected" data-value="minimal"
                                             onclick="selectWizardGrowthLevel('minimal')"
-                                            style="padding: 10px 20px; border: 2px solid #e0e0e0; background: white; border-radius: 8px; cursor: pointer;">
+                                            style="padding: 10px 20px; border: 2px solid #345475; background: rgba(52, 84, 117, 0.1); border-radius: 8px; cursor: pointer;">
                                         Minimal
                                     </button>
-                                    <button type="button" class="option-button selected" data-value="moderate" 
+                                    <button type="button" class="option-button" data-value="moderate"
                                             onclick="selectWizardGrowthLevel('moderate')"
-                                            style="padding: 10px 20px; border: 2px solid #345475; background: rgba(52, 84, 117, 0.1); border-radius: 8px; cursor: pointer;">
+                                            style="padding: 10px 20px; border: 2px solid #e0e0e0; background: white; border-radius: 8px; cursor: pointer;">
                                         Moderate
                                     </button>
-                                    <button type="button" class="option-button" data-value="heavy" 
+                                    <button type="button" class="option-button" data-value="heavy"
                                             onclick="selectWizardGrowthLevel('heavy')"
                                             style="padding: 10px 20px; border: 2px solid #e0e0e0; background: white; border-radius: 8px; cursor: pointer;">
                                         Heavy
                                     </button>
+                                    <button type="button" class="option-button" data-value="severe"
+                                            onclick="selectWizardGrowthLevel('severe')"
+                                            style="padding: 10px 20px; border: 2px solid #e0e0e0; background: white; border-radius: 8px; cursor: pointer;">
+                                        Severe
+                                    </button>
                                 </div>
-                                <input type="hidden" id="wizardGrowthLevel" value="moderate">
+                                <input type="hidden" id="wizardGrowthLevel" value="minimal">
                             </div>
                         </div>
                     `;
@@ -2651,7 +2666,7 @@
                     wizardContainer.classList.remove('service-fade-container', 'fade-in');
                 }, 600);
             }, 400);
-        } */
+        }
         
         // Old wizard step functions removed - replaced by renderConsolidatedForm
         
