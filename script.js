@@ -1236,18 +1236,20 @@ function validateCheckoutForm() {
     const submitButton = document.getElementById('submit-order');
     const requiredInputs = document.querySelectorAll('#checkout-section input[required]:not([type="checkbox"]), #checkout-section select[required]');
     const agreementCheckbox = document.getElementById('service-agreement');
-    
+
     let allFieldsFilled = true;
     requiredInputs.forEach(input => {
         if (!input.value.trim()) {
             allFieldsFilled = false;
         }
     });
-    
-    const intervalSelected = selectedServiceInterval !== null;
+
+    // For item recovery, interval is not required (it's always one-time)
+    const isItemRecovery = selectedServiceKey === 'item_recovery';
+    const intervalSelected = isItemRecovery ? true : (selectedServiceInterval !== null);
     const agreementChecked = agreementCheckbox.checked;
     const cardComplete = cardElement && cardElement._complete;
-    
+
     if (allFieldsFilled && intervalSelected && agreementChecked && cardComplete) {
         submitButton.disabled = false;
     } else {
@@ -1420,11 +1422,12 @@ function showCheckout() {
         // For item recovery, show special location form
         if (boatInfoSection) boatInfoSection.style.display = 'none';
         if (itemRecoverySection) itemRecoverySection.style.display = 'block';
-        
+
         // Hide interval section and set to one-time
         intervalSection.style.display = 'none';
         orderData.interval = 'one-time';
-        
+        selectedServiceInterval = 'one-time'; // Set this for validation to work
+
         // Update required fields
         toggleRequiredFields(false, true);
     } else {
