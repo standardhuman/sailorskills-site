@@ -1659,6 +1659,23 @@
                 
                 // Update pricing and sync values
                 setTimeout(() => {
+                    // Attach event listeners to wizard buttons
+                    document.querySelectorAll('#wizardPaintConditionButtons button').forEach(btn => {
+                        btn.onclick = function() {
+                            if (window.selectWizardPaintCondition) {
+                                window.selectWizardPaintCondition(this.dataset.value);
+                            }
+                        };
+                    });
+
+                    document.querySelectorAll('#wizardGrowthLevelButtons button').forEach(btn => {
+                        btn.onclick = function() {
+                            if (window.selectWizardGrowthLevel) {
+                                window.selectWizardGrowthLevel(this.dataset.value);
+                            }
+                        };
+                    });
+
                     if (window.syncWizardValues) syncWizardValues();
                     if (window.calculateCost) window.calculateCost();
                     setTimeout(() => {
