@@ -985,18 +985,16 @@ function calculateCost() {
         checkoutButton.className = 'submit-button';
         checkoutButton.textContent = 'Proceed to Checkout';
         checkoutButton.style.marginTop = '20px';
-        checkoutButton.style.marginBottom = '30px';
+        checkoutButton.style.marginBottom = '10px';
         checkoutButton.addEventListener('click', showCheckout);
-        
-        // Insert button after the minimum fee text, before the breakdown
-        const resultSection = document.getElementById('step-8');
-        const minimumFeeText = resultSection.querySelector('.variable-info');
-        
-        if (minimumFeeText && minimumFeeText.nextSibling) {
-            // Insert after the minimum fee text
-            minimumFeeText.parentNode.insertBefore(checkoutButton, minimumFeeText.nextSibling);
+
+        // Insert button right before the navigation buttons (which contains Start Over)
+        const navButtons = document.querySelector('.navigation-buttons');
+        if (navButtons && navButtons.parentNode) {
+            navButtons.parentNode.insertBefore(checkoutButton, navButtons);
         } else {
-            // Fallback to appending at the end
+            // Fallback to appending at the end of results
+            const resultSection = document.getElementById('step-8');
             resultSection.appendChild(checkoutButton);
         }
     }

@@ -78,49 +78,68 @@ serve(async (req) => {
         zip: formData.billingZip
       })
 
-    // Create or update boat
-    const { data: boat } = await supabase
-      .from('boats')
-      .upsert({
-        customer_id: customer.id,
-        name: formData.boatName,
-        make: formData.boatMake,
-        model: formData.boatModel,
-        length: parseInt(formData.boatLength),
-        // Add other boat details from formData.serviceDetails if available
-      }, {
-        onConflict: 'customer_id,name'
-      })
-      .single()
+    // Create or update boat (skip for item recovery)
+    let boat = null;
+    if (formData.service !== 'Item Recovery') {
+      const boatResult = await supabase
+        .from('boats')
+        .upsert({
+          customer_id: customer.id,
+          name: formData.boatName,
+          make: formData.boatMake,
+          model: formData.boatModel,
+          length: parseInt(formData.boatLength) || 0,
+          // Add other boat details from formData.serviceDetails if available
+        }, {
+          onConflict: 'customer_id,name'
+        })
+        .single()
+      boat = boatResult.data;
+    }
 
-    // Create or get marina
-    const { data: marina } = await supabase
-      .from('marinas')
-      .upsert({
-        name: formData.marinaName
-      }, {
-        onConflict: 'name'
-      })
-      .single()
+    // Create or get marina (skip for item recovery)
+    let marina = null;
+    if (formData.service !== 'Item Recovery' && formData.marinaName && formData.marinaName !== 'See recovery location') {
+      const marinaResult = await supabase
+        .from('marinas')
+        .upsert({
+          name: formData.marinaName
+        }, {
+          onConflict: 'name'
+        })
+        .single()
+      marina = marinaResult.data;
+    }
 
     // Generate order number
     const orderNumber = `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 5).toUpperCase()}`
 
-    // Create service order
+    // Create service order with metadata for item recovery
+    const orderData: any = {
+      order_number: orderNumber,
+      customer_id: customer.id,
+      boat_id: boat?.id || null,
+      marina_id: marina?.id || null,
+      dock: formData.dock || null,
+      slip_number: formData.slipNumber || null,
+      service_type: formData.service,
+      service_interval: formData.serviceInterval || 'one-time',
+      estimated_amount: formData.estimate,
+      status: 'pending'
+    }
+
+    // Add item recovery specific metadata if applicable
+    if (formData.service === 'Item Recovery') {
+      orderData.metadata = {
+        recoveryLocation: formData.recoveryLocation,
+        itemDescription: formData.itemDescription,
+        lostDate: formData.dropDate
+      }
+    }
+
     const { data: order } = await supabase
       .from('service_orders')
-      .insert({
-        order_number: orderNumber,
-        customer_id: customer.id,
-        boat_id: boat?.id,
-        marina_id: marina?.id,
-        dock: formData.dock,
-        slip_number: formData.slipNumber,
-        service_type: formData.service,
-        service_interval: formData.serviceInterval,
-        estimated_amount: formData.estimate,
-        status: 'pending'
-      })
+      .insert(orderData)
       .single()
 
     // Create recurring schedule if applicable
