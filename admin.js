@@ -411,6 +411,13 @@ export class AdminApp {
                         <button class="category-btn" onclick="adminApp.filterByCategory('engine')">Engine/Outboard</button>
                     </div>
 
+                    <div id="shaftSubfilter" class="shaft-subfilter" style="display: none;">
+                        <div class="subfilter-label">Shaft Type:</div>
+                        <button class="subfilter-btn active" onclick="adminApp.filterShaftType('all')">All Shaft</button>
+                        <button class="subfilter-btn" onclick="adminApp.filterShaftType('standard')">Standard (Imperial)</button>
+                        <button class="subfilter-btn" onclick="adminApp.filterShaftType('metric')">Metric</button>
+                    </div>
+
                     <div id="anodeGrid" class="anode-grid" style="max-height: 400px; overflow-y: auto;">
                         <!-- Anodes will be populated here -->
                     </div>
@@ -496,6 +503,13 @@ export class AdminApp {
                         <button class="category-btn" onclick="adminApp.filterByCategory('propeller')">Propeller</button>
                         <button class="category-btn" onclick="adminApp.filterByCategory('hull')">Hull</button>
                         <button class="category-btn" onclick="adminApp.filterByCategory('engine')">Engine/Outboard</button>
+                    </div>
+
+                    <div id="shaftSubfilter" class="shaft-subfilter" style="display: none;">
+                        <div class="subfilter-label">Shaft Type:</div>
+                        <button class="subfilter-btn active" onclick="adminApp.filterShaftType('all')">All Shaft</button>
+                        <button class="subfilter-btn" onclick="adminApp.filterShaftType('standard')">Standard (Imperial)</button>
+                        <button class="subfilter-btn" onclick="adminApp.filterShaftType('metric')">Metric</button>
                     </div>
 
                     <div id="anodeGrid" class="anode-grid" style="max-height: 400px; overflow-y: auto;">
@@ -628,13 +642,104 @@ export class AdminApp {
         // Update active button
         document.querySelectorAll('.category-btn').forEach(btn => {
             btn.classList.remove('active');
-            if (btn.textContent.toLowerCase() === category) {
+            if (btn.textContent.toLowerCase().includes(category.toLowerCase()) ||
+                (category === 'all' && btn.textContent === 'All') ||
+                (category === 'engine' && btn.textContent.includes('Engine'))) {
                 btn.classList.add('active');
             }
         });
 
+        // Show/hide shaft subfilter
+        const shaftSubfilter = document.getElementById('shaftSubfilter');
+        if (shaftSubfilter) {
+            if (category === 'shaft') {
+                shaftSubfilter.style.display = 'flex';
+                // Reset shaft subfilter to "All Shaft"
+                document.querySelectorAll('.subfilter-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.textContent.includes('All Shaft')) {
+                        btn.classList.add('active');
+                    }
+                });
+            } else {
+                shaftSubfilter.style.display = 'none';
+            }
+        }
+
+        // Store current category for shaft subfiltering
+        this.currentCategory = category;
+
         const searchTerm = document.getElementById('anodeSearch')?.value || '';
         this.displayAnodes(category, searchTerm);
+    }
+
+    filterShaftType(type) {
+        // Update active subfilter button
+        document.querySelectorAll('.subfilter-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if ((type === 'all' && btn.textContent.includes('All')) ||
+                (type === 'standard' && btn.textContent.includes('Standard')) ||
+                (type === 'metric' && btn.textContent.includes('Metric'))) {
+                btn.classList.add('active');
+            }
+        });
+
+        // Filter anodes based on shaft type
+        const searchTerm = document.getElementById('anodeSearch')?.value || '';
+
+        if (type === 'all') {
+            this.displayAnodes('shaft', searchTerm);
+        } else {
+            // Custom filtering for standard vs metric
+            this.displayAnodesWithShaftType(type, searchTerm);
+        }
+    }
+
+    displayAnodesWithShaftType(shaftType, searchTerm = '') {
+        if (!this.anodeCatalog) return;
+
+        const grid = document.getElementById('anodeGrid');
+        let filtered = this.anodeCatalog;
+
+        // Filter by shaft category and type
+        filtered = filtered.filter(anode => {
+            const cat = (anode.category || '').toLowerCase();
+            if (shaftType === 'standard') {
+                return cat === 'shaft_anodes_standard';
+            } else if (shaftType === 'metric') {
+                return cat === 'shaft_anodes_metric';
+            }
+            return false;
+        });
+
+        // Filter by search term
+        if (searchTerm) {
+            const term = searchTerm.toLowerCase();
+            filtered = filtered.filter(anode =>
+                anode.name.toLowerCase().includes(term) ||
+                (anode.sku || '').toLowerCase().includes(term)
+            );
+        }
+
+        // Display anodes
+        grid.innerHTML = filtered.map(anode => {
+            const quantity = this.selectedAnodes[anode.sku]?.quantity || 0;
+            const price = typeof anode.list_price === 'string' ?
+                parseFloat(anode.list_price.replace('$', '')) :
+                anode.list_price;
+
+            return `
+                <div class="anode-item">
+                    <div class="anode-name">${anode.name}</div>
+                    <div class="anode-price">$${price.toFixed(2)}</div>
+                    <div class="anode-controls">
+                        <button onclick="adminApp.updateAnodeQuantity('${anode.sku}', -1, ${price}, '${anode.name}')">−</button>
+                        <span class="quantity">${quantity}</span>
+                        <button onclick="adminApp.updateAnodeQuantity('${anode.sku}', 1, ${price}, '${anode.name}')">+</button>
+                    </div>
+                </div>
+            `;
+        }).join('');
     }
 
     updateAnodeQuantity(sku, change, price, name) {
