@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Charge Customer | Sailor Skills</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+    <!-- Hero Header -->
+    <div class="hero-header">
+        <div class="hero-content">
+            <div class="hero-brand">SAILOR SKILLS</div>
+            <div class="hero-service">ADMIN</div>
+            <div class="hero-tagline">CHARGE CUSTOMER</div>
+        </div>
+    </div>
+
+    <div class="admin-container">
+        <!-- Customer Selection -->
+        <div class="customer-section">
+            <h2>Select Customer</h2>
+            <div class="customer-search">
+                <input type="text" id="customerSearch" placeholder="Search customers by name or email">
+                <button onclick="adminApp.searchCustomers()">Search</button>
+                <button onclick="adminApp.loadRecentCustomers()">Show Recent</button>
+            </div>
+            <div id="customerList" class="customer-list"></div>
+            <div id="selectedCustomer" class="selected-customer"></div>
+        </div>
+
+        <!-- Service Selection -->
+        <div class="service-selector">
+            <h2>Select Service Type</h2>
+            <div id="serviceButtons" class="service-buttons"></div>
+            <div id="wizardContainer" style="display: none;">
+                <div id="wizardContent"></div>
+            </div>
+        </div>
+
+        <!-- Charge Summary -->
+        <div class="charge-summary">
+            <h2>💳 Charge Summary</h2>
+            <div id="chargeDetails">
+                Select a customer and service to see details
+            </div>
+            <button id="chargeButton" class="charge-button" disabled onclick="adminApp.chargeCustomer()">
+                💳 Charge Customer
+            </button>
+        </div>
+    </div>
+
+    <!-- Customer Selection Modal -->
+    <div id="customerSelectionModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close" onclick="adminApp.closeCustomerModal()">&times;</span>
+            <h2>Select or Enter Customer Details</h2>
+
+            <div class="modal-tabs">
+                <button class="tab-button active" onclick="adminApp.showTab('existing')">
+                    Select Existing Customer
+                </button>
+                <button class="tab-button" onclick="adminApp.showTab('manual')">
+                    Enter Manual Details
+                </button>
+            </div>
+
+            <div id="existingCustomerTab" class="tab-content">
+                <input type="text" id="modalCustomerSearch" placeholder="Search customers...">
+                <div id="modalCustomerList"></div>
+                <button onclick="adminApp.proceedWithSelectedCustomer()">Select Customer</button>
+            </div>
+
+            <div id="manualEntryTab" class="tab-content" style="display: none;">
+                <input type="text" id="manualCustomerName" placeholder="Customer Name">
+                <input type="email" id="manualCustomerEmail" placeholder="Email">
+                <input type="tel" id="manualCustomerPhone" placeholder="Phone">
+                <input type="text" id="manualBoatName" placeholder="Boat Name">
+                <button onclick="adminApp.proceedWithManualCustomer()">Create Customer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden fields for boat configuration -->
+    <input type="hidden" id="boatLength" value="">
+    <input type="hidden" id="actualPaintCondition" value="">
+    <input type="hidden" id="actualGrowthLevel" value="">
+
+    <script src="https://js.stripe.com/v3/"></script>
+    <script src="script.js" type="module"></script>
+    <script src="admin.js" type="module"></script>
+</body>
+</html>

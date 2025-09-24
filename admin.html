@@ -2464,11 +2464,14 @@
     <script type="module">
         try {
             console.log('Module script starting execution');
-        let selectedCustomer = null;
-        let customers = [];
 
-        // Wait for script.js to load completely
-        function initializePage() {
+            let selectedCustomer = null;
+            let customers = [];
+
+            console.log('Variables declared successfully');
+
+            // Wait for script.js to load completely
+            function initializePage() {
             // Make sure serviceButtons and servicePriceExplainer elements are available globally
             window.serviceButtons = document.getElementById('serviceButtons');
             window.servicePriceExplainer = document.getElementById('servicePriceExplainer');
@@ -2533,9 +2536,19 @@
         }
         
         // Initialize on page load
+        console.log('Adding DOMContentLoaded listener');
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOMContentLoaded event fired');
             initializePage();
         });
+
+        // If DOM is already ready, initialize immediately
+        if (document.readyState !== 'loading') {
+            console.log('DOM already ready, initializing immediately');
+            initializePage();
+        }
+
+        console.log('Checkpoint 1: After initializePage setup');
 
         // Load recent customers
         async function loadRecentCustomers() {
@@ -3713,6 +3726,8 @@
             console.log('Replaced click handlers for', serviceButtons.length, 'service buttons');
         }, 500); // Wait for buttons to be populated
 
+        console.log('Checkpoint 2: Before updateChargeSummary definition');
+
         // Update charge summary to include both services and anodes
         function updateChargeSummary() {
             const chargeDetails = document.getElementById('chargeDetails');
@@ -4059,9 +4074,13 @@
             }
         }
         
+        console.log('Checkpoint 3: Before making functions global');
+
         // Make functions globally available
         window.chargeCustomer = chargeCustomer;
         window.updateChargeSummary = updateChargeSummary;
+
+        console.log('Checkpoint 4: Functions made global, updateChargeSummary:', typeof window.updateChargeSummary);
 
         // If a service was already selected before this script loaded, update the summary now
         if (window.currentServiceKey) {
@@ -4703,8 +4722,10 @@
             }
         }; // End of chargeAnodes function
 
-        } catch (err) {
-            console.error('Module script error:', err);
+        console.log('Module script completed successfully');
+        }} catch (err) {
+            console.error('Module script error caught:', err);
+            console.error('Error stack:', err.stack);
         }
     </script>
 </body>
