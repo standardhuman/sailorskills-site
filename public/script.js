@@ -190,7 +190,7 @@ function populateServiceButtons() {
             button.className += ' cleaning-service';
         }
         // Add special class for underwater inspection to make it full-width
-        if (key === 'underwater_inspection') {
+        if (key === 'underwater_inspection' || key === 'anodes_only') {
             button.className += ' full-width-service';
         }
         button.dataset.serviceKey = key;
@@ -204,6 +204,8 @@ function populateServiceButtons() {
         priceDiv.className = 'service-price';
         if (service.type === 'per_foot') {
             priceDiv.textContent = `$${service.rate} per foot`;
+        } else if (key === 'anodes_only') {
+            priceDiv.textContent = 'Per anode rate';
         } else {
             priceDiv.textContent = `$${service.rate} flat rate`;
         }
