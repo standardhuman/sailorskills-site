@@ -200,6 +200,12 @@ export class AdminApp {
                     </label>
                 </div>
 
+                <div class="wizard-field">
+                    <button class="btn-primary anode-button" onclick="adminApp.openAnodeWizard()">
+                        ⚓ Add Anodes to Service
+                    </button>
+                </div>
+
                 <div class="wizard-actions">
                     <button onclick="adminApp.closeWizard()" class="btn-secondary">← Back to Services</button>
                 </div>
@@ -371,6 +377,228 @@ export class AdminApp {
         window.currentServiceKey = null;
         window.selectedServiceKey = null;
         this.updateChargeSummary();
+    }
+
+    openAnodeWizard() {
+        // Save current wizard state
+        const currentWizard = document.getElementById('wizardContent').innerHTML;
+
+        // Load anode selector interface
+        document.getElementById('wizardContent').innerHTML = `
+            <div class="admin-wizard">
+                <h3>⚓ Select Anodes to Add</h3>
+
+                <div class="anode-selector">
+                    <div class="wizard-field">
+                        <input type="text" id="anodeSearch" class="search-input"
+                               placeholder="Search anodes by name or SKU..."
+                               oninput="adminApp.filterAnodes(this.value)">
+                    </div>
+
+                    <div class="anode-categories">
+                        <button class="category-btn active" onclick="adminApp.filterByCategory('all')">All</button>
+                        <button class="category-btn" onclick="adminApp.filterByCategory('shaft')">Shaft</button>
+                        <button class="category-btn" onclick="adminApp.filterByCategory('prop')">Prop</button>
+                        <button class="category-btn" onclick="adminApp.filterByCategory('rudder')">Rudder</button>
+                        <button class="category-btn" onclick="adminApp.filterByCategory('trim-tab')">Trim Tab</button>
+                        <button class="category-btn" onclick="adminApp.filterByCategory('hull')">Hull</button>
+                        <button class="category-btn" onclick="adminApp.filterByCategory('engine')">Engine</button>
+                    </div>
+
+                    <div id="anodeGrid" class="anode-grid" style="max-height: 400px; overflow-y: auto;">
+                        <!-- Anodes will be populated here -->
+                    </div>
+                </div>
+
+                <div class="selected-anodes">
+                    <h4>Selected Anodes: <span id="selectedCount">0</span></h4>
+                    <div id="selectedAnodesList"></div>
+                    <div class="anode-total">
+                        <strong>Anodes Subtotal: $<span id="anodeSubtotal">0.00</span></strong>
+                    </div>
+                </div>
+
+                <div class="wizard-actions">
+                    <button onclick="adminApp.closeAnodeWizard('${btoa(currentWizard)}')" class="btn-secondary">← Back to Service</button>
+                    <button onclick="adminApp.confirmAnodeSelection('${btoa(currentWizard)}')" class="btn-primary">✓ Add Selected Anodes</button>
+                </div>
+            </div>
+        `;
+
+        // Load anode catalog
+        this.loadAnodeCatalog();
+    }
+
+    closeAnodeWizard(encodedWizard) {
+        // Restore previous wizard state
+        document.getElementById('wizardContent').innerHTML = atob(encodedWizard);
+        this.updateFromWizard();
+    }
+
+    confirmAnodeSelection(encodedWizard) {
+        // Store selected anodes count and calculate pricing
+        const selectedAnodes = this.getSelectedAnodes();
+        document.getElementById('anodesToInstall').value = selectedAnodes.count;
+
+        // Store anode details for charge summary
+        this.anodeDetails = selectedAnodes;
+
+        // Restore wizard and update pricing
+        document.getElementById('wizardContent').innerHTML = atob(encodedWizard);
+        this.updateFromWizard();
+    }
+
+    async loadAnodeCatalog() {
+        try {
+            // Try loading from multiple possible locations
+            let response = await fetch('/full-boatzincs-catalog.json');
+            if (!response.ok) {
+                response = await fetch('/anode-catalog.json');
+            }
+
+            const data = await response.json();
+            this.anodeCatalog = data.anodes || data;
+            this.selectedAnodes = {};
+            this.displayAnodes();
+        } catch (error) {
+            console.error('Failed to load anode catalog:', error);
+            document.getElementById('anodeGrid').innerHTML = '<p>Failed to load anode catalog</p>';
+        }
+    }
+
+    displayAnodes(category = 'all', searchTerm = '') {
+        if (!this.anodeCatalog) return;
+
+        const grid = document.getElementById('anodeGrid');
+        let filtered = this.anodeCatalog;
+
+        // Filter by category
+        if (category !== 'all') {
+            filtered = filtered.filter(anode => {
+                const cat = (anode.category || '').toLowerCase();
+                return cat.includes(category);
+            });
+        }
+
+        // Filter by search term
+        if (searchTerm) {
+            const term = searchTerm.toLowerCase();
+            filtered = filtered.filter(anode =>
+                anode.name.toLowerCase().includes(term) ||
+                (anode.sku || '').toLowerCase().includes(term)
+            );
+        }
+
+        // Display anodes
+        grid.innerHTML = filtered.map(anode => {
+            const quantity = this.selectedAnodes[anode.sku]?.quantity || 0;
+            const price = typeof anode.list_price === 'string' ?
+                parseFloat(anode.list_price.replace('$', '')) :
+                anode.list_price;
+
+            return `
+                <div class="anode-item">
+                    <div class="anode-name">${anode.name}</div>
+                    <div class="anode-price">$${price.toFixed(2)}</div>
+                    <div class="anode-controls">
+                        <button onclick="adminApp.updateAnodeQuantity('${anode.sku}', -1, ${price}, '${anode.name}')">−</button>
+                        <span class="quantity">${quantity}</span>
+                        <button onclick="adminApp.updateAnodeQuantity('${anode.sku}', 1, ${price}, '${anode.name}')">+</button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    filterAnodes(searchTerm) {
+        const activeCategory = document.querySelector('.category-btn.active')?.textContent.toLowerCase() || 'all';
+        this.displayAnodes(activeCategory, searchTerm);
+    }
+
+    filterByCategory(category) {
+        // Update active button
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.textContent.toLowerCase() === category) {
+                btn.classList.add('active');
+            }
+        });
+
+        const searchTerm = document.getElementById('anodeSearch')?.value || '';
+        this.displayAnodes(category, searchTerm);
+    }
+
+    updateAnodeQuantity(sku, change, price, name) {
+        if (!this.selectedAnodes[sku]) {
+            this.selectedAnodes[sku] = { quantity: 0, price, name };
+        }
+
+        this.selectedAnodes[sku].quantity = Math.max(0, this.selectedAnodes[sku].quantity + change);
+
+        if (this.selectedAnodes[sku].quantity === 0) {
+            delete this.selectedAnodes[sku];
+        }
+
+        // Update display
+        this.updateAnodeSelection();
+        const searchTerm = document.getElementById('anodeSearch')?.value || '';
+        const activeCategory = document.querySelector('.category-btn.active')?.textContent.toLowerCase() || 'all';
+        this.displayAnodes(activeCategory, searchTerm);
+    }
+
+    updateAnodeSelection() {
+        const list = document.getElementById('selectedAnodesList');
+        const countEl = document.getElementById('selectedCount');
+        const subtotalEl = document.getElementById('anodeSubtotal');
+
+        let totalCount = 0;
+        let totalPrice = 0;
+
+        const items = Object.entries(this.selectedAnodes).filter(([_, data]) => data.quantity > 0);
+
+        if (items.length === 0) {
+            list.innerHTML = '<div style="color: #999;">No anodes selected</div>';
+        } else {
+            list.innerHTML = items.map(([sku, data]) => {
+                totalCount += data.quantity;
+                totalPrice += data.quantity * data.price;
+                return `
+                    <div style="display: flex; justify-content: space-between; margin: 5px 0;">
+                        <span>${data.quantity}× ${data.name}</span>
+                        <span>$${(data.quantity * data.price).toFixed(2)}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        countEl.textContent = totalCount;
+        subtotalEl.textContent = totalPrice.toFixed(2);
+    }
+
+    getSelectedAnodes() {
+        let totalCount = 0;
+        let totalPrice = 0;
+        const items = [];
+
+        Object.entries(this.selectedAnodes || {}).forEach(([sku, data]) => {
+            if (data.quantity > 0) {
+                totalCount += data.quantity;
+                totalPrice += data.quantity * data.price;
+                items.push({
+                    sku,
+                    name: data.name,
+                    quantity: data.quantity,
+                    price: data.price,
+                    subtotal: data.quantity * data.price
+                });
+            }
+        });
+
+        return {
+            count: totalCount,
+            totalPrice,
+            items
+        };
     }
 
     confirmWizardSelection() {
@@ -546,6 +774,26 @@ export class AdminApp {
                     <span>${paintLabel} (recorded for service log)</span>
                 </div>`;
                 }
+            }
+
+            // Add anode details if any are selected
+            if (this.anodeDetails && this.anodeDetails.count > 0) {
+                detailsHTML += `
+                <div class="charge-detail-row" style="font-size: 12px; color: #666;">
+                    <span>Anodes (${this.anodeDetails.count} items):</span>
+                    <span>$${this.anodeDetails.totalPrice.toFixed(2)}</span>
+                </div>`;
+
+                // Add labor for anode installation (15 per anode)
+                const laborCost = this.anodeDetails.count * 15;
+                detailsHTML += `
+                <div class="charge-detail-row" style="font-size: 12px; color: #666;">
+                    <span>Anode Labor (${this.anodeDetails.count} × $15):</span>
+                    <span>$${laborCost.toFixed(2)}</span>
+                </div>`;
+
+                // Update total price to include anodes
+                price += this.anodeDetails.totalPrice + laborCost;
             }
 
             detailsHTML += `
