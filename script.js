@@ -1273,39 +1273,50 @@ async function handleOrderSubmission() {
     const submitButton = document.getElementById('submit-order');
     submitButton.disabled = true;
     submitButton.textContent = 'Processing...';
-    
-    // Collect form data
-    const formData = {
-        boatName: document.getElementById('boat-name').value,
-        boatLength: document.getElementById('boat-length-checkout').value,
-        boatMake: document.getElementById('boat-make').value,
-        boatModel: document.getElementById('boat-model').value,
-        marinaName: document.getElementById('marina-name').value,
-        dock: document.getElementById('dock').value,
-        slipNumber: document.getElementById('slip-number').value,
-        serviceInterval: selectedServiceInterval,
-        customerName: document.getElementById('customer-name').value,
-        customerEmail: document.getElementById('customer-email').value,
-        customerPhone: document.getElementById('customer-phone').value,
-        billingAddress: document.getElementById('billing-address').value,
-        billingCity: document.getElementById('billing-city').value,
-        billingState: document.getElementById('billing-state').value,
-        billingZip: document.getElementById('billing-zip').value,
-        customerBirthday: document.getElementById('customer-birthday').value,
-        customerNotes: document.getElementById('customer-notes').value,
-        estimate: orderData.estimate,
-        service: orderData.service,
-        serviceDetails: orderData.serviceDetails
-    };
-    
-    // Add item recovery fields if applicable
-    if (selectedServiceKey === 'item_recovery') {
-        formData.recoveryLocation = document.getElementById('recovery-location').value;
-        formData.itemDescription = document.getElementById('item-description').value;
-        formData.dropDate = document.getElementById('drop-date').value;
-    }
-    
+
     try {
+        // Collect form data based on service type
+        let formData = {
+            serviceInterval: selectedServiceInterval,
+            customerName: document.getElementById('customer-name').value,
+            customerEmail: document.getElementById('customer-email').value,
+            customerPhone: document.getElementById('customer-phone').value,
+            billingAddress: document.getElementById('billing-address').value,
+            billingCity: document.getElementById('billing-city').value,
+            billingState: document.getElementById('billing-state').value,
+            billingZip: document.getElementById('billing-zip').value,
+            customerNotes: document.getElementById('customer-notes')?.value || '',
+            estimate: orderData.estimate,
+            service: orderData.service,
+            serviceDetails: orderData.serviceDetails
+        };
+
+        // Add item recovery specific fields
+        if (selectedServiceKey === 'item_recovery') {
+            formData.recoveryLocation = document.getElementById('recovery-location').value;
+            formData.itemDescription = document.getElementById('item-description').value;
+            formData.dropDate = document.getElementById('drop-date').value;
+            // For item recovery, use location as the "marina" info
+            formData.marinaName = 'See recovery location';
+            formData.boatName = 'N/A - Item Recovery';
+            formData.boatLength = '0';
+            formData.boatMake = 'N/A';
+            formData.boatModel = 'N/A';
+            formData.dock = 'N/A';
+            formData.slipNumber = 'N/A';
+        } else {
+            // Add boat-specific fields for other services
+            formData.boatName = document.getElementById('boat-name')?.value || '';
+            formData.boatLength = document.getElementById('boat-length-checkout')?.value || '';
+            formData.boatMake = document.getElementById('boat-make')?.value || '';
+            formData.boatModel = document.getElementById('boat-model')?.value || '';
+            formData.marinaName = document.getElementById('marina-name')?.value || '';
+            formData.dock = document.getElementById('dock')?.value || '';
+            formData.slipNumber = document.getElementById('slip-number')?.value || '';
+        }
+
+        console.log('Submitting order with data:', formData);
+
         // Call Supabase Edge Function to create payment intent
         const response = await fetch(`${SUPABASE_FUNCTIONS_URL}/create-payment-intent`, {
             method: 'POST',
@@ -1375,8 +1386,23 @@ async function handleOrderSubmission() {
         showOrderConfirmation(orderNumber);
         
     } catch (error) {
-        console.error('Error:', error);
-        alert('There was an error processing your order. Please try again.');
+        console.error('Order submission error:', error);
+
+        // Show more detailed error message
+        let errorMessage = 'There was an error processing your order. ';
+        if (error.message) {
+            if (error.message.includes('fetch')) {
+                errorMessage += 'Unable to connect to payment server. Please check your internet connection and try again.';
+            } else if (error.message.includes('payment')) {
+                errorMessage += 'Payment processing failed. Please check your card details and try again.';
+            } else {
+                errorMessage += error.message;
+            }
+        } else {
+            errorMessage += 'Please try again or contact support.';
+        }
+
+        alert(errorMessage);
         submitButton.disabled = false;
         submitButton.textContent = 'Complete Order';
     }
