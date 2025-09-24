@@ -1201,20 +1201,26 @@ function setupCheckoutListeners() {
     
     // Agreement checkbox
     const agreementCheckbox = document.getElementById('service-agreement');
-    agreementCheckbox.addEventListener('change', validateCheckoutForm);
+    if (agreementCheckbox) {
+        agreementCheckbox.addEventListener('change', validateCheckoutForm);
+    }
     
     // Submit button
     const submitButton = document.getElementById('submit-order');
-    submitButton.addEventListener('click', handleOrderSubmission);
+    if (submitButton) {
+        submitButton.addEventListener('click', handleOrderSubmission);
+    }
     
     // Back to calculator button
     const backToCalcButton = document.getElementById('back-to-calculator');
-    backToCalcButton.addEventListener('click', function() {
-        checkoutSection.style.display = 'none';
-        stepElements[stepElements.length - 1].style.display = 'block'; // Show results
-        document.querySelector('.navigation-buttons').style.display = 'flex';
-        document.querySelector('.service-info-section').style.display = 'block';
-    });
+    if (backToCalcButton) {
+        backToCalcButton.addEventListener('click', function() {
+            checkoutSection.style.display = 'none';
+            stepElements[stepElements.length - 1].style.display = 'block'; // Show results
+            document.querySelector('.navigation-buttons').style.display = 'flex';
+            document.querySelector('.service-info-section').style.display = 'block';
+        });
+    }
 }
 
 // Validate checkout form

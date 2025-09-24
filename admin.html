@@ -1272,6 +1272,25 @@
         
         <!-- Define selectServiceDirect and wizard functions immediately -->
         <script>
+            // Update pricing display in wizard
+            window.updateWizardPricing = function() {
+                const wizardCostBreakdown = document.getElementById('wizardCostBreakdown');
+                const wizardTotalPrice = document.getElementById('wizardTotalPrice');
+                const costBreakdown = document.getElementById('costBreakdown');
+                const totalCostDisplay = document.getElementById('totalCostDisplay');
+
+                if (wizardCostBreakdown && costBreakdown) {
+                    // Use textContent for <pre> element, and format it nicely
+                    const breakdown = costBreakdown.textContent || 'Calculating...';
+                    wizardCostBreakdown.innerHTML = breakdown.replace(/\n/g, '<br>').replace(/•/g, '<br>•');
+                }
+
+                if (wizardTotalPrice && totalCostDisplay) {
+                    const totalText = totalCostDisplay.textContent || '$0.00';
+                    wizardTotalPrice.innerHTML = `<strong>Total: ${totalText}</strong>`;
+                }
+            }
+
             // Define wizard paint condition selection function
             window.selectWizardPaintCondition = function(value) {
                 document.querySelectorAll('#wizardPaintConditionButtons .option-button').forEach(btn => {
@@ -1375,13 +1394,14 @@
                             </div>
                         `;
                         
-                        // Call renderConsolidatedForm immediately - it's now always available
+                        // Call renderConsolidatedForm after a longer delay to ensure module script loads
                         const isCleaningService = serviceKey === 'onetime_cleaning' || serviceKey === 'recurring_cleaning';
-                        window.renderConsolidatedForm(isCleaningService, serviceKey);
-                        
-                        // Try again after a delay in case the full version loads later
+                        // Wait for module script to load and override the stub
                         setTimeout(() => {
-                            window.renderConsolidatedForm(isCleaningService, serviceKey);
+                            if (window.renderConsolidatedForm) {
+                                console.log('Calling renderConsolidatedForm from selectServiceDirect');
+                                window.renderConsolidatedForm(isCleaningService, serviceKey);
+                            }
                         }, 1000);
                     }
                 }
@@ -1578,15 +1598,15 @@
                 }
             };
             
-            // Define renderConsolidatedForm immediately with full functionality
+            // Define renderConsolidatedForm here immediately - don't wait for module script
             window.renderConsolidatedForm = function(isCleaningService, serviceKey) {
-                console.log('renderConsolidatedForm called for', serviceKey);
+                console.log('Immediate renderConsolidatedForm called for', serviceKey);
                 const wizardContent = document.getElementById('wizardContent');
                 if (!wizardContent) return;
-                
+
                 const service = window.serviceData ? window.serviceData[serviceKey] : null;
                 const serviceName = service ? service.name : 'Service';
-                
+
                 // Build the form HTML
                 let html = `
                     <div class="consolidated-form">
@@ -1738,7 +1758,26 @@
                         };
                     });
 
-                    if (window.syncWizardValues) syncWizardValues();
+                    // Add boat length sync event listener directly
+                    const wizardBoatLengthInput = document.getElementById('wizardBoatLength');
+                    if (wizardBoatLengthInput) {
+                        wizardBoatLengthInput.addEventListener('input', function() {
+                            const boatLengthHidden = document.getElementById('boatLength');
+                            if (boatLengthHidden) {
+                                boatLengthHidden.value = this.value;
+                                console.log('Boat length synced to:', this.value);
+                                if (window.calculateCost) {
+                                    window.calculateCost();
+                                    console.log('calculateCost called after boat length change');
+                                }
+                                if (window.updateWizardPricing) {
+                                    window.updateWizardPricing();
+                                    console.log('updateWizardPricing called after boat length change');
+                                }
+                            }
+                        });
+                    }
+
                     if (window.calculateCost) window.calculateCost();
                     setTimeout(() => {
                         if (window.updateWizardPricing) window.updateWizardPricing();
@@ -2159,7 +2198,8 @@
     </script>
     <script src="script.js" type="module"></script>
     <script type="module">
-        console.log('Module script starting execution');
+        try {
+            console.log('Module script starting execution');
         let selectedCustomer = null;
         let customers = [];
 
@@ -2771,7 +2811,8 @@
                 formHTML += `
                     <div class="input-group">
                         <label for="wizardBoatLength">Boat Length (feet)</label>
-                        <input type="text" id="wizardBoatLength" placeholder="e.g., 35, 42, 50" value="35" 
+                        <input type="text" id="wizardBoatLength" placeholder="e.g., 35, 42, 50"
+                               value="${document.getElementById('boatLength')?.value || '35'}"
                                style="font-size: 18px; padding: 14px; width: 100%; border: 2px solid #ddd; border-radius: 8px;">
                     </div>`;
             }
@@ -2959,40 +3000,27 @@
                 document.head.appendChild(style);
             }
             
-            // Sync values with hidden inputs
-            syncWizardValues();
-            
-            // Calculate and show price in wizard
+            // Ensure boat length has a default value if not set
+            const boatLengthHidden = document.getElementById('boatLength');
+            if (boatLengthHidden && !boatLengthHidden.value) {
+                boatLengthHidden.value = '35';
+            }
+
+            // Sync values with hidden inputs and calculate price - needs delay for DOM to be ready
             setTimeout(() => {
+                syncWizardValues();
+
+                console.log('Initial calculation on wizard load');
                 if (window.calculateCost) {
                     window.calculateCost();
+                    console.log('calculateCost called on wizard initialization');
                 }
-                updateWizardPricing();
+                if (window.updateWizardPricing) {
+                    window.updateWizardPricing();
+                    console.log('updateWizardPricing called on wizard initialization');
+                }
             }, 100);
         }
-        
-        // Update pricing display in wizard
-        function updateWizardPricing() {
-            const wizardCostBreakdown = document.getElementById('wizardCostBreakdown');
-            const wizardTotalPrice = document.getElementById('wizardTotalPrice');
-            const costBreakdown = document.getElementById('costBreakdown');
-            const totalCostDisplay = document.getElementById('totalCostDisplay');
-
-            if (wizardCostBreakdown && costBreakdown) {
-                // Use textContent for <pre> element, and format it nicely
-                const breakdown = costBreakdown.textContent || 'Calculating...';
-                wizardCostBreakdown.innerHTML = breakdown.replace(/\n/g, '<br>').replace(/•/g, '<br>•');
-            }
-
-            if (wizardTotalPrice && totalCostDisplay) {
-                const totalText = totalCostDisplay.textContent || '$0.00';
-                wizardTotalPrice.innerHTML = `<strong>Total: ${totalText}</strong>`;
-            }
-        }
-        
-        // Make updateWizardPricing globally available
-        window.updateWizardPricing = updateWizardPricing;
-        console.log('Assigned updateWizardPricing to window');
 
         // Sync wizard values with hidden form inputs
         function syncWizardValues() {
@@ -3008,13 +3036,30 @@
             // Sync boat length (only if it exists for per-foot services)
             const wizardBoatLength = document.getElementById('wizardBoatLength');
             if (wizardBoatLength) {
+                // Set initial value from hidden input
+                const boatLength = document.getElementById('boatLength');
+                if (boatLength && boatLength.value) {
+                    wizardBoatLength.value = boatLength.value;
+                }
+
                 wizardBoatLength.addEventListener('input', function() {
                     const boatLength = document.getElementById('boatLength');
                     if (boatLength) {
                         boatLength.value = this.value;
-                        if (window.calculateCost) window.calculateCost();
-                        updateChargeSummary();
-                        updateWizardPricing();
+                        console.log('Boat length synced to:', this.value);
+
+                        // Trigger calculations immediately
+                        if (window.calculateCost) {
+                            window.calculateCost();
+                            console.log('calculateCost called after boat length change');
+                        }
+                        if (window.updateChargeSummary) {
+                            window.updateChargeSummary();
+                        }
+                        if (window.updateWizardPricing) {
+                            window.updateWizardPricing();
+                            console.log('updateWizardPricing called after boat length change');
+                        }
                     }
                 });
             } else {
@@ -4134,6 +4179,9 @@
             } catch (error) {
                 showResult('error', 'Failed to charge customer: ' + error.message);
             }
+        }
+        } catch (err) {
+            console.error('Module script error:', err);
         }
     </script>
 </body>
