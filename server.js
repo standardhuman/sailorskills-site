@@ -43,7 +43,8 @@ app.use((req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`Server running at http://localhost:${PORT}`);
+    console.log(`🚀 Server running at http://localhost:${PORT}`);
+    console.log('📁 Auto-reload enabled with nodemon');
     console.log('Available routes:');
     console.log('  http://localhost:' + PORT + '/');
     console.log('  http://localhost:' + PORT + '/diving');

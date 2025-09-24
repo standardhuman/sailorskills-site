@@ -15,10 +15,9 @@ export class AdminApp {
         // Set up event listeners
         this.setupEventListeners();
 
-        // Initialize service buttons if available
-        if (window.populateServiceButtons && window.serviceData) {
-            window.populateServiceButtons();
-            this.attachServiceButtonHandlers();
+        // Initialize service buttons
+        if (window.serviceData) {
+            this.populateAdminServiceButtons();
         } else {
             // Retry if script.js hasn't loaded yet
             setTimeout(() => this.init(), 100);
@@ -45,16 +44,340 @@ export class AdminApp {
         }
     }
 
-    attachServiceButtonHandlers() {
-        // Override service selection to enable charge button
-        if (window.selectServiceDirect) {
-            const originalSelect = window.selectServiceDirect;
-            window.selectServiceDirect = (serviceKey) => {
-                this.currentServiceKey = serviceKey;
-                originalSelect(serviceKey);
-                this.updateChargeSummary();
-            };
+    populateAdminServiceButtons() {
+        const buttonsContainer = document.getElementById('simpleServiceButtons');
+        if (!buttonsContainer) {
+            console.error('Service buttons container not found');
+            return;
         }
+
+        // Clear existing buttons
+        buttonsContainer.innerHTML = '';
+
+        // Define service order and styling
+        const services = [
+            { key: 'recurring_cleaning', label: '🧽 Recurring Cleaning', style: 'cleaning' },
+            { key: 'onetime_cleaning', label: '🧽 One-time Cleaning', style: 'cleaning' },
+            { key: 'anodes_only', label: '⚡ Zinc Anodes Only', style: 'anodes' },
+            { key: 'underwater_inspection', label: '🔍 Underwater Inspection', style: 'special' },
+            { key: 'propeller_service', label: '🔧 Propeller Service', style: 'special' },
+            { key: 'item_recovery', label: '🔍 Item Recovery', style: 'recovery' }
+        ];
+
+        services.forEach(({ key, label, style }) => {
+            if (!window.serviceData[key]) return;
+
+            const button = document.createElement('button');
+            button.className = 'simple-service-btn';
+            button.textContent = label;
+
+            // Add specific styling class
+            if (style === 'anodes') {
+                button.style.background = '#e67e22';
+            } else if (style === 'recovery') {
+                button.style.background = '#9b59b6';
+            } else if (style === 'special') {
+                button.style.background = '#2ecc71';
+            }
+
+            button.onclick = () => this.selectAdminService(key);
+            buttonsContainer.appendChild(button);
+        });
+    }
+
+    selectAdminService(serviceKey) {
+        console.log('Selecting service:', serviceKey);
+
+        // Store the service key
+        this.currentServiceKey = serviceKey;
+        window.currentServiceKey = serviceKey;
+        window.selectedServiceKey = serviceKey;
+
+        // Get service data
+        const service = window.serviceData[serviceKey];
+        if (!service) return;
+
+        // For per-foot services, show the wizard
+        if (service.type === 'per_foot') {
+            // Hide service buttons
+            document.getElementById('simpleServiceButtons').style.display = 'none';
+
+            // Show wizard
+            const wizardContainer = document.getElementById('wizardContainer');
+            wizardContainer.style.display = 'block';
+
+            // Initialize the wizard for admin
+            this.initializeWizard(serviceKey);
+        } else {
+            // For flat rate services, set the price directly
+            // Set the price in the hidden display element
+            const price = service.rate || 0;
+            const displayEl = document.getElementById('totalCostDisplay');
+            if (displayEl) {
+                displayEl.textContent = `$${price.toFixed(2)}`;
+            }
+        }
+
+        // Update charge summary after a slight delay to ensure calculations are done
+        setTimeout(() => this.updateChargeSummary(), 100);
+    }
+
+    initializeWizard(serviceKey) {
+        const wizardContent = document.getElementById('wizardContent');
+        if (!wizardContent) return;
+
+        // Create simplified wizard for admin
+        wizardContent.innerHTML = `
+            <div class="admin-wizard">
+                <h3>${window.serviceData[serviceKey].name}</h3>
+
+                <div class="wizard-field">
+                    <label>Boat Length (feet)</label>
+                    <input type="number" id="adminBoatLength" min="10" max="200" value="30"
+                           oninput="adminApp.updateFromWizard()">
+                </div>
+
+                <div class="wizard-field">
+                    <label>Hull Type</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="adminHullType" value="monohull" checked
+                                   onchange="adminApp.updateFromWizard()">
+                            <span>Monohull</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="adminHullType" value="catamaran"
+                                   onchange="adminApp.updateFromWizard()">
+                            <span>Catamaran (+25% surcharge)</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="adminHullType" value="trimaran"
+                                   onchange="adminApp.updateFromWizard()">
+                            <span>Trimaran (+50% surcharge)</span>
+                        </label>
+                    </div>
+                </div>
+
+                ${serviceKey.includes('cleaning') ? `
+                <div class="wizard-field">
+                    <label>Paint Condition</label>
+                    <div class="button-group">
+                        <button class="condition-btn active" data-value="excellent"
+                                onclick="adminApp.setPaintCondition('excellent')">Excellent</button>
+                        <button class="condition-btn" data-value="good"
+                                onclick="adminApp.setPaintCondition('good')">Good</button>
+                        <button class="condition-btn" data-value="fair"
+                                onclick="adminApp.setPaintCondition('fair')">Fair</button>
+                        <button class="condition-btn" data-value="poor"
+                                onclick="adminApp.setPaintCondition('poor')">Poor</button>
+                    </div>
+                </div>
+
+                <div class="wizard-field">
+                    <label>Growth Level: <span id="growthPercent">0%</span> - <span id="growthLabel">Minimal</span></label>
+                    <input type="range" id="adminGrowthLevel" min="0" max="200" value="0"
+                           oninput="adminApp.updateGrowthDisplay(this.value); adminApp.updateFromWizard()">
+                    <div class="slider-labels">
+                        <span class="slider-label" style="left: 5%">Minimal<br><small>0%</small></span>
+                        <span class="slider-label" style="left: 35%">Moderate<br><small>50%</small></span>
+                        <span class="slider-label" style="left: 65%">Heavy<br><small>100%</small></span>
+                        <span class="slider-label" style="left: 95%">Severe<br><small>200%</small></span>
+                    </div>
+                </div>
+                ` : ''}
+
+                <div class="wizard-field">
+                    <label>
+                        <input type="checkbox" id="adminPowerboat" onchange="adminApp.updateFromWizard()">
+                        <span>Powerboat (not sailing vessel) (+25% surcharge)</span>
+                    </label>
+                </div>
+
+                <div class="wizard-field">
+                    <label>
+                        <input type="checkbox" id="adminTwinEngines" onchange="adminApp.updateFromWizard()">
+                        <span>Twin engines (+10% surcharge)</span>
+                    </label>
+                </div>
+
+                <div class="wizard-actions">
+                    <button onclick="adminApp.closeWizard()" class="btn-secondary">← Back to Services</button>
+                </div>
+            </div>
+        `;
+
+        // Set initial values
+        document.getElementById('boatLength').value = '30';
+        document.getElementById('actualPaintCondition').value = 'excellent';
+        document.getElementById('actualGrowthLevel').value = '0';
+        document.getElementById('additionalHulls').value = '0';
+
+        // Calculate initial price
+        setTimeout(() => {
+            this.calculateAdminPrice();
+            this.updateChargeSummary();
+        }, 100);
+    }
+
+    setPaintCondition(condition) {
+        document.querySelectorAll('.condition-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        event.target.classList.add('active');
+        document.getElementById('actualPaintCondition').value = condition;
+        this.updateFromWizard();
+    }
+
+    updateGrowthDisplay(value) {
+        const percent = parseInt(value);
+        document.getElementById('growthPercent').textContent = percent + '%';
+        document.getElementById('actualGrowthLevel').value = value;
+
+        // Update the growth label based on percentage
+        const labelEl = document.getElementById('growthLabel');
+        if (labelEl) {
+            let label = 'Minimal';
+            if (percent >= 150) {
+                label = 'Severe';
+            } else if (percent >= 75) {
+                label = 'Heavy';
+            } else if (percent >= 25) {
+                label = 'Moderate';
+            }
+            labelEl.textContent = label;
+        }
+        // updateFromWizard is called from the oninput handler
+    }
+
+    updateFromWizard() {
+        // Update boat length
+        const boatLength = document.getElementById('adminBoatLength')?.value || 30;
+        document.getElementById('boatLength').value = boatLength;
+
+        // Update hull type
+        const hullType = document.querySelector('input[name="adminHullType"]:checked')?.value || 'monohull';
+
+        // Set hull type in hidden fields (script.js uses these)
+        // For monohull, additionalHulls = 0
+        // For catamaran, additionalHulls = 1 (2 total hulls)
+        // For trimaran, additionalHulls = 2 (3 total hulls)
+        let additionalHulls = 0;
+        if (hullType === 'catamaran') additionalHulls = 1;
+        if (hullType === 'trimaran') additionalHulls = 2;
+
+        // Store hull type for price calculation
+        const hullInput = document.getElementById('additionalHulls');
+        if (hullInput) {
+            hullInput.value = additionalHulls;
+        }
+
+        // Update twin engines
+        const hasTwinEngines = document.getElementById('adminTwinEngines')?.checked;
+        const twinEnginesInput = document.getElementById('has_twin_engines');
+        if (twinEnginesInput) {
+            twinEnginesInput.checked = hasTwinEngines;
+        }
+
+        // Calculate the cost manually for admin page
+        this.calculateAdminPrice();
+        this.updateChargeSummary();
+    }
+
+    calculateAdminPrice() {
+        if (!this.currentServiceKey || !window.serviceData[this.currentServiceKey]) return;
+
+        const service = window.serviceData[this.currentServiceKey];
+
+        // Only calculate for per-foot services
+        if (service.type !== 'per_foot') return;
+
+        const boatLength = parseFloat(document.getElementById('boatLength').value) || 30;
+        const baseRate = service.rate || 0;
+
+        // Calculate base cost
+        let cost = boatLength * baseRate;
+        let baseCost = cost;
+
+        // Track surcharges for display
+        this.surchargeDetails = {
+            base: baseCost,
+            hull: 0,
+            paint: 0,
+            growth: 0,
+            engines: 0,
+            powerboat: 0
+        };
+
+        // Apply hull surcharge
+        const additionalHulls = parseInt(document.getElementById('additionalHulls')?.value) || 0;
+        let hullMultiplier = 1;
+        if (additionalHulls === 1) {
+            hullMultiplier = 1.25; // Catamaran +25%
+            this.surchargeDetails.hull = 25;
+        }
+        if (additionalHulls === 2) {
+            hullMultiplier = 1.50; // Trimaran +50%
+            this.surchargeDetails.hull = 50;
+        }
+        cost *= hullMultiplier;
+
+        // Paint condition - captured for service logs but no surcharge
+        if (this.currentServiceKey.includes('cleaning')) {
+            const paintCondition = document.getElementById('actualPaintCondition')?.value || 'excellent';
+            // Paint condition is recorded but doesn't affect price
+            this.surchargeDetails.paint = 0;
+
+            // Apply growth level surcharge
+            // 0-50% = 0% surcharge (Minimal to Moderate)
+            // 50-200% = 0% to 200% surcharge (scales linearly)
+            const growthLevel = parseInt(document.getElementById('actualGrowthLevel')?.value) || 0;
+            let growthSurcharge = 0;
+
+            if (growthLevel > 50) {
+                // Scale from 0% to 200% surcharge for 50-200% growth
+                // Formula: (growthLevel - 50) * (200/150) / 100
+                growthSurcharge = ((growthLevel - 50) * 1.333) / 100;
+            }
+
+            this.surchargeDetails.growth = growthSurcharge * 100;
+            cost *= (1 + growthSurcharge);
+        }
+
+        // Apply powerboat surcharge
+        const isPowerboat = document.getElementById('adminPowerboat')?.checked;
+        if (isPowerboat) {
+            cost *= 1.25; // +25%
+            this.surchargeDetails.powerboat = 25;
+        }
+
+        // Apply twin engines surcharge
+        const hasTwinEngines = document.getElementById('has_twin_engines')?.checked;
+        if (hasTwinEngines) {
+            cost *= 1.10; // +10%
+            this.surchargeDetails.engines = 10;
+        }
+
+        // Update the display
+        const displayEl = document.getElementById('totalCostDisplay');
+        if (displayEl) {
+            displayEl.textContent = `$${cost.toFixed(2)}`;
+        }
+    }
+
+    closeWizard() {
+        document.getElementById('simpleServiceButtons').style.display = 'flex';
+        document.getElementById('wizardContainer').style.display = 'none';
+        this.currentServiceKey = null;
+        window.currentServiceKey = null;
+        window.selectedServiceKey = null;
+        this.updateChargeSummary();
+    }
+
+    confirmWizardSelection() {
+        // Wizard selection confirmed, keep the service selected
+        this.calculateAdminPrice();
+        this.updateChargeSummary();
+        alert('Price calculated! Check the charge summary below.');
     }
 
     // Customer Management
@@ -148,40 +471,132 @@ export class AdminApp {
         const chargeButton = document.getElementById('chargeButton');
 
         // Get service info
-        const serviceName = window.serviceData && window.currentServiceKey ?
-            window.serviceData[window.currentServiceKey]?.name : '';
+        const service = window.serviceData && this.currentServiceKey ?
+            window.serviceData[this.currentServiceKey] : null;
+        const serviceName = service?.name || '';
 
-        // Get price
-        const totalElement = document.getElementById('totalCostDisplay');
-        const price = totalElement ?
-            parseFloat(totalElement.textContent.replace('$', '').replace(',', '')) : 0;
+        // Get price - try both totalCostDisplay and totalCost
+        const totalElement = document.getElementById('totalCostDisplay') || document.getElementById('totalCost');
+        let price = 0;
+        if (totalElement) {
+            const priceText = totalElement.textContent || totalElement.value || '0';
+            price = parseFloat(priceText.replace('$', '').replace(',', '')) || 0;
+        }
+
+        // If price is still 0 and we have a flat rate service, get the rate directly
+        if (price === 0 && service) {
+            if (service.type === 'flat' && service.rate) {
+                price = service.rate;
+            }
+        }
 
         // Update charge details
         if (this.currentServiceKey) {
-            let detailsHTML = `<div>Service: ${serviceName || this.currentServiceKey}</div>`;
-            detailsHTML += `<div>Price: $${price.toFixed(2)}</div>`;
+            let detailsHTML = `
+                <div class="charge-detail-row">
+                    <span>Service:</span>
+                    <span>${serviceName || this.currentServiceKey}</span>
+                </div>`;
+
+            // Add surcharge details if available
+            if (this.surchargeDetails && service?.type === 'per_foot') {
+                // Get boat length and rate
+                const boatLength = parseFloat(document.getElementById('boatLength')?.value) || 30;
+                const rate = service.rate || 0;
+
+                detailsHTML += `
+                <div class="charge-detail-row" style="font-size: 12px; color: #666;">
+                    <span>Calculation:</span>
+                    <span>${boatLength}ft × $${rate.toFixed(2)}/ft = $${this.surchargeDetails.base.toFixed(2)}</span>
+                </div>`;
+
+                // Show active surcharges
+                const surcharges = [];
+                if (this.surchargeDetails.hull > 0) {
+                    const hullType = this.surchargeDetails.hull === 25 ? 'Catamaran' : 'Trimaran';
+                    surcharges.push(`${hullType} +${this.surchargeDetails.hull}%`);
+                }
+                // Paint condition no longer adds surcharge
+                if (this.surchargeDetails.growth > 0) {
+                    const growthLabel = document.getElementById('growthLabel')?.textContent || 'Growth';
+                    surcharges.push(`${growthLabel} growth +${this.surchargeDetails.growth.toFixed(0)}%`);
+                }
+                if (this.surchargeDetails.powerboat > 0) {
+                    surcharges.push(`Powerboat +${this.surchargeDetails.powerboat}%`);
+                }
+                if (this.surchargeDetails.engines > 0) {
+                    surcharges.push(`Twin engines +${this.surchargeDetails.engines}%`);
+                }
+
+                if (surcharges.length > 0) {
+                    detailsHTML += `
+                <div class="charge-detail-row" style="font-size: 12px; color: #666;">
+                    <span>Surcharges:</span>
+                    <span>${surcharges.join(', ')}</span>
+                </div>`;
+                }
+
+                // Show paint condition (for service logs, no charge)
+                if (this.currentServiceKey.includes('cleaning')) {
+                    const paintCondition = document.getElementById('actualPaintCondition')?.value || 'excellent';
+                    const paintLabel = paintCondition.charAt(0).toUpperCase() + paintCondition.slice(1);
+                    detailsHTML += `
+                <div class="charge-detail-row" style="font-size: 12px; color: #666;">
+                    <span>Paint Condition:</span>
+                    <span>${paintLabel} (recorded for service log)</span>
+                </div>`;
+                }
+            }
+
+            detailsHTML += `
+                <div class="charge-detail-row">
+                    <span>Total Price:</span>
+                    <span style="font-weight: 600; color: #345475;">$${price.toFixed(2)}</span>
+                </div>`;
 
             if (this.selectedCustomer) {
-                detailsHTML += `<div>Customer: ${this.selectedCustomer.name || this.selectedCustomer.email}</div>`;
+                detailsHTML += `
+                <div class="charge-detail-row">
+                    <span>Customer:</span>
+                    <span>${this.selectedCustomer.name || this.selectedCustomer.email}</span>
+                </div>`;
                 if (this.selectedCustomer.payment_method) {
-                    detailsHTML += `<div>Payment: Card ending in ${this.selectedCustomer.payment_method.card.last4}</div>`;
+                    detailsHTML += `
+                <div class="charge-detail-row">
+                    <span>Payment:</span>
+                    <span>Card ending in ${this.selectedCustomer.payment_method.card.last4}</span>
+                </div>`;
                 } else {
-                    detailsHTML += `<div>Payment: No card on file</div>`;
+                    detailsHTML += `
+                <div class="charge-detail-row">
+                    <span>Payment:</span>
+                    <span style="color: #e74c3c;">No card on file</span>
+                </div>`;
                 }
             } else {
-                detailsHTML += `<div>Customer: Not selected</div>`;
+                detailsHTML += `
+                <div class="charge-detail-row">
+                    <span>Customer:</span>
+                    <span style="color: #999;">Not selected (will prompt)</span>
+                </div>`;
             }
+
+            detailsHTML += `
+                <div class="charge-detail-row" style="border-top: 2px solid #345475; padding-top: 10px; margin-top: 10px;">
+                    <span><strong>Amount to Charge:</strong></span>
+                    <span><strong>$${price.toFixed(2)}</strong></span>
+                </div>`;
 
             chargeDetails.innerHTML = detailsHTML;
         } else {
-            chargeDetails.innerHTML = 'Select a service to see details';
+            chargeDetails.innerHTML = '<div style="text-align: center; color: #7f8c8d;">Select a customer and configure service details</div>';
         }
 
         // Enable button if service is selected (customer can be selected later)
-        chargeButton.disabled = !this.currentServiceKey;
+        chargeButton.disabled = !this.currentServiceKey || price === 0;
 
         // Update button text
-        if (this.selectedCustomer && this.selectedCustomer.payment_method) {
+        if (price > 0) {
             chargeButton.textContent = `💳 Charge $${price.toFixed(2)}`;
         } else {
             chargeButton.textContent = `💳 Charge Customer`;

@@ -9,13 +9,16 @@
     "preview": "vite preview",
     "test": "echo \"Error: no test specified\" && exit 1",
     "compare-headers": "node compare-headers.js",
-    "server": "node api/index.js"
+    "server": "node api/index.js",
+    "start": "node server.js",
+    "dev:server": "nodemon server.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@playwright/test": "^1.55.1",
+    "nodemon": "^3.1.10",
     "playwright": "^1.55.0"
   },
   "directories": {
