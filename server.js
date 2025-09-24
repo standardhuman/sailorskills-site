@@ -1,12 +1,20 @@
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import 'dotenv/config';
+import quoteRoutes from './api/save-quote.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Middleware for parsing JSON
+app.use(express.json());
+
+// API routes
+app.use(quoteRoutes);
 
 // Serve static files (disable directory redirect)
 app.use(express.static(__dirname, { redirect: false }));
@@ -30,6 +38,11 @@ app.get('/anode-quote', (req, res) => {
 
 app.get('/comprehensive-quote', (req, res) => {
     res.sendFile(path.join(__dirname, 'comprehensive-quote.html'));
+});
+
+// Quote viewer route
+app.get('/quote/:quoteNumber', (req, res) => {
+    res.sendFile(path.join(__dirname, 'quote-viewer.html'));
 });
 
 // Default route - serve index.html

@@ -1446,18 +1446,26 @@ export class AdminApp {
         }
 
         try {
-            // For now, simulate quote generation
-            // In production, this would call API to:
-            // 1. Save quote to database
-            // 2. Generate PDF if requested
-            // 3. Send email if requested
-            // 4. Return quote URL
+            // Save quote to Supabase
+            const saveResponse = await fetch('/api/quotes', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(quoteData)
+            });
 
-            await this.simulateQuoteGeneration(quoteData);
+            if (!saveResponse.ok) {
+                const errorData = await saveResponse.json();
+                throw new Error(errorData.error || 'Failed to save quote');
+            }
+
+            const saveResult = await saveResponse.json();
+            console.log('Quote saved to database:', saveResult);
 
             // Show success message
             if (resultDiv) {
-                const onlineUrl = `https://sailorskills.com/quotes/${quoteNumber}`;
+                const onlineUrl = `${window.location.origin}/quote/${quoteNumber}`;
                 resultDiv.innerHTML = `
                     <div class="success-result">
                         <h3>✅ Quote Generated Successfully!</h3>
@@ -1574,15 +1582,6 @@ export class AdminApp {
         };
     }
 
-    async simulateQuoteGeneration(quoteData) {
-        // Simulate API delay
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                console.log('Quote generated:', quoteData);
-                resolve(quoteData);
-            }, 2000);
-        });
-    }
 
     generatePDF(quoteData) {
         const doc = new window.jspdf.jsPDF();
@@ -1777,8 +1776,7 @@ export class AdminApp {
 
     viewQuoteOnline(quoteNumber) {
         console.log('View online quote:', quoteNumber);
-        // In production, this would open the quote URL
-        const url = `https://sailorskills.com/quotes/${quoteNumber}`;
+        const url = `${window.location.origin}/quote/${quoteNumber}`;
         window.open(url, '_blank');
     }
 
