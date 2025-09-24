@@ -1298,10 +1298,14 @@
                 const wizardContainer = document.getElementById('wizardContainer');
                 const simpleButtons = document.getElementById('simpleServiceButtons');
 
-                // Hide wizard
+                // Hide wizard but keep the structure
                 if (wizardContainer) {
                     wizardContainer.style.display = 'none';
-                    wizardContainer.innerHTML = '';
+                    // Clear content but keep the wizardContent div
+                    const wizardContent = document.getElementById('wizardContent');
+                    if (wizardContent) {
+                        wizardContent.innerHTML = '';
+                    }
                 }
 
                 // Show simple service buttons
@@ -1639,6 +1643,7 @@
 
                 const service = window.serviceData ? window.serviceData[serviceKey] : null;
                 const serviceName = service ? service.name : 'Service';
+                const needsBoatLength = service && service.type === 'per_foot';
 
                 // Build the form HTML
                 let html = `
@@ -1649,14 +1654,28 @@
                                 ← Back to Services
                             </button>
                         </div>
-                        
+
                         <div class="form-section" style="background: #f8f9fa; padding: 25px; border-radius: 12px; border: 1px solid #e0e0e0; margin-bottom: 20px;">
                             <h3 style="margin-top: 0; margin-bottom: 20px; color: #2c3e50; font-size: 20px; font-weight: 600;">Boat Information</h3>
                             <div class="input-group" style="margin-bottom: 20px;">
-                                <label for="wizardBoatLength" style="display: block; margin-bottom: 8px; font-weight: 600;">Boat Length (feet)</label>
-                                <input type="text" id="wizardBoatLength" placeholder="e.g., 35, 42, 50" value="35" 
+                                <label for="wizardBoatName" style="display: block; margin-bottom: 8px; font-weight: 600;">Boat Name (optional)</label>
+                                <input type="text" id="wizardBoatName" placeholder="Enter boat name"
+                                       value="${document.getElementById('boatName')?.value || ''}"
                                        style="font-size: 18px; padding: 14px; width: 100%; border: 2px solid #ddd; border-radius: 8px;">
-                            </div>
+                            </div>`;
+
+                // Only show boat length for per-foot services (cleaning services)
+                if (needsBoatLength) {
+                    html += `
+                            <div class="input-group" style="margin-bottom: 20px;">
+                                <label for="wizardBoatLength" style="display: block; margin-bottom: 8px; font-weight: 600;">Boat Length (feet)</label>
+                                <input type="text" id="wizardBoatLength" placeholder="e.g., 35, 42, 50"
+                                       value="${document.getElementById('boatLength')?.value || '35'}"
+                                       style="font-size: 18px; padding: 14px; width: 100%; border: 2px solid #ddd; border-radius: 8px;">
+                            </div>`;
+                }
+
+                html += `
                         </div>
                 `;
                 
@@ -1728,20 +1747,18 @@
                     `;
                 }
 
-                // Add pricing display section for cleaning services
-                if (isCleaningService || serviceKey === 'underwater_inspection') {
-                    html += `
-                        <div class="form-section" style="background: #e8f4fd; padding: 25px; border-radius: 12px; border: 2px solid #345475; margin-bottom: 20px;">
-                            <h3 style="margin-top: 0; margin-bottom: 15px; color: #2c3e50; font-size: 20px; font-weight: 600;">💰 Pricing Summary</h3>
-                            <div id="wizardCostBreakdown" style="font-size: 16px; line-height: 1.8; color: #34495e; margin-bottom: 15px;">
-                                Calculating...
-                            </div>
-                            <div id="wizardTotalPrice" style="font-size: 24px; font-weight: bold; color: #345475; padding-top: 15px; border-top: 2px solid #345475;">
-                                Total: $0.00
-                            </div>
+                // Add pricing display section for ALL services
+                html += `
+                    <div class="form-section" style="background: #e8f4fd; padding: 25px; border-radius: 12px; border: 2px solid #345475; margin-bottom: 20px;">
+                        <h3 style="margin-top: 0; margin-bottom: 15px; color: #2c3e50; font-size: 20px; font-weight: 600;">💰 Pricing Summary</h3>
+                        <div id="wizardCostBreakdown" style="font-size: 16px; line-height: 1.8; color: #34495e; margin-bottom: 15px;">
+                            Calculating...
                         </div>
-                    `;
-                }
+                        <div id="wizardTotalPrice" style="font-size: 24px; font-weight: bold; color: #345475; padding-top: 15px; border-top: 2px solid #345475;">
+                            Total: $0.00
+                        </div>
+                    </div>
+                `;
 
                 // Add anodes button
                 const isAnodesOnly = serviceKey === 'anodes_only';
