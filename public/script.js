@@ -993,8 +993,8 @@ function calculateCost() {
         updateChargeSummary();
     }
     
-    // Add checkout button if not already present
-    if (!document.getElementById('checkout-button')) {
+    // Add checkout button only if we're on the results page (step 8) and it's not already present
+    if (currentStep === 8 && !document.getElementById('checkout-button')) {
         const checkoutButton = document.createElement('button');
         checkoutButton.id = 'checkout-button';
         checkoutButton.className = 'submit-button';
