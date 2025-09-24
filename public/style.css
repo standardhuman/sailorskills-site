@@ -611,6 +611,36 @@ input[type="tel"]:focus {
     grid-column: 1 / -1;
 }
 
+/* Service separator styling */
+.service-separator {
+    grid-column: 1 / -1;
+    margin: 20px 0;
+    padding: 10px 0;
+    text-align: center;
+    position: relative;
+}
+
+.service-separator::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background-color: #d0d9e0;
+}
+
+.service-separator span {
+    background-color: #ffffff;
+    padding: 0 20px;
+    position: relative;
+    font-size: 14px;
+    color: #7f8c8d;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 500;
+}
+
 /* On mobile, stack all services in single column */
 @media (max-width: 768px) {
     .service-selection-grid {

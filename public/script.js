@@ -177,11 +177,20 @@ function populateServiceButtons() {
     serviceButtons.innerHTML = '';
     
     // Define the order to display services
-    const serviceOrder = ['recurring_cleaning', 'onetime_cleaning', 'underwater_inspection', 'anodes_only', 'item_recovery', 'propeller_service'];
+    const serviceOrder = ['recurring_cleaning', 'onetime_cleaning', 'separator', 'anodes_only', 'underwater_inspection', 'item_recovery', 'propeller_service'];
     
     console.log('Populating service buttons with click handlers...');
     
     for (const key of serviceOrder) {
+        // Add a separator between cleaning and other services
+        if (key === 'separator') {
+            const separator = document.createElement('div');
+            separator.className = 'service-separator';
+            separator.innerHTML = '<span>Other Services</span>';
+            serviceButtons.appendChild(separator);
+            continue;
+        }
+
         const service = serviceData[key];
         const button = document.createElement('div');
         button.className = 'service-option';
