@@ -8,15 +8,15 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Serve static files
-app.use(express.static(__dirname));
+// Serve static files (disable directory redirect)
+app.use(express.static(__dirname, { redirect: false }));
 
 // URL rewriting - serve HTML files without extension
 app.get('/diving', (req, res) => {
     res.sendFile(path.join(__dirname, 'diving.html'));
 });
 
-app.get('/admin', (req, res) => {
+app.get(['/admin', '/admin/'], (req, res) => {
     res.sendFile(path.join(__dirname, 'admin.html'));
 });
 

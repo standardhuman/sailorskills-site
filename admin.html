@@ -129,19 +129,20 @@
 
         .customer-controls {
             display: flex;
+            flex-direction: column;
             gap: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             position: relative;
         }
 
         .customer-search-input {
             flex: 1;
-            padding: 14px 18px;
+            padding: 10px 14px;
             border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 18px;
+            border-radius: 8px;
+            font-size: 14px;
             transition: all 0.3s ease;
-            min-height: 52px;
+            min-height: 40px;
             -webkit-appearance: none;
         }
         
@@ -153,16 +154,16 @@
         }
 
         .customer-btn {
-            padding: 14px 28px;
+            padding: 8px 16px;
             background-color: #345475;
             color: white;
             border: none;
-            border-radius: 10px;
+            border-radius: 8px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-size: 17px;
-            min-height: 52px;
+            font-size: 14px;
+            min-height: 36px;
             white-space: nowrap;
         }
 
@@ -522,8 +523,14 @@
             display: flex;
             justify-content: space-between;
             padding: 0 12px;
-            font-size: 14px;
+            font-size: 12px;
             color: #2c3e50;
+            text-align: center;
+            line-height: 1.3;
+        }
+
+        .growth-slider-labels span {
+            flex: 1;
         }
 
         .growth-slider-value {
@@ -1288,16 +1295,14 @@
         
         <!-- Customer Selector Section -->
         <div class="customer-section">
-            <h2>Select Customer</h2>
-            <div class="customer-controls">
-                <div style="width: 100%; margin-bottom: 15px;">
-                    <input type="text" 
-                           id="customerSearch" 
-                           class="customer-search-input"
-                           placeholder="Search by name, email, or boat name..."
-                           style="width: 100%; box-sizing: border-box;">
-                </div>
-                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <h2 style="margin-bottom: 15px;">Select Customer</h2>
+            <div class="customer-controls" style="margin-bottom: 15px;">
+                <input type="text"
+                       id="customerSearch"
+                       class="customer-search-input"
+                       placeholder="Search by name, email, or boat name..."
+                       style="width: 100%; box-sizing: border-box;">
+                <div style="display: flex; gap: 8px; justify-content: flex-start;">
                     <button onclick="searchCustomers()" class="customer-btn">Search</button>
                     <button onclick="loadRecentCustomers()" class="customer-btn">Show Recent</button>
                     <button onclick="showCreateCustomerForm()" class="customer-btn" style="background-color: #27ae60;">+ New Customer</button>
@@ -1426,8 +1431,6 @@
                     { slider: 'wizardGrowthLevelSlider', display: 'wizardGrowthSliderValue' },
                     { slider: 'wizardGrowthLevelSliderMain', display: 'wizardGrowthSliderValueMain' }
                 ];
-                const levels = ['minimal', 'moderate', 'heavy', 'severe'];
-                const labels = ['Minimal', 'Moderate', 'Heavy', 'Severe'];
 
                 sliders.forEach(({slider: sliderId, display: displayId}) => {
                     const sliderEl = document.getElementById(sliderId);
@@ -1435,25 +1438,53 @@
 
                     if (sliderEl) {
                         sliderEl.addEventListener('input', function() {
-                            const value = parseInt(this.value);
+                            const sliderValue = parseInt(this.value);
+                            let label, level, percentage;
+
+                            // Map slider value to growth level and surcharge percentage
+                            if (sliderValue === 0) {
+                                label = 'Minimal';
+                                level = 'minimal';
+                                percentage = 0;
+                            } else if (sliderValue <= 20) {
+                                label = 'Minimal';
+                                level = 'minimal';
+                                percentage = 0;
+                            } else if (sliderValue <= 35) {
+                                label = 'Moderate';
+                                level = 'moderate';
+                                percentage = Math.round((sliderValue - 20) * 25 / 15);
+                            } else if (sliderValue <= 60) {
+                                label = 'Heavy';
+                                level = 'heavy';
+                                percentage = 25 + Math.round((sliderValue - 35) * 25 / 25);
+                            } else {
+                                label = 'Severe';
+                                level = 'severe';
+                                // Smooth increase from 50% to 200%
+                                percentage = 50 + Math.round((sliderValue - 60) * 150 / 40);
+                            }
+
                             const wizardInput = document.getElementById('wizardGrowthLevel');
                             if (wizardInput) {
-                                wizardInput.value = levels[value];
+                                wizardInput.value = level;
+                                wizardInput.setAttribute('data-surcharge', percentage);
                             }
                             if (displayEl) {
-                                displayEl.textContent = labels[value];
+                                displayEl.textContent = `${label} (${percentage}%)`;
                             }
 
                             // Sync with main form
                             const mainGrowth = document.getElementById('actualGrowthLevel');
                             if (mainGrowth) {
-                                mainGrowth.value = levels[value];
+                                mainGrowth.value = level;
+                                mainGrowth.setAttribute('data-surcharge', percentage);
                                 const mainSlider = document.getElementById('growthLevelSlider');
                                 if (mainSlider) {
-                                    mainSlider.value = value;
+                                    mainSlider.value = sliderValue;
                                     const mainDisplay = document.getElementById('growthSliderValue');
                                     if (mainDisplay) {
-                                        mainDisplay.textContent = labels[value];
+                                        mainDisplay.textContent = `${label} (${percentage}%)`;
                                     }
                                 }
                             }
@@ -1802,14 +1833,14 @@
                             <div class="input-group">
                                 <label style="display: block; margin-bottom: 8px; font-weight: 600;">Actual Growth Level</label>
                                 <div class="growth-slider-container">
-                                    <input type="range" class="growth-slider" id="wizardGrowthLevelSliderMain" min="0" max="3" value="0" step="1">
+                                    <input type="range" class="growth-slider" id="wizardGrowthLevelSliderMain" min="0" max="100" value="0" step="5">
                                     <div class="growth-slider-labels">
-                                        <span>Minimal</span>
-                                        <span>Moderate</span>
-                                        <span>Heavy</span>
-                                        <span>Severe</span>
+                                        <span>Minimal<br>0%</span>
+                                        <span>Moderate<br>25%</span>
+                                        <span>Heavy<br>50%</span>
+                                        <span>Severe<br>200%</span>
                                     </div>
-                                    <div class="growth-slider-value" id="wizardGrowthSliderValueMain">Minimal</div>
+                                    <div class="growth-slider-value" id="wizardGrowthSliderValueMain">Minimal (0%)</div>
                                 </div>
                                 <input type="hidden" id="wizardGrowthLevel" value="minimal">
                             </div>
@@ -2104,14 +2135,14 @@
                 <div class="input-group">
                     <label>Actual Growth Level Found</label>
                     <div class="growth-slider-container">
-                        <input type="range" class="growth-slider" id="growthLevelSlider" min="0" max="3" value="0" step="1">
+                        <input type="range" class="growth-slider" id="growthLevelSlider" min="0" max="100" value="0" step="5">
                         <div class="growth-slider-labels">
-                            <span>Minimal</span>
-                            <span>Moderate</span>
-                            <span>Heavy</span>
-                            <span>Severe</span>
+                            <span>Minimal<br>0%</span>
+                            <span>Moderate<br>25%</span>
+                            <span>Heavy<br>50%</span>
+                            <span>Severe<br>200%</span>
                         </div>
-                        <div class="growth-slider-value" id="growthSliderValue">Minimal</div>
+                        <div class="growth-slider-value" id="growthSliderValue">Minimal (0%)</div>
                     </div>
                     <input type="hidden" id="actualGrowthLevel" value="minimal">
                 </div>
@@ -2757,9 +2788,12 @@
             document.querySelectorAll('#paintConditionButtons .option-button').forEach(btn => {
                 btn.classList.remove('selected');
             });
-            document.querySelector(`#paintConditionButtons [data-value="${value}"]`).classList.add('selected');
+            const targetBtn = document.querySelector(`#paintConditionButtons [data-value="${value}"]`);
+            if (targetBtn) {
+                targetBtn.classList.add('selected');
+            }
             document.getElementById('actualPaintCondition').value = value;
-            
+
             if (window.calculateCostDirect) {
                 window.calculateCostDirect();
             }
@@ -2773,14 +2807,39 @@
             const slider = document.getElementById('growthLevelSlider');
             const valueDisplay = document.getElementById('growthSliderValue');
             const hiddenInput = document.getElementById('actualGrowthLevel');
-            const levels = ['minimal', 'moderate', 'heavy', 'severe'];
-            const labels = ['Minimal', 'Moderate', 'Heavy', 'Severe'];
 
             if (slider) {
                 slider.addEventListener('input', function() {
-                    const value = parseInt(this.value);
-                    hiddenInput.value = levels[value];
-                    valueDisplay.textContent = labels[value];
+                    const sliderValue = parseInt(this.value);
+                    let label, level, percentage;
+
+                    // Map slider value to growth level and surcharge percentage
+                    if (sliderValue === 0) {
+                        label = 'Minimal';
+                        level = 'minimal';
+                        percentage = 0;
+                    } else if (sliderValue <= 20) {
+                        label = 'Minimal';
+                        level = 'minimal';
+                        percentage = 0;
+                    } else if (sliderValue <= 35) {
+                        label = 'Moderate';
+                        level = 'moderate';
+                        percentage = Math.round((sliderValue - 20) * 25 / 15);
+                    } else if (sliderValue <= 60) {
+                        label = 'Heavy';
+                        level = 'heavy';
+                        percentage = 25 + Math.round((sliderValue - 35) * 25 / 25);
+                    } else {
+                        label = 'Severe';
+                        level = 'severe';
+                        // Smooth increase from 50% to 200%
+                        percentage = 50 + Math.round((sliderValue - 60) * 150 / 40);
+                    }
+
+                    hiddenInput.value = level;
+                    hiddenInput.setAttribute('data-surcharge', percentage);
+                    valueDisplay.textContent = `${label} (${percentage}%)`;
 
                     if (window.calculateCostDirect) {
                         window.calculateCostDirect();
@@ -3050,14 +3109,14 @@
                         <div class="input-group">
                             <label>Actual Growth Level</label>
                             <div class="growth-slider-container">
-                                <input type="range" class="growth-slider" id="wizardGrowthLevelSlider" min="0" max="3" value="0" step="1">
+                                <input type="range" class="growth-slider" id="wizardGrowthLevelSlider" min="0" max="100" value="0" step="5">
                                 <div class="growth-slider-labels">
-                                    <span>Minimal</span>
-                                    <span>Moderate</span>
-                                    <span>Heavy</span>
-                                    <span>Severe</span>
+                                    <span>Minimal<br>0%</span>
+                                    <span>Moderate<br>25%</span>
+                                    <span>Heavy<br>50%</span>
+                                    <span>Severe<br>200%</span>
                                 </div>
-                                <div class="growth-slider-value" id="wizardGrowthSliderValue">Minimal</div>
+                                <div class="growth-slider-value" id="wizardGrowthSliderValue">Minimal (0%)</div>
                             </div>
                             <input type="hidden" id="wizardGrowthLevel" value="minimal">
                         </div>

@@ -1014,6 +1014,14 @@ function getDirectPaintSurcharge(paintCondition) {
 
 // Get growth surcharge based on actual condition (for admin page)
 function getDirectGrowthSurcharge(growthLevel) {
+    // First check if we have a data-surcharge attribute with the exact percentage
+    const growthElement = document.getElementById('actualGrowthLevel');
+    if (growthElement && growthElement.hasAttribute('data-surcharge')) {
+        const percentage = parseFloat(growthElement.getAttribute('data-surcharge'));
+        return percentage / 100; // Convert percentage to decimal
+    }
+
+    // Fallback to original logic if no data-surcharge attribute
     switch(growthLevel) {
         case estGrowthLabels.MINIMAL:
             return 0; // No surcharge

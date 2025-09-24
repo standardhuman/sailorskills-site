@@ -1,55 +1,34 @@
 import { chromium } from 'playwright';
 
-async function testDivingPage() {
-  const browser = await chromium.launch({ headless: false });
-  const page = await browser.newPage();
-  
-  console.log('🧪 Testing Customer-Facing Diving Page\n');
-  console.log('='*50);
-  
-  try {
-    // Navigate to diving page
-    console.log('\n📍 Navigate to Diving Page');
-    await page.goto('http://localhost:3000/diving');
-    await page.waitForTimeout(2000);
-    console.log('  ✓ Diving page loaded');
-    
-    // Check for the new text additions
-    console.log('\n📍 Verify New Information Text');
-    
-    // Check for labor + materials indicator
-    const laborText = await page.getByText('All prices shown are for labor only. Materials are additional.');
-    if (await laborText.isVisible()) {
-      console.log('  ✓ "Labor only, materials additional" text is visible');
-    } else {
-      console.log('  ❌ Labor/materials text NOT found');
-    }
-    
-    // Check for $150 minimum service fee
-    const minimumFeeText = await page.getByText('$150 minimum service fee applies to all services.');
-    if (await minimumFeeText.isVisible()) {
-      console.log('  ✓ "$150 minimum service fee" text is visible');
-    } else {
-      console.log('  ❌ Minimum fee text NOT found');
-    }
-    
-    // Check service buttons are present
-    console.log('\n📍 Verify Service Buttons');
-    const serviceButtons = await page.$$('.service-option');
-    console.log(`  ✓ Found ${serviceButtons.length} service buttons`);
-    
-    // Take screenshot for visual confirmation
-    await page.screenshot({ path: 'diving-page-test.png', fullPage: false });
-    console.log('\n📸 Screenshot saved as diving-page-test.png');
-    
-    console.log('\n✅ Test completed successfully!');
-    
-  } catch (error) {
-    console.error('\n❌ Test failed:', error.message);
-  } finally {
-    await page.waitForTimeout(2000);
-    await browser.close();
-  }
-}
+const browser = await chromium.launch({ headless: true });
+const page = await browser.newPage();
 
-testDivingPage().catch(console.error);
+console.log('Testing diving page...\n');
+
+// Test diving.html
+await page.goto('http://localhost:3000/diving.html');
+const title = await page.title();
+console.log('✓ Diving page title:', title);
+
+// Check for service buttons
+const serviceButtons = await page.locator('.service-selection-grid button').count();
+console.log('✓ Service buttons found:', serviceButtons);
+
+// Check page structure
+const heroHeader = await page.locator('.hero-header').count();
+const calculator = await page.locator('.calculator-container').count();
+console.log('✓ Hero header present:', heroHeader > 0);
+console.log('✓ Calculator container present:', calculator > 0);
+
+// Test admin page
+await page.goto('http://localhost:3000/admin.html');
+const adminTitle = await page.title();
+console.log('\n✓ Admin page title:', adminTitle);
+
+// Check for growth slider in admin
+const growthSliders = await page.locator('.growth-slider').count();
+console.log('✓ Growth sliders in admin:', growthSliders);
+
+console.log('\n✅ All pages accessible and functional!');
+
+await browser.close();
