@@ -1326,7 +1326,76 @@
             </form>
         </div>
     </div>
-    
+
+    <!-- Customer Selection Modal (for charging without pre-selected customer) -->
+    <div id="customerSelectionModal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 600px;">
+            <span class="close" onclick="closeCustomerSelectionModal()">&times;</span>
+            <h2>Select or Enter Customer Details</h2>
+
+            <div style="margin: 20px 0;">
+                <!-- Tabs for selection method -->
+                <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                    <button id="selectExistingTab" class="tab-button active" onclick="showCustomerTab('existing')" style="flex: 1; padding: 10px; background: #345475; color: white; border: none; border-radius: 5px;">
+                        Select Existing Customer
+                    </button>
+                    <button id="manualEntryTab" class="tab-button" onclick="showCustomerTab('manual')" style="flex: 1; padding: 10px; background: #e0e0e0; color: #333; border: none; border-radius: 5px;">
+                        Enter Manual Details
+                    </button>
+                </div>
+
+                <!-- Existing Customer Selection -->
+                <div id="existingCustomerTab">
+                    <input type="text"
+                           id="modalCustomerSearch"
+                           placeholder="Search customers..."
+                           style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 5px;">
+                    <div id="modalCustomerList" style="max-height: 300px; overflow-y: auto; border: 1px solid #e0e0e0; border-radius: 5px; padding: 10px;">
+                        <!-- Customer list will be populated here -->
+                    </div>
+                    <button onclick="proceedWithSelectedCustomer()" class="submit-btn" style="margin-top: 15px; width: 100%;">
+                        Proceed with Selected Customer
+                    </button>
+                </div>
+
+                <!-- Manual Entry -->
+                <div id="manualEntryTab" style="display: none;">
+                    <form id="manualCustomerForm">
+                        <div class="form-group">
+                            <label for="manualCustomerName">Customer Name *</label>
+                            <input type="text" id="manualCustomerName" required placeholder="John Doe">
+                        </div>
+                        <div class="form-group">
+                            <label for="manualCustomerEmail">Email</label>
+                            <input type="email" id="manualCustomerEmail" placeholder="customer@example.com (optional)">
+                        </div>
+                        <div class="form-group">
+                            <label for="manualCustomerPhone">Phone</label>
+                            <input type="tel" id="manualCustomerPhone" placeholder="(555) 123-4567 (optional)">
+                        </div>
+                        <div class="form-group">
+                            <label for="manualBoatName">Boat Name</label>
+                            <input type="text" id="manualBoatName" placeholder="Optional">
+                        </div>
+                        <div class="form-group">
+                            <label for="paymentMethod">Payment Method *</label>
+                            <select id="paymentMethod" required>
+                                <option value="cash">Cash</option>
+                                <option value="check">Check</option>
+                                <option value="venmo">Venmo</option>
+                                <option value="zelle">Zelle</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="submit-btn" style="width: 100%;">
+                            Proceed with Manual Entry
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="container">
         
         <!-- Customer Selector Section -->
@@ -1374,6 +1443,11 @@
         
         <!-- Define selectServiceDirect and wizard functions immediately -->
         <script>
+            // Stub for updateChargeSummary (will be overridden later)
+            window.updateChargeSummary = function() {
+                console.log('updateChargeSummary stub called - waiting for real implementation');
+            };
+
             // Update pricing display in wizard
             window.updateWizardPricing = function() {
                 const wizardCostBreakdown = document.getElementById('wizardCostBreakdown');
@@ -1541,10 +1615,17 @@
 
             window.selectServiceDirect = function(serviceKey) {
                 console.log('Direct service selection:', serviceKey);
-                
+
                 // Update service state
                 window.currentServiceKey = serviceKey;
                 window.selectedServiceKey = serviceKey;
+
+                // Update charge summary to enable button (with delay to ensure function is loaded)
+                setTimeout(() => {
+                    if (window.updateChargeSummary) {
+                        window.updateChargeSummary();
+                    }
+                }, 100);
                 
                 // Hide the simple service buttons
                 const simpleButtons = document.getElementById('simpleServiceButtons');
@@ -3489,10 +3570,17 @@
         // Direct service selection (skips the two-click behavior)
         window.selectServiceDirect = function(serviceKey) {
             console.log('Direct service selection:', serviceKey);
-            
+
             // Update service state
             window.currentServiceKey = serviceKey;
             window.selectedServiceKey = serviceKey;
+
+            // Update charge summary to enable button (with delay to ensure function is loaded)
+            setTimeout(() => {
+                if (window.updateChargeSummary) {
+                    window.updateChargeSummary();
+                }
+            }, 100);
             
             // Use the existing transitionToDetailsForm function if available
             if (typeof window.transitionToDetailsForm === 'function') {
@@ -3629,24 +3717,16 @@
         function updateChargeSummary() {
             const chargeDetails = document.getElementById('chargeDetails');
             const chargeButton = document.getElementById('chargeButton');
-            
-            if (!selectedCustomer) {
-                chargeDetails.innerHTML = `
-                    <div style="text-align: center; color: #7f8c8d;">
-                        Select a customer and configure service details
-                    </div>
-                `;
-                chargeButton.disabled = true;
-                return;
-            }
 
             // Get service info and price
             const totalElement = document.getElementById('totalCostDisplay');
             const servicePrice = totalElement ? parseFloat(totalElement.textContent.replace('$', '').replace(',', '')) : 0;
-            
-            const selectedServiceEl = document.querySelector('.service-option.selected');
-            const serviceTitleEl = selectedServiceEl ? selectedServiceEl.querySelector('.service-title') : null;
-            const serviceName = serviceTitleEl ? serviceTitleEl.textContent : '';
+
+            // Get service name from the current selection method
+            let serviceName = '';
+            if (window.selectedServiceKey && window.serviceData && window.serviceData[window.selectedServiceKey]) {
+                serviceName = window.serviceData[window.selectedServiceKey].name;
+            }
             
             // Check if this is "Anodes Only" service
             const isAnodesOnlyService = window.selectedServiceKey === 'anodes_only';
@@ -3680,24 +3760,40 @@
             const combinedTotal = servicePrice + anodeTotalWithMarkupAndTax;
 
             // Build the charge details HTML
-            let detailsHTML = `
-                <div class="charge-detail-row">
-                    <span>Customer:</span>
-                    <span>${selectedCustomer.name || 'Unnamed'}</span>
-                </div>
-                <div class="charge-detail-row">
-                    <span>Email:</span>
-                    <span>${selectedCustomer.email}</span>
-                </div>
-                <div class="charge-detail-row">
-                    <span>Payment Method:</span>
-                    <span style="color: ${selectedCustomer.payment_method ? '#27ae60' : '#e74c3c'}">
-                        ${selectedCustomer.payment_method ? 
-                            `Card ending in ${selectedCustomer.payment_method.card.last4}` : 
-                            'No card on file'}
-                    </span>
-                </div>
-            `;
+            let detailsHTML = '';
+
+            // Show customer info if selected, otherwise show placeholder
+            if (selectedCustomer) {
+                detailsHTML = `
+                    <div class="charge-detail-row">
+                        <span>Customer:</span>
+                        <span>${selectedCustomer.name || 'Unnamed'}</span>
+                    </div>
+                    <div class="charge-detail-row">
+                        <span>Email:</span>
+                        <span>${selectedCustomer.email}</span>
+                    </div>
+                    <div class="charge-detail-row">
+                        <span>Payment Method:</span>
+                        <span style="color: ${selectedCustomer.payment_method ? '#27ae60' : '#e74c3c'}">
+                            ${selectedCustomer.payment_method ?
+                                `Card ending in ${selectedCustomer.payment_method.card.last4}` :
+                                'No card on file'}
+                        </span>
+                    </div>
+                `;
+            } else {
+                detailsHTML = `
+                    <div class="charge-detail-row">
+                        <span>Customer:</span>
+                        <span style="color: #e74c3c; font-style: italic;">No customer selected</span>
+                    </div>
+                    <div class="charge-detail-row">
+                        <span></span>
+                        <span style="font-size: 12px; color: #7f8c8d;">Select a customer or enter details when charging</span>
+                    </div>
+                `;
+            }
             
             // Add breakdown if there are charges
             if (serviceName || anodeItems.length > 0) {
@@ -3776,16 +3872,38 @@
             chargeDetails.innerHTML = detailsHTML;
             
             // Update charge button based on editable amount
-            const editableAmount = parseFloat(document.getElementById('editableAmount')?.value || 0);
-            chargeButton.disabled = !selectedCustomer.payment_method || editableAmount === 0;
-            chargeButton.textContent = selectedCustomer.payment_method ? 
-                `💳 Charge $${editableAmount.toFixed(2)}` : 'No Payment Method Available';
+            const editableAmount = parseFloat(document.getElementById('editableAmount')?.value || combinedTotal);
+
+            // Enable button if there's a service configured
+            chargeButton.disabled = !window.currentServiceKey;
+
+            // Update button text based on customer selection
+            if (selectedCustomer) {
+                chargeButton.textContent = selectedCustomer.payment_method ?
+                    `💳 Charge $${editableAmount.toFixed(2)}` : `💳 Charge $${editableAmount.toFixed(2)} (No card on file)`;
+            } else {
+                chargeButton.textContent = `💳 Charge $${editableAmount.toFixed(2)}`;
+            }
         }
 
         // Charge the customer
         async function chargeCustomer() {
-            if (!selectedCustomer || !selectedCustomer.payment_method) {
-                alert('Please select a customer with a payment method on file');
+            // Check if a service is configured
+            const service = window.currentServiceKey;
+            if (!service) {
+                alert('Please select a service first');
+                return;
+            }
+
+            // If no customer selected, show the modal
+            if (!selectedCustomer) {
+                openCustomerSelectionModal();
+                return;
+            }
+
+            // If customer selected but no payment method
+            if (!selectedCustomer.payment_method) {
+                alert('Please add a payment method for this customer');
                 return;
             }
 
@@ -3807,15 +3925,15 @@
             
             // Get selected service key and details
             const selectedServiceEl = document.querySelector('.service-option.selected');
-            const service = selectedServiceEl ? selectedServiceEl.dataset.serviceKey : '';
+            const serviceKeyFromElement = selectedServiceEl ? selectedServiceEl.dataset.serviceKey : '';
             const serviceTitleEl = selectedServiceEl ? selectedServiceEl.querySelector('.service-title') : null;
             const serviceName = serviceTitleEl ? serviceTitleEl.textContent : '';
             const boatLength = document.getElementById('boatLength').value;
             const boatName = document.getElementById('boatName')?.value || '';
 
             // Build comprehensive metadata for transaction history
-            const metadata = { 
-                service_key: service,
+            const metadata = {
+                service_key: serviceKeyFromElement || service,
                 service_name: serviceName,
                 service_date: new Date().toISOString().split('T')[0],
                 service_time: new Date().toLocaleTimeString()
@@ -3944,6 +4062,187 @@
         // Make functions globally available
         window.chargeCustomer = chargeCustomer;
         window.updateChargeSummary = updateChargeSummary;
+
+        // If a service was already selected before this script loaded, update the summary now
+        if (window.currentServiceKey) {
+            console.log('Service already selected, updating charge summary:', window.currentServiceKey);
+            updateChargeSummary();
+        }
+
+        // Customer Selection Modal Functions
+        function openCustomerSelectionModal() {
+            const modal = document.getElementById('customerSelectionModal');
+            if (modal) {
+                modal.style.display = 'block';
+                // Populate existing customers list
+                const customerList = document.getElementById('modalCustomerList');
+                if (customerList && customers) {
+                    customerList.innerHTML = customers.map(customer => `
+                        <div class="customer-item" onclick="selectModalCustomer('${customer.id}')" style="padding: 10px; border: 1px solid #ddd; margin-bottom: 5px; cursor: pointer; border-radius: 5px;">
+                            <div style="font-weight: bold;">${customer.name || 'Unnamed Customer'}</div>
+                            <div style="font-size: 14px; color: #666;">${customer.email}${customer.boat_name ? ' • Boat: ' + customer.boat_name : ''}</div>
+                            <div style="font-size: 12px; color: ${customer.payment_method ? 'green' : 'orange'};">
+                                ${customer.payment_method ? '✓ Card on file' : '⚠ No card on file'}
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            }
+        }
+
+        function closeCustomerSelectionModal() {
+            const modal = document.getElementById('customerSelectionModal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        function showCustomerTab(tab) {
+            const existingTab = document.getElementById('existingCustomerTab');
+            const manualTab = document.getElementById('manualEntryTab');
+            const existingBtn = document.getElementById('selectExistingTab');
+            const manualBtn = document.getElementById('manualEntryTab');
+
+            if (tab === 'existing') {
+                if (existingTab) existingTab.style.display = 'block';
+                if (manualTab) manualTab.style.display = 'none';
+                if (existingBtn) {
+                    existingBtn.style.background = '#345475';
+                    existingBtn.style.color = 'white';
+                    existingBtn.classList.add('active');
+                }
+                if (manualBtn) {
+                    manualBtn.style.background = '#e0e0e0';
+                    manualBtn.style.color = '#333';
+                    manualBtn.classList.remove('active');
+                }
+            } else {
+                if (existingTab) existingTab.style.display = 'none';
+                if (manualTab) manualTab.style.display = 'block';
+                if (manualBtn) {
+                    manualBtn.style.background = '#345475';
+                    manualBtn.style.color = 'white';
+                    manualBtn.classList.add('active');
+                }
+                if (existingBtn) {
+                    existingBtn.style.background = '#e0e0e0';
+                    existingBtn.style.color = '#333';
+                    existingBtn.classList.remove('active');
+                }
+            }
+        }
+
+        let modalSelectedCustomerId = null;
+
+        function selectModalCustomer(customerId) {
+            modalSelectedCustomerId = customerId;
+            // Highlight selected customer
+            document.querySelectorAll('#modalCustomerList .customer-item').forEach(el => {
+                el.style.background = 'white';
+            });
+            event.currentTarget.style.background = '#e8f4ff';
+        }
+
+        async function proceedWithSelectedCustomer() {
+            if (!modalSelectedCustomerId) {
+                alert('Please select a customer');
+                return;
+            }
+
+            // Find and set the selected customer
+            selectedCustomer = customers.find(c => c.id === modalSelectedCustomerId);
+            if (!selectedCustomer) {
+                alert('Customer not found');
+                return;
+            }
+
+            // Check if customer has payment method
+            if (!selectedCustomer.payment_method) {
+                if (confirm('This customer has no payment method on file. Would you like to add one now?')) {
+                    closeCustomerSelectionModal();
+                    showAddPaymentMethod(selectedCustomer.id);
+                    return;
+                } else {
+                    return;
+                }
+            }
+
+            // Close modal and proceed with charge
+            closeCustomerSelectionModal();
+            updateChargeSummary();
+            // Call chargeCustomer again now that we have a customer selected
+            chargeCustomer();
+        }
+
+        async function proceedWithManualCustomer() {
+            const name = document.getElementById('manualCustomerName')?.value;
+            const email = document.getElementById('manualCustomerEmail')?.value;
+            const phone = document.getElementById('manualCustomerPhone')?.value;
+            const boatName = document.getElementById('manualBoatName')?.value;
+            const paymentMethod = document.getElementById('manualPaymentMethod')?.value;
+
+            if (!name || !email) {
+                alert('Please enter at least name and email');
+                return;
+            }
+
+            // Here we would typically create a new customer via API
+            // For now, we'll just create a temporary customer object
+            const tempCustomer = {
+                id: 'temp_' + Date.now(),
+                name: name,
+                email: email,
+                phone: phone,
+                boat_name: boatName,
+                payment_method: paymentMethod ? { type: 'manual', details: paymentMethod } : null
+            };
+
+            // In production, this would make an API call to create the customer
+            try {
+                // Simulate API call
+                console.log('Creating customer:', tempCustomer);
+                alert('Manual customer entry would create: ' + name + ' (' + email + ')');
+
+                // For demo purposes, add to customers array and select
+                customers.push(tempCustomer);
+                selectedCustomer = tempCustomer;
+
+                closeCustomerSelectionModal();
+                updateChargeSummary();
+
+                // Note: In production, you'd need to handle payment method properly
+                if (!paymentMethod) {
+                    alert('Note: Customer created without payment method. Payment method would need to be added before charging.');
+                }
+            } catch (error) {
+                console.error('Error creating customer:', error);
+                alert('Failed to create customer. Please try again.');
+            }
+        }
+
+        // Modal search functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const modalSearch = document.getElementById('modalCustomerSearch');
+            if (modalSearch) {
+                modalSearch.addEventListener('input', function(e) {
+                    const searchTerm = e.target.value.toLowerCase();
+                    const customerItems = document.querySelectorAll('#modalCustomerList .customer-item');
+
+                    customerItems.forEach(item => {
+                        const text = item.textContent.toLowerCase();
+                        item.style.display = text.includes(searchTerm) ? 'block' : 'none';
+                    });
+                });
+            }
+        });
+
+        // Make modal functions globally available
+        window.openCustomerSelectionModal = openCustomerSelectionModal;
+        window.closeCustomerSelectionModal = closeCustomerSelectionModal;
+        window.showCustomerTab = showCustomerTab;
+        window.selectModalCustomer = selectModalCustomer;
+        window.proceedWithSelectedCustomer = proceedWithSelectedCustomer;
+        window.proceedWithManualCustomer = proceedWithManualCustomer;
         window.updateChargeButton = updateChargeButton;
 
         // Show result message
@@ -3998,8 +4297,8 @@
                 section.style.display = 'none';
                 section.classList.remove('active');
             }
-        }
-        
+        }; // End of toggleAnodeSection
+
         // Load anode catalog from JSON file
         async function loadAnodeCatalog() {
             try {
@@ -4136,8 +4435,8 @@
             event.target.classList.add('active');
             
             displayAnodes();
-        }
-        
+        }; // End of filterAnodes
+
         // Update anode quantity
         window.updateAnodeQuantity = function(anodeId, change) {
             const anode = anodeCatalog.find(a => a.boatzincs_id === anodeId);
@@ -4155,8 +4454,8 @@
             
             document.getElementById(`qty-${anodeId}`).value = anodeCart[anodeId]?.quantity || 0;
             updateCart();
-        }
-        
+        }; // End of updateAnodeQuantity
+
         // Set anode quantity directly
         window.setAnodeQuantity = function(anodeId, value) {
             const quantity = parseInt(value) || 0;
@@ -4169,8 +4468,8 @@
                 }
             }
             updateCart();
-        }
-        
+        }; // End of setAnodeQuantity
+
         // Update cart display and totals
         function updateCart() {
             const cartItems = document.getElementById('cartItems');
@@ -4256,8 +4555,8 @@
                     ${boat.completed ? '<div class="boat-status">✓ Completed</div>' : ''}
                 </div>
             `).join('');
-        }
-        
+        }; // End of loadDailySchedule
+
         // Select boat from schedule
         window.selectBoatFromSchedule = function(boatId, boatName, customerName) {
             selectedBoat = { id: boatId, name: boatName, customer: customerName };
@@ -4276,13 +4575,13 @@
             anodeCart = {};
             displayAnodes();
             updateCart();
-        }
-        
+        }; // End of selectBoatFromSchedule
+
         // Upload schedule CSV
         window.uploadScheduleCSV = function() {
             alert('CSV upload feature coming soon. For now, use the manual schedule entry.');
-        }
-        
+        }; // End of uploadScheduleCSV
+
         // Generate quote for customer (anodes only)
         window.generateQuote = function() {
             const taxRate = parseFloat(document.getElementById('taxRate').value) || 10.75;
@@ -4303,8 +4602,8 @@
             
             // Open quote page in new tab
             window.open('/anode-quote.html?' + params.toString(), '_blank');
-        }
-        
+        }; // End of generateQuote
+
         // Generate combined quote for services and anodes
         window.generateCombinedQuote = function() {
             // Get all current data
@@ -4342,8 +4641,8 @@
             
             // Open comprehensive quote page
             window.open('/comprehensive-quote.html?load=current', '_blank');
-        }
-        
+        }; // End of generateCombinedQuote
+
         // Charge customer for anodes
         window.chargeAnodes = async function() {
             if (!selectedCustomer || Object.keys(anodeCart).length === 0) return;
@@ -4402,7 +4701,8 @@
             } catch (error) {
                 showResult('error', 'Failed to charge customer: ' + error.message);
             }
-        }
+        }; // End of chargeAnodes function
+
         } catch (err) {
             console.error('Module script error:', err);
         }
