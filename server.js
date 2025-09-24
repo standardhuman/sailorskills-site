@@ -55,14 +55,20 @@ app.use((req, res) => {
     res.status(404).send('Page not found');
 });
 
-app.listen(PORT, () => {
-    console.log(`🚀 Server running at http://localhost:${PORT}`);
-    console.log('📁 Auto-reload enabled with nodemon');
-    console.log('Available routes:');
-    console.log('  http://localhost:' + PORT + '/');
-    console.log('  http://localhost:' + PORT + '/diving');
-    console.log('  http://localhost:' + PORT + '/admin');
-    console.log('  http://localhost:' + PORT + '/booking');
-    console.log('  http://localhost:' + PORT + '/anode-quote');
-    console.log('  http://localhost:' + PORT + '/comprehensive-quote');
-});
+// Only listen if not in Vercel
+if (process.env.VERCEL !== '1') {
+    app.listen(PORT, () => {
+        console.log(`🚀 Server running at http://localhost:${PORT}`);
+        console.log('📁 Auto-reload enabled with nodemon');
+        console.log('Available routes:');
+        console.log('  http://localhost:' + PORT + '/');
+        console.log('  http://localhost:' + PORT + '/diving');
+        console.log('  http://localhost:' + PORT + '/admin');
+        console.log('  http://localhost:' + PORT + '/booking');
+        console.log('  http://localhost:' + PORT + '/anode-quote');
+        console.log('  http://localhost:' + PORT + '/comprehensive-quote');
+    });
+}
+
+// Export for Vercel
+export default app;
