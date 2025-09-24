@@ -20,17 +20,17 @@ try {
     console.warn('Quote routes not available:', error.message);
 }
 
-// Serve static files (CSS, JS, images, etc)
-app.use(express.static(__dirname));
-
-// HTML routes (serve HTML without extensions in URL)
+// HTML routes (serve HTML without extensions in URL) - BEFORE static files
 app.get('/diving', (req, res) => {
     res.sendFile(path.join(__dirname, 'diving.html'));
 });
 
 app.get(['/admin', '/admin/'], (req, res) => {
-    res.sendFile(path.join(__dirname, 'admin-new.html'));
+    res.sendFile(path.join(__dirname, 'admin.html'));
 });
+
+// Serve static files (CSS, JS, images, etc) - AFTER specific routes
+app.use(express.static(__dirname));
 
 app.get('/booking', (req, res) => {
     res.sendFile(path.join(__dirname, 'booking.html'));

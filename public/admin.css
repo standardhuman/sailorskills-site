@@ -7,6 +7,7 @@ body {
     margin: 0;
     padding: 0;
     color: #181818;
+    overflow-x: hidden;
 }
 
 /* Hero Header */
@@ -1160,4 +1161,242 @@ input[type="hidden"] {
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+    /* Main content spacing */
+    .main-content {
+        min-height: calc(100vh - 60px);
+    }
+
+    /* Admin badge position for mobile with nav header */
+    .admin-badge {
+        top: 70px !important;
+        right: 10px !important;
+        padding: 6px 12px !important;
+        font-size: 10px !important;
+    }
+
+    /* Hero adjustments for mobile */
+    .hero-header {
+        min-height: 180px;
+    }
+
+    .hero-content {
+        padding: 20px 15px 30px !important;
+    }
+
+    .hero-brand {
+        font-size: 16px !important;
+    }
+
+    .hero-title {
+        font-size: 60px !important;
+    }
+
+    .hero-tagline {
+        font-size: 16px;
+    }
+
+    .hero-subtitle {
+        font-size: 12px !important;
+    }
+
+    /* Container mobile padding */
+    .container {
+        padding: 15px !important;
+        max-width: 100%;
+    }
+
+    /* Customer controls mobile layout */
+    .customer-controls {
+        flex-direction: column !important;
+        gap: 12px !important;
+    }
+
+    .customer-search-input {
+        font-size: 16px !important; /* Prevent zoom on iOS */
+        width: 100% !important;
+    }
+
+    .customer-buttons {
+        width: 100%;
+        justify-content: stretch;
+    }
+
+    .customer-btn {
+        flex: 1;
+        min-height: 44px !important;
+        font-size: 14px !important;
+    }
+
+    /* Customer list mobile */
+    .customer-list {
+        max-height: 400px !important;
+    }
+
+    .customer-item {
+        padding: 18px 15px !important;
+        min-height: 60px;
+    }
+
+    /* Service buttons mobile */
+    .simple-service-buttons {
+        flex-direction: column;
+    }
+
+    .simple-service-btn {
+        width: 100%;
+        min-height: 50px !important;
+        font-size: 14px !important;
+    }
+
+    /* Modal mobile */
+    .modal-content {
+        width: 95% !important;
+        margin: 10% auto !important;
+        padding: 20px !important;
+        max-height: 85vh;
+        overflow-y: auto;
+    }
+
+    /* Form fields mobile */
+    .form-row {
+        flex-direction: column !important;
+    }
+
+    .form-field input,
+    .form-field select {
+        font-size: 16px !important; /* Prevent zoom */
+        padding: 12px !important;
+        min-height: 44px;
+    }
+
+    /* Wizard fields mobile */
+    .wizard-field input[type="number"],
+    .wizard-field input[type="range"],
+    .wizard-field select {
+        font-size: 16px !important;
+    }
+
+    /* Radio options mobile */
+    .radio-option {
+        min-height: 50px !important;
+        padding: 16px !important;
+    }
+
+    /* Buttons mobile */
+    .charge-button,
+    .btn-primary,
+    .btn-secondary,
+    .tab-button {
+        min-height: 44px !important;
+        font-size: 16px !important;
+        padding: 12px 20px !important;
+    }
+
+    /* Charge summary mobile */
+    .charge-summary {
+        padding: 20px 15px !important;
+    }
+
+    /* Anode grid mobile */
+    .anode-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* Navigation header mobile */
+    .navigation-header {
+        padding: 10px 15px;
+    }
+
+    .nav-links {
+        display: none; /* Hide desktop nav on mobile */
+    }
+
+    .nav-container {
+        justify-content: center;
+    }
+
+    .nav-logo {
+        font-size: 14px;
+    }
+
+    /* Status messages mobile */
+    .charge-result {
+        font-size: 14px !important;
+        padding: 12px !important;
+    }
+
+    /* Quote details mobile */
+    .quote-details {
+        padding: 15px !important;
+    }
+
+    .quote-details p {
+        font-size: 13px !important;
+    }
+}
+
+/* Small mobile specific (iPhone SE, etc.) */
+@media (max-width: 480px) {
+    .hero-title {
+        font-size: 48px !important;
+    }
+
+    .hero-brand,
+    .hero-tagline {
+        font-size: 14px !important;
+    }
+
+    .hero-subtitle {
+        font-size: 11px !important;
+    }
+
+    .container {
+        padding: 10px !important;
+    }
+
+    .admin-badge {
+        font-size: 9px !important;
+        padding: 5px 10px !important;
+    }
+
+    .customer-section h2,
+    .service-selector h2,
+    .charge-summary h3 {
+        font-size: 20px !important;
+    }
+}
+
+/* Tablet specific */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .container {
+        padding: 20px 30px !important;
+    }
+
+    .hero-title {
+        font-size: 80px !important;
+    }
+
+    .admin-badge {
+        top: 80px !important;
+    }
+}
+
+/* Ensure touch targets are accessible */
+button,
+input,
+select,
+textarea,
+a {
+    touch-action: manipulation;
+}
+
+/* Prevent horizontal scroll */
+html,
+body {
+    max-width: 100%;
+    overflow-x: hidden;
 }

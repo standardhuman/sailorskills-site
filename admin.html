@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="admin.css">
     <style>
         /* Admin specific styles - matching cost calculator theme */
         body {
@@ -80,6 +81,42 @@
             margin: 0 auto;
             padding: 20px 40px 40px;
             font-family: 'Montserrat', sans-serif;
+        }
+
+        /* Mobile responsive adjustments */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .admin-badge {
+                top: 70px !important;
+                right: 10px !important;
+                padding: 6px 12px !important;
+                font-size: 10px !important;
+            }
+
+            /* Mobile hero adjustments */
+            .hero-service {
+                font-size: 60px !important;
+            }
+
+            .hero-brand, .hero-tagline {
+                font-size: 16px !important;
+            }
+
+            .hero-content {
+                padding: 20px 15px 30px !important;
+            }
+
+            /* Mobile form adjustments */
+            .customer-controls {
+                flex-direction: column !important;
+            }
+
+            .amount-input, .customer-search-input {
+                font-size: 16px !important; /* Prevent zoom on iOS */
+            }
         }
         
         .admin-badge {
@@ -1219,16 +1256,32 @@
     </style>
 </head>
 <body>
-    <!-- Hero Header -->
-    <div class="hero-header">
-        <div class="admin-badge">ADMIN MODE</div>
-        <div class="hero-content">
-            <div class="hero-brand">SAILOR SKILLS</div>
-            <h1 class="hero-service">ADMIN</h1>
-            <div class="hero-tagline">CHARGE CUSTOMER</div>
-            <div class="hero-subtitle">Use pricing calculator for existing customers</div>
+    <!-- Navigation Header -->
+    <header class="navigation-header">
+        <div class="nav-container">
+            <a href="https://www.sailorskills.com/" class="nav-logo">SAILOR SKILLS</a>
+            <nav class="nav-links">
+                <a href="https://www.sailorskills.com/">HOME</a>
+                <a href="https://www.sailorskills.com/training">TRAINING</a>
+                <a href="https://www.sailorskills.com/diving">DIVING</a>
+                <a href="https://www.sailorskills.com/detailing">DETAILING</a>
+                <a href="https://www.sailorskills.com/deliveries">DELIVERIES</a>
+            </nav>
         </div>
-    </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Hero Header -->
+        <div class="hero-header">
+            <div class="admin-badge">ADMIN MODE</div>
+            <div class="hero-content">
+                <div class="hero-brand">SAILOR SKILLS</div>
+                <h1 class="hero-service">ADMIN</h1>
+                <div class="hero-tagline">CHARGE CUSTOMER</div>
+                <div class="hero-subtitle">Use pricing calculator for existing customers</div>
+            </div>
+        </div>
     
     <!-- Add Payment Method Modal -->
     <div id="paymentMethodModal" class="modal" style="display: none;">
@@ -4728,5 +4781,6 @@
             console.error('Error stack:', err.stack);
         }
     </script>
+    </main>
 </body>
 </html>
