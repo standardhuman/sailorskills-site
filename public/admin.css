@@ -27,6 +27,30 @@ body {
     align-items: center;
 }
 
+/* Fix navigation menu overflow */
+.navigation-header {
+    width: 100%;
+    padding: 10px 15px !important;
+    overflow-x: auto;
+    box-sizing: border-box;
+}
+
+.nav-menu {
+    display: flex;
+    gap: clamp(8px, 1.5vw, 15px);
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.nav-menu a {
+    white-space: nowrap;
+    font-size: clamp(11px, 2.3vw, 14px);
+    padding: 5px 8px;
+}
+
 /* Hero Header - Fully Responsive and Contained */
 .hero-header {
     background-color: #ffffff;
@@ -37,7 +61,7 @@ body {
     justify-content: center;
     position: relative;
     border-bottom: 1px solid #345475;
-    padding: clamp(15px, 3vw, 30px) 10px; /* Consistent side padding */
+    padding: clamp(15px, 3vw, 30px) 15px; /* Proper side padding */
     box-sizing: border-box;
 }
 
@@ -81,12 +105,12 @@ body {
     margin-top: clamp(3px, 0.5vw, 5px);
 }
 
-/* Container - Fully Responsive and Centered */
+/* Container - Fully Responsive and Centered with Proper Padding */
 .container {
-    width: 100%;
-    max-width: min(600px, calc(100% - 20px)); /* Always leave 10px padding on sides */
+    width: calc(100% - 30px); /* 15px padding on each side */
+    max-width: 600px;
     margin: 0 auto;
-    padding: clamp(10px, 3vw, 20px);
+    padding: clamp(10px, 3vw, 20px) 0;
     font-family: 'Montserrat', sans-serif;
     box-sizing: border-box;
     display: flex;
@@ -300,7 +324,7 @@ body {
 
 .simple-service-buttons {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(150px, calc(50% - 5px)), 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr)); /* Prevent overflow with minmax(0, 1fr) */
     gap: clamp(8px, 2vw, 12px);
     margin: clamp(12px, 3vw, 20px) 0;
     width: 100%;
