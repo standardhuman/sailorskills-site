@@ -996,13 +996,26 @@ export class AdminApp {
                    !(name.includes('strip') && name.includes('3-foot'));
         });
 
-        // Filter by shaft category and type
+        // Filter by shaft category first
         filtered = filtered.filter(anode => {
             const cat = (anode.category || '').toLowerCase();
+            return cat.includes('shaft');
+        });
+
+        // Then filter by standard (inch) vs metric (mm)
+        filtered = filtered.filter(anode => {
+            const name = anode.name || '';
+            const desc = anode.description || '';
+            const combined = (name + ' ' + desc).toLowerCase();
+
             if (shaftType === 'standard') {
-                return cat === 'shaft_anodes_standard';
+                // Standard sizes use inches (fractions or decimals with ")
+                return combined.match(/\d+\/\d+"|[\d.]+"\s|inch/i) &&
+                       !combined.match(/\d+mm|metric/i);
             } else if (shaftType === 'metric') {
-                return cat === 'shaft_anodes_metric';
+                // Metric sizes use mm
+                return combined.match(/\d+mm|metric/i) &&
+                       !combined.match(/\d+\/\d+"|[\d.]+"\s/);
             }
             return false;
         });
