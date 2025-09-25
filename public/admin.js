@@ -62,31 +62,34 @@ export class AdminApp {
 
         // If we found a target element, scroll to it
         if (targetElement && targetElement.style.display !== 'none') {
-            // Calculate the position to scroll to, accounting for any fixed headers
-            // and adding extra offset to push service buttons completely off screen
-            const headerHeight = 60; // Approximate height of navigation header
-            const extraOffset = 100; // Additional offset to ensure buttons are off screen
-            const elementPosition = targetElement.getBoundingClientRect().top + window.pageYOffset;
+            // Get the service buttons container to ensure we scroll past it
+            const buttonsContainer = document.getElementById('simpleServiceButtons') ||
+                                    document.querySelector('.simple-service-buttons');
 
-            // Try to center the form in the viewport if possible
-            const viewportHeight = window.innerHeight;
-            const elementHeight = targetElement.offsetHeight;
+            // Calculate how far we need to scroll to hide the buttons completely
+            if (buttonsContainer) {
+                const buttonsRect = buttonsContainer.getBoundingClientRect();
+                const buttonsBottom = buttonsRect.bottom + window.pageYOffset;
 
-            let offsetPosition;
-            if (elementHeight < viewportHeight - headerHeight) {
-                // If element fits in viewport, center it
-                const centerOffset = (viewportHeight - elementHeight) / 2;
-                offsetPosition = elementPosition - centerOffset;
+                // Add a small margin (20px) to ensure buttons are fully off screen
+                const scrollTarget = buttonsBottom + 20;
+
+                // Smooth scroll to push buttons off screen
+                window.scrollTo({
+                    top: scrollTarget,
+                    behavior: 'smooth'
+                });
             } else {
-                // Otherwise, scroll to top of element with extra offset
-                offsetPosition = elementPosition - headerHeight - extraOffset;
-            }
+                // Fallback to original behavior if we can't find buttons
+                const headerHeight = 60;
+                const elementPosition = targetElement.getBoundingClientRect().top + window.pageYOffset;
+                const offsetPosition = elementPosition - headerHeight;
 
-            // Smooth scroll to the element
-            window.scrollTo({
-                top: Math.max(0, offsetPosition),
-                behavior: 'smooth'
-            });
+                window.scrollTo({
+                    top: Math.max(0, offsetPosition),
+                    behavior: 'smooth'
+                });
+            }
         }
     }
 
@@ -628,6 +631,11 @@ export class AdminApp {
 
         // Load anode catalog
         this.loadAnodeCatalog();
+
+        // Scroll to the anode picker after a brief delay for rendering
+        setTimeout(() => {
+            this.scrollToAnodePicker();
+        }, 100);
     }
 
     closeAnodesOnlyWizard() {
@@ -728,6 +736,25 @@ export class AdminApp {
 
         // Load anode catalog
         this.loadAnodeCatalog();
+
+        // Scroll to the anode picker after a brief delay for rendering
+        setTimeout(() => {
+            this.scrollToAnodePicker();
+        }, 100);
+    }
+
+    scrollToAnodePicker() {
+        const anodeSelector = document.querySelector('.anode-selector');
+        if (anodeSelector) {
+            // Calculate position to fill the screen with the anode picker
+            const rect = anodeSelector.getBoundingClientRect();
+            const scrollTarget = rect.top + window.pageYOffset - 10; // 10px margin from top
+
+            window.scrollTo({
+                top: scrollTarget,
+                behavior: 'smooth'
+            });
+        }
     }
 
     closeAnodeWizard() {
