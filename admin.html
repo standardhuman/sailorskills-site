@@ -1480,13 +1480,13 @@
         <div class="service-selector">
             <h2>Select Service Type</h2>
             <div class="simple-service-buttons" id="simpleServiceButtons" style="display: flex; flex-wrap: wrap; gap: 10px; margin: 20px 0;">
-                <!-- Simple service buttons -->
-                <button onclick="if(window.selectServiceDirect) selectServiceDirect('recurring_cleaning')" class="simple-service-btn" style="padding: 12px 20px; background: #3498db; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px;">Recurring Cleaning</button>
-                <button onclick="if(window.selectServiceDirect) selectServiceDirect('onetime_cleaning')" class="simple-service-btn" style="padding: 12px 20px; background: #3498db; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px;">One-Time Cleaning</button>
-                <button onclick="if(window.selectServiceDirect) selectServiceDirect('item_recovery')" class="simple-service-btn" style="padding: 12px 20px; background: #3498db; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px;">Item Recovery</button>
-                <button onclick="if(window.selectServiceDirect) selectServiceDirect('underwater_inspection')" class="simple-service-btn" style="padding: 12px 20px; background: #3498db; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px;">Underwater Inspection</button>
-                <button onclick="if(window.selectServiceDirect) selectServiceDirect('propeller_service')" class="simple-service-btn" style="padding: 12px 20px; background: #3498db; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px;">Propeller Service</button>
-                <button onclick="if(window.selectServiceDirect) selectServiceDirect('anodes_only')" class="simple-service-btn" style="padding: 12px 20px; background: #e67e22; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px;">Anodes Only</button>
+                <!-- Simple service buttons with emojis and colors -->
+                <button onclick="if(window.selectServiceDirect) selectServiceDirect('recurring_cleaning')" class="simple-service-btn" style="padding: 12px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; box-shadow: 0 4px 6px rgba(102, 126, 234, 0.3); transition: all 0.3s;">🔄 Recurring Cleaning</button>
+                <button onclick="if(window.selectServiceDirect) selectServiceDirect('onetime_cleaning')" class="simple-service-btn" style="padding: 12px 20px; background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; box-shadow: 0 4px 6px rgba(52, 152, 219, 0.3); transition: all 0.3s;">🧽 One-Time Cleaning</button>
+                <button onclick="if(window.selectServiceDirect) selectServiceDirect('item_recovery')" class="simple-service-btn" style="padding: 12px 20px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; box-shadow: 0 4px 6px rgba(245, 87, 108, 0.3); transition: all 0.3s;">🔍 Item Recovery</button>
+                <button onclick="if(window.selectServiceDirect) selectServiceDirect('underwater_inspection')" class="simple-service-btn" style="padding: 12px 20px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; box-shadow: 0 4px 6px rgba(79, 172, 254, 0.3); transition: all 0.3s;">🤿 Underwater Inspection</button>
+                <button onclick="if(window.selectServiceDirect) selectServiceDirect('propeller_service')" class="simple-service-btn" style="padding: 12px 20px; background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; box-shadow: 0 4px 6px rgba(250, 112, 154, 0.3); transition: all 0.3s;">⚙️ Propeller Service</button>
+                <button onclick="if(window.selectServiceDirect) selectServiceDirect('anodes_only')" class="simple-service-btn" style="padding: 12px 20px; background: linear-gradient(135deg, #f77062 0%, #fe5196 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; box-shadow: 0 4px 6px rgba(247, 112, 98, 0.3); transition: all 0.3s;">⚡ Anodes Only</button>
             </div>
             
             <!-- Service details container -->
@@ -4781,6 +4781,12 @@
             console.error('Module script error caught:', err);
             console.error('Error stack:', err.stack);
         }
+    </script>
+
+    <!-- Load admin.js module -->
+    <script type="module">
+        import { AdminApp } from './admin.js';
+        window.adminApp = new AdminApp();
     </script>
     </main>
 </body>

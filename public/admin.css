@@ -272,7 +272,6 @@ body {
 
 .simple-service-btn {
     padding: 12px 20px;
-    background: #3498db;
     color: white;
     border: none;
     border-radius: 8px;
@@ -280,19 +279,30 @@ body {
     font-size: 16px;
     font-weight: 600;
     transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
 }
 
 .simple-service-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
 
-.simple-service-btn[onclick*="anodes"] {
-    background: #e67e22;
+.simple-service-btn:active {
+    transform: translateY(-1px) scale(0.98);
+    transition: all 0.1s ease;
 }
 
-.simple-service-btn[onclick*="anodes"]:hover {
-    box-shadow: 0 4px 12px rgba(230, 126, 34, 0.3);
+/* Service-specific hover brightness adjustments */
+.simple-service-btn:hover::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.1);
+    pointer-events: none;
 }
 
 /* Charge Summary */

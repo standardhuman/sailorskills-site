@@ -139,6 +139,43 @@ export class AdminApp {
         const wizardContent = document.getElementById('wizardContent');
         if (!wizardContent) return;
 
+        // Special handling for propeller service
+        if (serviceKey === 'propeller_service') {
+            wizardContent.innerHTML = `
+                <div class="admin-wizard">
+                    <h3>${window.serviceData[serviceKey].name}</h3>
+                    <div class="wizard-field">
+                        <label>Number of Propellers</label>
+                        <input type="number" id="propellerCount" min="1" max="4" value="1"
+                               oninput="adminApp.updatePropellerService()">
+                        <div style="margin-top: 10px; color: #666; font-size: 14px;">
+                            Service rate: $349 per propeller
+                        </div>
+                    </div>
+                    <div class="wizard-field">
+                        <label>
+                            <input type="checkbox" id="propellerRemoval" checked
+                                   onchange="adminApp.updatePropellerService()">
+                            <span>Removal Service</span>
+                        </label>
+                    </div>
+                    <div class="wizard-field">
+                        <label>
+                            <input type="checkbox" id="propellerInstall"
+                                   onchange="adminApp.updatePropellerService()">
+                            <span>Installation Service</span>
+                        </label>
+                    </div>
+                    <div class="wizard-actions">
+                        <button class="btn-secondary" onclick="adminApp.backToServices()">← Back</button>
+                    </div>
+                </div>
+            `;
+            // Initialize propeller service calculation
+            this.updatePropellerService();
+            return;
+        }
+
         // Create simplified wizard for admin
         wizardContent.innerHTML = `
             <div class="admin-wizard">
@@ -268,7 +305,70 @@ export class AdminApp {
         // updateFromWizard is called from the oninput handler
     }
 
+    updatePropellerService() {
+        const count = parseInt(document.getElementById('propellerCount')?.value) || 1;
+        const removal = document.getElementById('propellerRemoval')?.checked;
+        const install = document.getElementById('propellerInstall')?.checked;
+
+        let totalServices = 0;
+        if (removal) totalServices += count;
+        if (install) totalServices += count;
+
+        const price = totalServices * 349;
+
+        // Update display
+        const displayEl = document.getElementById('totalCostDisplay');
+        if (displayEl) {
+            displayEl.textContent = `$${price.toFixed(2)}`;
+        }
+
+        // Store details for charge summary
+        this.propellerDetails = {
+            count: count,
+            removal: removal,
+            install: install,
+            totalServices: totalServices,
+            price: price
+        };
+
+        this.updateChargeSummary();
+    }
+
+    backToServices() {
+        // Hide wizard and show service buttons
+        const wizardContainer = document.getElementById('wizardContainer');
+        if (wizardContainer) {
+            wizardContainer.style.display = 'none';
+        }
+
+        const simpleButtons = document.getElementById('simpleServiceButtons');
+        if (simpleButtons) {
+            simpleButtons.style.display = 'flex';
+        }
+
+        const serviceHeading = document.querySelector('.service-selector h2');
+        if (serviceHeading) {
+            serviceHeading.style.display = 'block';
+        }
+
+        // Clear current service
+        this.currentServiceKey = null;
+        this.propellerDetails = null;
+        this.updateChargeSummary();
+    }
+
     updateFromWizard() {
+        // Debounce updates to prevent lag on slider changes
+        if (this.updateTimeout) {
+            clearTimeout(this.updateTimeout);
+        }
+
+        this.updateTimeout = setTimeout(() => {
+            this._performWizardUpdate();
+        }, 100);
+    }
+
+    _performWizardUpdate() {
         // Update boat length
         const boatLength = document.getElementById('adminBoatLength')?.value || 30;
         document.getElementById('boatLength').value = boatLength;
@@ -1068,6 +1168,34 @@ export class AdminApp {
 
                 // Update total price to include anodes
                 price += this.anodeDetails.totalPrice + laborCost;
+            }
+
+            // Add propeller service details if applicable
+            if (this.propellerDetails && this.currentServiceKey === 'propeller_service') {
+                const details = this.propellerDetails;
+                detailsHTML += `
+                <div class="charge-detail-row" style="font-size: 12px; color: #666;">
+                    <span>Propellers:</span>
+                    <span>${details.count}</span>
+                </div>`;
+
+                if (details.removal) {
+                    detailsHTML += `
+                    <div class="charge-detail-row" style="font-size: 12px; color: #666;">
+                        <span>Removal (${details.count} × $349):</span>
+                        <span>$${(details.count * 349).toFixed(2)}</span>
+                    </div>`;
+                }
+
+                if (details.install) {
+                    detailsHTML += `
+                    <div class="charge-detail-row" style="font-size: 12px; color: #666;">
+                        <span>Installation (${details.count} × $349):</span>
+                        <span>$${(details.count * 349).toFixed(2)}</span>
+                    </div>`;
+                }
+
+                price = details.price;
             }
 
             detailsHTML += `
