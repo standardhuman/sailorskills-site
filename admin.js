@@ -56,31 +56,61 @@ export class AdminApp {
         // Clear existing buttons
         buttonsContainer.innerHTML = '';
 
-        // Define service order and styling
+        // Define service order and styling with high-contrast gradients
         const services = [
-            { key: 'recurring_cleaning', label: '🧽 Recurring Cleaning', style: 'cleaning' },
-            { key: 'onetime_cleaning', label: '🧽 One-time Cleaning', style: 'cleaning' },
-            { key: 'anodes_only', label: '⚡ Zinc Anodes Only', style: 'anodes' },
-            { key: 'underwater_inspection', label: '🔍 Underwater Inspection', style: 'special' },
-            { key: 'propeller_service', label: '🔧 Propeller Service', style: 'special' },
-            { key: 'item_recovery', label: '🔍 Item Recovery', style: 'recovery' }
+            {
+                key: 'recurring_cleaning',
+                label: '🔄 Recurring Cleaning',
+                gradient: 'linear-gradient(135deg, #4A148C 0%, #6A1B9A 100%)'  // Very dark purple
+            },
+            {
+                key: 'onetime_cleaning',
+                label: '🧽 One-Time Cleaning',
+                gradient: 'linear-gradient(135deg, #0D47A1 0%, #1565C0 100%)'  // Very dark blue
+            },
+            {
+                key: 'item_recovery',
+                label: '🔍 Item Recovery',
+                gradient: 'linear-gradient(135deg, #AD1457 0%, #C2185B 100%)'  // Dark pink
+            },
+            {
+                key: 'underwater_inspection',
+                label: '🤿 Underwater Inspection',
+                gradient: 'linear-gradient(135deg, #00695C 0%, #00897B 100%)'  // Dark teal
+            },
+            {
+                key: 'propeller_service',
+                label: '⚙️ Propeller Service',
+                gradient: 'linear-gradient(135deg, #E65100 0%, #F57C00 100%)'  // Dark orange
+            },
+            {
+                key: 'anodes_only',
+                label: '⚡ Anodes Only',
+                gradient: 'linear-gradient(135deg, #B71C1C 0%, #D32F2F 100%)'  // Dark red
+            }
         ];
 
-        services.forEach(({ key, label, style }) => {
+        services.forEach(({ key, label, gradient }) => {
             if (!window.serviceData[key]) return;
 
             const button = document.createElement('button');
             button.className = 'simple-service-btn';
             button.textContent = label;
 
-            // Add specific styling class
-            if (style === 'anodes') {
-                button.style.background = '#e67e22';
-            } else if (style === 'recovery') {
-                button.style.background = '#9b59b6';
-            } else if (style === 'special') {
-                button.style.background = '#2ecc71';
-            }
+            // Apply high-contrast gradient background
+            button.style.cssText = `
+                padding: 12px 20px;
+                background: ${gradient};
+                color: white;
+                border: none;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 16px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+                transition: all 0.3s;
+                text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+                font-weight: 600;
+            `;
 
             button.onclick = () => this.selectAdminService(key);
             buttonsContainer.appendChild(button);
