@@ -63,13 +63,28 @@ export class AdminApp {
         // If we found a target element, scroll to it
         if (targetElement && targetElement.style.display !== 'none') {
             // Calculate the position to scroll to, accounting for any fixed headers
+            // and adding extra offset to push service buttons completely off screen
             const headerHeight = 60; // Approximate height of navigation header
+            const extraOffset = 100; // Additional offset to ensure buttons are off screen
             const elementPosition = targetElement.getBoundingClientRect().top + window.pageYOffset;
-            const offsetPosition = elementPosition - headerHeight;
+
+            // Try to center the form in the viewport if possible
+            const viewportHeight = window.innerHeight;
+            const elementHeight = targetElement.offsetHeight;
+
+            let offsetPosition;
+            if (elementHeight < viewportHeight - headerHeight) {
+                // If element fits in viewport, center it
+                const centerOffset = (viewportHeight - elementHeight) / 2;
+                offsetPosition = elementPosition - centerOffset;
+            } else {
+                // Otherwise, scroll to top of element with extra offset
+                offsetPosition = elementPosition - headerHeight - extraOffset;
+            }
 
             // Smooth scroll to the element
             window.scrollTo({
-                top: offsetPosition,
+                top: Math.max(0, offsetPosition),
                 behavior: 'smooth'
             });
         }
@@ -560,27 +575,33 @@ export class AdminApp {
         // Load anode selector interface for Anodes Only service
         document.getElementById('wizardContent').innerHTML = `
             <div class="admin-wizard">
-                <h3>⚓ Select Zinc Anodes</h3>
+                <h3>⚓ Select Anodes</h3>
 
                 <div class="anode-selector">
                     <div class="wizard-field">
                         <input type="text" id="anodeSearch" class="search-input"
-                               placeholder="Search anodes by name or SKU..."
+                               placeholder="Search by size or type..."
                                oninput="adminApp.filterAnodes(this.value)">
                     </div>
 
                     <div class="anode-categories">
                         <button class="category-btn active" onclick="adminApp.filterByCategory('all')">All</button>
                         <button class="category-btn" onclick="adminApp.filterByCategory('shaft')">Shaft</button>
-                        <button class="category-btn" onclick="adminApp.filterByCategory('propeller')">Propeller</button>
+                        <button class="category-btn" onclick="adminApp.filterByCategory('propeller')">Prop</button>
                         <button class="category-btn" onclick="adminApp.filterByCategory('hull')">Hull</button>
-                        <button class="category-btn" onclick="adminApp.filterByCategory('engine')">Engine/Outboard</button>
+                        <button class="category-btn" onclick="adminApp.filterByCategory('engine')">Engine</button>
+                    </div>
+
+                    <div id="materialFilter" class="material-filter">
+                        <button class="material-btn active" onclick="adminApp.filterByMaterial('all')">All</button>
+                        <button class="material-btn" onclick="adminApp.filterByMaterial('zinc')">Zinc</button>
+                        <button class="material-btn" onclick="adminApp.filterByMaterial('magnesium')">Mag</button>
+                        <button class="material-btn" onclick="adminApp.filterByMaterial('aluminum')">Alum</button>
                     </div>
 
                     <div id="shaftSubfilter" class="shaft-subfilter" style="display: none;">
-                        <div class="subfilter-label">Shaft Type:</div>
-                        <button class="subfilter-btn active" onclick="adminApp.filterShaftType('all')">All Shaft</button>
-                        <button class="subfilter-btn" onclick="adminApp.filterShaftType('standard')">Standard (Imperial)</button>
+                        <button class="subfilter-btn active" onclick="adminApp.filterShaftType('all')">All</button>
+                        <button class="subfilter-btn" onclick="adminApp.filterShaftType('standard')">Standard</button>
                         <button class="subfilter-btn" onclick="adminApp.filterShaftType('metric')">Metric</button>
                     </div>
 
@@ -659,22 +680,28 @@ export class AdminApp {
                 <div class="anode-selector">
                     <div class="wizard-field">
                         <input type="text" id="anodeSearch" class="search-input"
-                               placeholder="Search anodes by name or SKU..."
+                               placeholder="Search by size or type..."
                                oninput="adminApp.filterAnodes(this.value)">
                     </div>
 
                     <div class="anode-categories">
                         <button class="category-btn active" onclick="adminApp.filterByCategory('all')">All</button>
                         <button class="category-btn" onclick="adminApp.filterByCategory('shaft')">Shaft</button>
-                        <button class="category-btn" onclick="adminApp.filterByCategory('propeller')">Propeller</button>
+                        <button class="category-btn" onclick="adminApp.filterByCategory('propeller')">Prop</button>
                         <button class="category-btn" onclick="adminApp.filterByCategory('hull')">Hull</button>
-                        <button class="category-btn" onclick="adminApp.filterByCategory('engine')">Engine/Outboard</button>
+                        <button class="category-btn" onclick="adminApp.filterByCategory('engine')">Engine</button>
+                    </div>
+
+                    <div id="materialFilter" class="material-filter">
+                        <button class="material-btn active" onclick="adminApp.filterByMaterial('all')">All</button>
+                        <button class="material-btn" onclick="adminApp.filterByMaterial('zinc')">Zinc</button>
+                        <button class="material-btn" onclick="adminApp.filterByMaterial('magnesium')">Mag</button>
+                        <button class="material-btn" onclick="adminApp.filterByMaterial('aluminum')">Alum</button>
                     </div>
 
                     <div id="shaftSubfilter" class="shaft-subfilter" style="display: none;">
-                        <div class="subfilter-label">Shaft Type:</div>
-                        <button class="subfilter-btn active" onclick="adminApp.filterShaftType('all')">All Shaft</button>
-                        <button class="subfilter-btn" onclick="adminApp.filterShaftType('standard')">Standard (Imperial)</button>
+                        <button class="subfilter-btn active" onclick="adminApp.filterShaftType('all')">All</button>
+                        <button class="subfilter-btn" onclick="adminApp.filterShaftType('standard')">Standard</button>
                         <button class="subfilter-btn" onclick="adminApp.filterShaftType('metric')">Metric</button>
                     </div>
 
@@ -786,12 +813,15 @@ export class AdminApp {
                 parseFloat(anode.list_price.replace('$', '')) :
                 anode.list_price;
 
+            // Use simplified name
+            const simplifiedName = this.simplifyAnodeName(anode);
+
             // Store anode data for button clicks
             const dataAttr = btoa(JSON.stringify({ id: anodeId, price, name: anode.name }));
 
             return `
-                <div class="anode-item">
-                    <div class="anode-name">${anode.name}</div>
+                <div class="anode-item compact">
+                    <div class="anode-name">${simplifiedName}</div>
                     <div class="anode-price">$${price.toFixed(2)}</div>
                     <div class="anode-controls">
                         <button data-anode="${dataAttr}" data-change="-1" onclick="adminApp.handleAnodeClick(this)">−</button>
@@ -806,6 +836,50 @@ export class AdminApp {
     filterAnodes(searchTerm) {
         const activeCategory = document.querySelector('.category-btn.active')?.textContent.toLowerCase() || 'all';
         this.displayAnodes(activeCategory, searchTerm);
+    }
+
+    simplifyAnodeName(anode) {
+        let name = anode.name || '';
+
+        // Remove brand names
+        name = name.replace(/Camp |Martyr |Performance Metals |Tecnoseal |Reliance /gi, '');
+
+        // Remove model numbers like X-3A, X-2, etc.
+        name = name.replace(/\bX-\d+[A-Z]?\b/gi, '');
+
+        // Remove the word "Anode" and "Zinc"
+        name = name.replace(/\bAnode\b|\bZinc\b/gi, '');
+
+        // Clean up shaft descriptions
+        name = name.replace(/Shaft\s+(-\s+)?/gi, 'Shaft ');
+
+        // Clean up extra spaces and dashes
+        name = name.replace(/\s+/g, ' ').replace(/\s+-\s+/g, ' ').trim();
+        name = name.replace(/^-\s*/, '').replace(/\s*-$/, '');
+
+        // Capitalize first letter
+        if (name.length > 0) {
+            name = name.charAt(0).toUpperCase() + name.slice(1);
+        }
+
+        return name;
+    }
+
+    filterByMaterial(material) {
+        this.currentMaterial = material;
+
+        // Update button states
+        document.querySelectorAll('.material-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.textContent.toLowerCase().includes(material) ||
+                (material === 'all' && btn.textContent === 'All')) {
+                btn.classList.add('active');
+            }
+        });
+
+        // Re-display anodes with material filter applied
+        const searchTerm = document.getElementById('anodeSearch')?.value || '';
+        this.displayAnodes(this.currentCategory || 'all', searchTerm);
     }
 
     filterByCategory(category) {
@@ -899,12 +973,15 @@ export class AdminApp {
                 parseFloat(anode.list_price.replace('$', '')) :
                 anode.list_price;
 
+            // Use simplified name
+            const simplifiedName = this.simplifyAnodeName(anode);
+
             // Store anode data for button clicks
             const dataAttr = btoa(JSON.stringify({ id: anodeId, price, name: anode.name }));
 
             return `
-                <div class="anode-item">
-                    <div class="anode-name">${anode.name}</div>
+                <div class="anode-item compact">
+                    <div class="anode-name">${simplifiedName}</div>
                     <div class="anode-price">$${price.toFixed(2)}</div>
                     <div class="anode-controls">
                         <button data-anode="${dataAttr}" data-change="-1" onclick="adminApp.handleAnodeClick(this)">−</button>

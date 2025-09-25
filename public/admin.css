@@ -1002,9 +1002,38 @@ input[type="hidden"] {
 
 .anode-categories {
     display: flex;
-    gap: 8px;
-    margin: 15px 0;
+    gap: 6px;
+    margin: 10px 0;
     flex-wrap: wrap;
+}
+
+/* Material Filters */
+.material-filter {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+}
+
+.material-btn {
+    padding: 6px 12px;
+    background: #f7f7f7;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.material-btn:hover {
+    background: #e0e0e0;
+}
+
+.material-btn.active {
+    background: #667eea;
+    color: white;
+    border-color: #5a67d8;
 }
 
 .category-btn {
@@ -1067,8 +1096,30 @@ input[type="hidden"] {
 .anode-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 15px;
-    padding: 15px 0;
+    gap: 10px;
+    padding: 10px 0;
+}
+
+/* Compact anode items */
+.anode-item.compact {
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 8px;
+    transition: all 0.3s ease;
+}
+
+.anode-item.compact .anode-name {
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.anode-item.compact .anode-price {
+    font-size: 14px;
+    font-weight: 600;
+    color: #345475;
+    margin-bottom: 6px;
 }
 
 .anode-item {
@@ -1079,7 +1130,8 @@ input[type="hidden"] {
     transition: all 0.3s ease;
 }
 
-.anode-item:hover {
+.anode-item:hover,
+.anode-item.compact:hover {
     border-color: #667eea;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
@@ -1867,11 +1919,44 @@ input, select, textarea {
         min-height: 48px;
     }
 
-    /* Anode grid mobile */
+    /* Anode grid mobile - 2 columns for better space usage */
     .anode-grid {
-        grid-template-columns: 1fr;
-        gap: 10px;
-        padding: 10px 0;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+        padding: 8px 0;
+        max-height: 350px !important;
+    }
+
+    /* Even more compact on mobile */
+    .anode-item.compact {
+        padding: 6px;
+    }
+
+    .anode-item.compact .anode-name {
+        font-size: 11px;
+        line-height: 1.2;
+        margin-bottom: 3px;
+    }
+
+    .anode-item.compact .anode-price {
+        font-size: 12px;
+        margin-bottom: 4px;
+    }
+
+    .anode-item.compact .anode-quantity {
+        gap: 4px;
+    }
+
+    .anode-item.compact .quantity-btn {
+        width: 22px;
+        height: 22px;
+        font-size: 14px;
+    }
+
+    .anode-item.compact .quantity-input {
+        width: 32px;
+        font-size: 12px;
+        padding: 2px;
     }
 
     .anode-categories {
