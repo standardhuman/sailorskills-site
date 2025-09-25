@@ -27,28 +27,122 @@ body {
     align-items: center;
 }
 
-/* Fix navigation menu overflow */
+/* Navigation with Hamburger Menu */
 .navigation-header {
     width: 100%;
     padding: 10px 15px !important;
-    overflow-x: auto;
     box-sizing: border-box;
+    background: #ffffff;
+    border-bottom: 1px solid #e0e0e0;
 }
 
-.nav-menu {
+.nav-container {
     display: flex;
-    gap: clamp(8px, 1.5vw, 15px);
-    justify-content: center;
-    flex-wrap: wrap;
-    padding: 0;
-    margin: 0;
-    list-style: none;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
-.nav-menu a {
-    white-space: nowrap;
-    font-size: clamp(11px, 2.3vw, 14px);
-    padding: 5px 8px;
+/* Hamburger Menu Button */
+.nav-toggle {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    flex-direction: column;
+    gap: 4px;
+    align-items: center;
+    z-index: 1001;
+}
+
+.nav-toggle .hamburger {
+    display: block;
+    width: 25px;
+    height: 3px;
+    background: #345475;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+}
+
+/* Show hamburger on mobile */
+@media (max-width: 768px) {
+    .nav-toggle {
+        display: flex;
+    }
+
+    .nav-links {
+        position: fixed;
+        top: 60px;
+        right: -100%;
+        width: 250px;
+        height: calc(100vh - 60px);
+        background: #ffffff;
+        flex-direction: column;
+        padding: 20px;
+        box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+        transition: right 0.3s ease;
+        z-index: 1000;
+        overflow-y: auto;
+    }
+
+    .nav-links.active {
+        right: 0;
+    }
+
+    .nav-links a {
+        display: block;
+        padding: 12px 0;
+        font-size: 16px;
+        color: #345475;
+        text-decoration: none;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .nav-links a:hover {
+        color: #2a3f5f;
+        background: rgba(52, 84, 117, 0.05);
+    }
+
+    /* Animate hamburger to X when active */
+    .nav-toggle.active .hamburger:nth-child(1) {
+        transform: translateY(7px) rotate(45deg);
+    }
+
+    .nav-toggle.active .hamburger:nth-child(2) {
+        opacity: 0;
+    }
+
+    .nav-toggle.active .hamburger:nth-child(3) {
+        transform: translateY(-7px) rotate(-45deg);
+    }
+}
+
+/* Desktop navigation */
+@media (min-width: 769px) {
+    .nav-toggle {
+        display: none;
+    }
+
+    .nav-links {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+    }
+
+    .nav-links a {
+        white-space: nowrap;
+        font-size: 14px;
+        color: #345475;
+        text-decoration: none;
+        padding: 5px 10px;
+        transition: color 0.3s ease;
+    }
+
+    .nav-links a:hover {
+        color: #2a3f5f;
+    }
 }
 
 /* Hero Header - Fully Responsive and Contained */
