@@ -46,6 +46,35 @@ export class AdminApp {
         }
     }
 
+    scrollToServiceForm() {
+        // Find the service form container or wizard container
+        let targetElement = document.getElementById('wizardContainer');
+
+        // If wizard container isn't visible, try the service form container
+        if (!targetElement || targetElement.style.display === 'none') {
+            targetElement = document.querySelector('.service-form-container');
+        }
+
+        // If we still don't have a target, try the charge summary
+        if (!targetElement || targetElement.style.display === 'none') {
+            targetElement = document.querySelector('.charge-summary');
+        }
+
+        // If we found a target element, scroll to it
+        if (targetElement && targetElement.style.display !== 'none') {
+            // Calculate the position to scroll to, accounting for any fixed headers
+            const headerHeight = 60; // Approximate height of navigation header
+            const elementPosition = targetElement.getBoundingClientRect().top + window.pageYOffset;
+            const offsetPosition = elementPosition - headerHeight;
+
+            // Smooth scroll to the element
+            window.scrollTo({
+                top: offsetPosition,
+                behavior: 'smooth'
+            });
+        }
+    }
+
     populateAdminServiceButtons() {
         const buttonsContainer = document.getElementById('simpleServiceButtons');
         if (!buttonsContainer) {
@@ -128,6 +157,11 @@ export class AdminApp {
         // Get service data
         const service = window.serviceData[serviceKey];
         if (!service) return;
+
+        // Smooth scroll to the service form after a brief delay to ensure it's rendered
+        setTimeout(() => {
+            this.scrollToServiceForm();
+        }, 100);
 
         // Special handling for Anodes Only service - open anode selector directly
         if (serviceKey === 'anodes_only') {
