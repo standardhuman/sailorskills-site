@@ -7,18 +7,38 @@ body {
     margin: 0;
     padding: 0;
     color: #181818;
+    overflow-x: hidden; /* Prevent horizontal scroll */
+    width: 100%;
+    box-sizing: border-box;
 }
 
-/* Hero Header - Fully Responsive */
+/* Global box-sizing for all elements */
+* {
+    box-sizing: border-box;
+}
+
+/* Ensure all content stays within viewport */
+.main-wrapper {
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Hero Header - Fully Responsive and Contained */
 .hero-header {
     background-color: #ffffff;
     min-height: clamp(160px, 25vh, 229px);
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
     border-bottom: 1px solid #345475;
-    padding: clamp(15px, 3vw, 30px);
+    padding: clamp(15px, 3vw, 30px) 10px; /* Consistent side padding */
+    box-sizing: border-box;
 }
 
 .hero-content {
@@ -26,6 +46,9 @@ body {
     padding: clamp(15px, 3vw, 30px) clamp(10px, 2vw, 20px) clamp(25px, 4vw, 40px);
     width: 100%;
     max-width: 600px;
+    box-sizing: border-box;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 .hero-brand {
@@ -58,13 +81,17 @@ body {
     margin-top: clamp(3px, 0.5vw, 5px);
 }
 
-/* Container - Fully Responsive */
+/* Container - Fully Responsive and Centered */
 .container {
-    max-width: min(600px, 100%);
+    width: 100%;
+    max-width: min(600px, calc(100% - 20px)); /* Always leave 10px padding on sides */
     margin: 0 auto;
     padding: clamp(10px, 3vw, 20px);
     font-family: 'Montserrat', sans-serif;
     box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
 }
 
 /* Admin Badge - Fully Responsive */
@@ -97,12 +124,14 @@ body {
     }
 }
 
-/* Customer Section - Fully Responsive */
+/* Customer Section - Fully Responsive and Contained */
 .customer-section {
     background: #ffffff;
     padding: clamp(20px, 4vw, 30px) 0;
     margin-bottom: clamp(20px, 4vw, 30px);
     border-bottom: 1px solid #e0e0e0;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .customer-section h2 {
@@ -253,11 +282,13 @@ body {
     display: block;
 }
 
-/* Service Selector - Fully Responsive */
+/* Service Selector - Fully Responsive and Contained */
 .service-selector {
     padding: clamp(20px, 4vw, 30px) 0;
     border-bottom: 1px solid #e0e0e0;
     margin-bottom: clamp(20px, 4vw, 30px);
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .service-selector h2 {
@@ -269,29 +300,37 @@ body {
 
 .simple-service-buttons {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(150px, 100%), 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(150px, calc(50% - 5px)), 1fr));
     gap: clamp(8px, 2vw, 12px);
     margin: clamp(12px, 3vw, 20px) 0;
+    width: 100%;
+    box-sizing: border-box;
+    justify-items: stretch;
+    align-items: stretch;
 }
 
 .simple-service-btn {
-    padding: clamp(10px, 2vw, 14px) clamp(12px, 2.5vw, 20px);
+    padding: clamp(10px, 2vw, 14px) clamp(8px, 2vw, 20px);
     color: white;
     border: none;
     border-radius: clamp(6px, 1vw, 10px);
     cursor: pointer;
-    font-size: clamp(13px, 2.5vw, 16px);
+    font-size: clamp(12px, 2.3vw, 16px);
     font-weight: 600;
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
     min-height: clamp(48px, 8vw, 70px);
+    width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     text-align: center;
-    line-height: 1.3;
+    line-height: 1.2;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    box-sizing: border-box;
 }
 
 .simple-service-btn:hover {
@@ -316,13 +355,15 @@ body {
     pointer-events: none;
 }
 
-/* Charge Summary - Fully Responsive */
+/* Charge Summary - Fully Responsive and Contained */
 .charge-summary {
     background: #f8f9fa;
     padding: clamp(15px, 4vw, 30px);
     border-radius: clamp(6px, 1vw, 8px);
     margin-top: clamp(20px, 4vw, 30px);
     border: 1px solid #e0e0e0;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .charge-summary h3 {
@@ -420,31 +461,36 @@ body {
     display: block;
 }
 
-/* Modal Styles - Fully Responsive */
+/* Modal Styles - Fully Responsive and Contained */
 .modal {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
+    width: 100vw;
+    height: 100vh;
     background: rgba(0, 0, 0, 0.5);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 1000;
-    padding: clamp(10px, 2vw, 20px);
+    padding: 10px;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
 .modal-content {
     background: white;
     padding: clamp(15px, 4vw, 30px);
     border-radius: clamp(6px, 1vw, 8px);
-    max-width: min(600px, 100%);
-    width: 100%;
-    max-height: 90vh;
+    max-width: min(600px, calc(100vw - 20px));
+    width: calc(100% - 20px);
+    max-height: calc(100vh - 20px);
     overflow-y: auto;
+    overflow-x: hidden;
     position: relative;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    margin: 0 auto;
+    box-sizing: border-box;
 }
 
 .close {
@@ -559,7 +605,7 @@ input[type="hidden"] {
     background: #555;
 }
 
-/* Admin Wizard Styles - Fully Responsive */
+/* Admin Wizard Styles - Fully Responsive and Contained */
 .admin-wizard {
     background: white;
     padding: clamp(15px, 4vw, 25px);
@@ -567,9 +613,11 @@ input[type="hidden"] {
     border-radius: clamp(6px, 1vw, 8px);
     margin-top: clamp(12px, 3vw, 20px);
     overflow: visible;
-    max-width: min(500px, 100%);
+    width: 100%;
+    max-width: min(500px, calc(100% - 20px));
     margin-left: auto;
     margin-right: auto;
+    box-sizing: border-box;
 }
 
 .admin-wizard h3 {
@@ -593,9 +641,11 @@ input[type="hidden"] {
 .wizard-field input[type="number"],
 .wizard-field input[type="range"] {
     width: 100%;
+    max-width: 100%;
     padding: 8px;
     border: 1px solid #e0e0e0;
     border-radius: 4px;
+    box-sizing: border-box;
 }
 
 .wizard-field input[type="range"] {
@@ -1224,6 +1274,37 @@ input[type="hidden"] {
     .container {
         max-width: 600px;
     }
+}
+
+/* Global overflow prevention */
+img, video, iframe, embed, object {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Prevent text overflow in all elements */
+h1, h2, h3, h4, h5, h6, p, span, div, button, a {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+}
+
+/* Ensure tables don't overflow */
+table {
+    max-width: 100%;
+    overflow-x: auto;
+    display: block;
+}
+
+/* Prevent long URLs from breaking layout */
+a {
+    word-break: break-all;
+}
+
+/* Input fields containment */
+input, select, textarea {
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 /* Keep minimal overrides for specific edge cases only */
