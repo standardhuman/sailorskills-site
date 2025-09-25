@@ -804,6 +804,18 @@ export class AdminApp {
         const grid = document.getElementById('anodeGrid');
         let filtered = this.anodeCatalog;
 
+        // Filter out polishing strips and free items
+        filtered = filtered.filter(anode => {
+            const name = (anode.name || '').toLowerCase();
+            const sku = (anode.sku || '').toLowerCase();
+            // Filter out polishing strips, zinc strips, and free promotional items
+            return !name.includes('polishing') &&
+                   !sku.includes('polishing-strip') &&
+                   !sku.includes('shaft-polishing-strip') &&
+                   !name.includes('free!!!') &&
+                   !(name.includes('strip') && name.includes('3-foot'));
+        });
+
         // Filter by category
         if (category !== 'all') {
             filtered = filtered.filter(anode => {
@@ -971,6 +983,18 @@ export class AdminApp {
 
         const grid = document.getElementById('anodeGrid');
         let filtered = this.anodeCatalog;
+
+        // Filter out polishing strips and free items
+        filtered = filtered.filter(anode => {
+            const name = (anode.name || '').toLowerCase();
+            const sku = (anode.sku || '').toLowerCase();
+            // Filter out polishing strips, zinc strips, and free promotional items
+            return !name.includes('polishing') &&
+                   !sku.includes('polishing-strip') &&
+                   !sku.includes('shaft-polishing-strip') &&
+                   !name.includes('free!!!') &&
+                   !(name.includes('strip') && name.includes('3-foot'));
+        });
 
         // Filter by shaft category and type
         filtered = filtered.filter(anode => {
