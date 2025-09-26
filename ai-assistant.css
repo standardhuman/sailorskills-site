@@ -425,6 +425,23 @@
 }
 
 /* API Settings Modal */
+#api-test-result {
+    margin-top: 12px;
+}
+
+#api-test-result > div {
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    border: 1px solid;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
 .api-usage {
     margin-top: 20px;
     padding: 16px;

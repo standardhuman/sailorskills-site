@@ -617,20 +617,23 @@ class AIAssistant {
         const apiKey = document.getElementById('gemini-api-key').value.trim();
         const model = document.getElementById('gemini-model').value;
         const extractionMode = document.getElementById('extraction-mode').value;
+        const resultDiv = document.getElementById('api-test-result');
 
         // Validate API key if changed
         if (apiKey && apiKey !== this.geminiService.apiKey) {
-            this.addToChat('assistant', '🔄 Validating API key...');
+            resultDiv.innerHTML = '<div style="color: #0c5460; background: #d1ecf1; padding: 8px; border-radius: 4px;">🔄 Validating API key...</div>';
 
             const valid = await this.geminiService.validateApiKey(apiKey);
             if (!valid) {
-                // Check console for more details
-                this.showError('Invalid API key. Please check: 1) No extra spaces, 2) Correct API key from Google AI Studio, 3) Check browser console for details');
+                // Show error in modal
+                resultDiv.innerHTML = '<div style="color: #721c24; background: #f8d7da; padding: 8px; border-radius: 4px;">❌ Invalid API key. Check console for details.</div>';
                 return;
+            } else {
+                resultDiv.innerHTML = '<div style="color: #155724; background: #d4edda; padding: 8px; border-radius: 4px;">✅ API key validated successfully!</div>';
             }
         }
 
-        // Save settings even without validation for testing
+        // Save settings
         if (apiKey) {
             this.geminiService.setApiKey(apiKey);
         }
@@ -642,10 +645,14 @@ class AIAssistant {
         localStorage.setItem('auto_process', document.getElementById('auto-process').checked);
         localStorage.setItem('save_history', document.getElementById('save-history').checked);
 
-        // Close modal
-        document.getElementById('settings-modal').classList.remove('active');
+        // Show success message briefly, then close modal
+        resultDiv.innerHTML = '<div style="color: #155724; background: #d4edda; padding: 8px; border-radius: 4px;">✅ Settings saved successfully!</div>';
 
-        this.addToChat('assistant', '✅ Settings saved successfully!');
+        // Close modal after a brief delay
+        setTimeout(() => {
+            document.getElementById('settings-modal').classList.remove('active');
+            resultDiv.innerHTML = ''; // Clear message for next time
+        }, 1000);
     }
 
     loadSettings() {
@@ -698,18 +705,21 @@ class AIAssistant {
     // Test API key directly
     async testApiKey() {
         const apiKey = document.getElementById('gemini-api-key').value.trim();
+        const resultDiv = document.getElementById('api-test-result');
 
         if (!apiKey) {
-            this.showError('Please enter an API key first');
+            resultDiv.innerHTML = '<div style="color: #856404; background: #fff3cd; padding: 8px; border-radius: 4px;">⚠️ Please enter an API key first</div>';
             return;
         }
 
-        this.addToChat('assistant', '🔄 Testing API key...');
+        resultDiv.innerHTML = '<div style="color: #0c5460; background: #d1ecf1; padding: 8px; border-radius: 4px;">🔄 Testing API key...</div>';
 
         try {
-            // Direct test without validation wrapper
+            // Test with the currently selected model
+            const model = document.getElementById('gemini-model').value;
+
             const response = await fetch(
-                `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+                `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
                 {
                     method: 'POST',
                     headers: {
@@ -728,20 +738,39 @@ class AIAssistant {
             const data = await response.json();
 
             if (response.ok) {
-                this.addToChat('assistant', '✅ API key is valid and working!');
+                resultDiv.innerHTML = `
+                    <div style="color: #155724; background: #d4edda; padding: 8px; border-radius: 4px;">
+                        ✅ API key is valid and working!<br>
+                        <small>Model: ${model}</small><br>
+                        <small>Response: ${data.candidates?.[0]?.content?.parts?.[0]?.text || 'OK'}</small>
+                    </div>
+                `;
                 // Auto-save the key
                 this.geminiService.setApiKey(apiKey);
             } else {
                 console.error('API test response:', data);
-                if (data.error?.message) {
-                    this.showError(`API Error: ${data.error.message}`);
-                } else {
-                    this.showError('API key test failed. Check browser console for details.');
+                let errorMessage = data.error?.message || 'Unknown error';
+
+                // Check for specific errors
+                if (errorMessage.includes('quota') || errorMessage.includes('RESOURCE_EXHAUSTED')) {
+                    errorMessage = 'Quota exceeded for this model. Try a different model.';
                 }
+
+                resultDiv.innerHTML = `
+                    <div style="color: #721c24; background: #f8d7da; padding: 8px; border-radius: 4px;">
+                        ❌ API Error<br>
+                        <small>${errorMessage}</small>
+                    </div>
+                `;
             }
         } catch (error) {
             console.error('Test error:', error);
-            this.showError(`Connection error: ${error.message}`);
+            resultDiv.innerHTML = `
+                <div style="color: #721c24; background: #f8d7da; padding: 8px; border-radius: 4px;">
+                    ❌ Connection error<br>
+                    <small>${error.message}</small>
+                </div>
+            `;
         }
     }
 }
