@@ -140,6 +140,61 @@ nav {
     background: #e67e22;
 }
 
+/* Catalog Quick Filters */
+.catalog-quick-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 20px 0;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 6px;
+}
+
+.catalog-filter-btn {
+    padding: 12px 20px;
+    border: 2px solid #dee2e6;
+    background: white;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 500;
+    transition: all 0.2s;
+    min-width: 100px;
+    text-align: center;
+}
+
+.catalog-filter-btn:hover {
+    background: #e9ecef;
+    border-color: #adb5bd;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.catalog-filter-btn.active {
+    background: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+.catalog-filter-btn.sale {
+    border-color: #28a745;
+}
+
+.catalog-filter-btn.sale:hover {
+    background: #d4edda;
+    border-color: #28a745;
+}
+
+.catalog-filter-btn.in-stock {
+    border-color: #17a2b8;
+}
+
+.catalog-filter-btn.in-stock:hover {
+    background: #d1ecf1;
+    border-color: #17a2b8;
+}
+
 /* Stats Bar */
 .stats-bar {
     background: #f8f9fa;
@@ -820,6 +875,18 @@ nav {
 
     .catalog-grid {
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    }
+
+    .catalog-quick-filters {
+        padding: 10px;
+        gap: 6px;
+    }
+
+    .catalog-filter-btn {
+        padding: 10px 12px;
+        font-size: 13px;
+        min-width: 70px;
+        flex: 1 1 calc(25% - 6px);
     }
 
     .controls {

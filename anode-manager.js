@@ -72,6 +72,28 @@ class AnodeManager {
             this.filterCatalog();
         });
 
+        // Catalog quick filter buttons
+        document.querySelectorAll('.catalog-filter-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const filterType = e.target.dataset.filter;
+                this.applyCatalogQuickFilter(filterType);
+
+                // Update button states
+                if (filterType === 'on-sale' || filterType === 'in-stock') {
+                    // Toggle buttons can be active independently
+                    e.target.classList.toggle('active');
+                } else {
+                    // Material/category buttons are mutually exclusive
+                    document.querySelectorAll('.catalog-filter-btn').forEach(b => {
+                        if (!b.classList.contains('sale') && !b.classList.contains('in-stock')) {
+                            b.classList.remove('active');
+                        }
+                    });
+                    e.target.classList.add('active');
+                }
+            });
+        });
+
         document.getElementById('refresh-catalog')?.addEventListener('click', () => {
             this.loadCatalog(true);
         });
@@ -206,6 +228,15 @@ class AnodeManager {
             filtered = filtered.filter(item => item.category === this.filters.category);
         }
 
+        // Additional quick filters
+        if (this.filters.inStockOnly) {
+            filtered = filtered.filter(item => item.stock_status === 'in_stock');
+        }
+
+        if (this.filters.onSaleOnly) {
+            filtered = filtered.filter(item => item.is_on_sale);
+        }
+
         // Pagination
         const start = (this.currentPage - 1) * this.itemsPerPage;
         const end = start + this.itemsPerPage;
@@ -267,6 +298,58 @@ class AnodeManager {
     filterCatalog() {
         this.currentPage = 1;
         this.renderCatalog();
+    }
+
+    applyCatalogQuickFilter(filterType) {
+        // Reset filters
+        this.filters.material = '';
+        this.filters.category = '';
+        document.getElementById('material-filter').value = '';
+        document.getElementById('category-filter').value = '';
+
+        switch(filterType) {
+            case 'all':
+                // Show all - filters already reset
+                this.filters.inStockOnly = false;
+                this.filters.onSaleOnly = false;
+                break;
+            case 'zinc':
+                this.filters.material = 'zinc';
+                document.getElementById('material-filter').value = 'zinc';
+                break;
+            case 'aluminum':
+                this.filters.material = 'aluminum';
+                document.getElementById('material-filter').value = 'aluminum';
+                break;
+            case 'magnesium':
+                this.filters.material = 'magnesium';
+                document.getElementById('material-filter').value = 'magnesium';
+                break;
+            case 'shaft':
+                this.filters.category = 'shaft';
+                document.getElementById('category-filter').value = 'shaft';
+                break;
+            case 'hull':
+                this.filters.category = 'hull';
+                document.getElementById('category-filter').value = 'hull';
+                break;
+            case 'engine':
+                this.filters.category = 'engine';
+                document.getElementById('category-filter').value = 'engine';
+                break;
+            case 'propeller':
+                this.filters.category = 'propeller';
+                document.getElementById('category-filter').value = 'propeller';
+                break;
+            case 'on-sale':
+                this.filters.onSaleOnly = !this.filters.onSaleOnly;
+                break;
+            case 'in-stock':
+                this.filters.inStockOnly = !this.filters.inStockOnly;
+                break;
+        }
+
+        this.filterCatalog();
     }
 
     updateCatalogStats() {
