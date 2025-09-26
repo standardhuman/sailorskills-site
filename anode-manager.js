@@ -1,4 +1,4 @@
-// Anode Management System JavaScript
+// Inventory Management System JavaScript
 
 class AnodeManager {
     constructor() {
