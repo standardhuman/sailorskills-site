@@ -13,6 +13,7 @@ class AnodeManager {
             search: '',
             material: '',
             category: '',
+            sizingUnit: '', // 'standard' or 'metric'
             inStock: false,
             lowStock: false
         };
@@ -65,11 +66,13 @@ class AnodeManager {
         document.getElementById('material-filter')?.addEventListener('change', (e) => {
             this.filters.material = e.target.value;
             this.filterCatalog();
+            this.updateFilterButtonStates();
         });
 
         document.getElementById('category-filter')?.addEventListener('change', (e) => {
             this.filters.category = e.target.value;
             this.filterCatalog();
+            this.updateFilterButtonStates();
         });
 
         // Catalog quick filter buttons
@@ -77,20 +80,7 @@ class AnodeManager {
             btn.addEventListener('click', (e) => {
                 const filterType = e.target.dataset.filter;
                 this.applyCatalogQuickFilter(filterType);
-
-                // Update button states
-                if (filterType === 'on-sale' || filterType === 'in-stock') {
-                    // Toggle buttons can be active independently
-                    e.target.classList.toggle('active');
-                } else {
-                    // Material/category buttons are mutually exclusive
-                    document.querySelectorAll('.catalog-filter-btn').forEach(b => {
-                        if (!b.classList.contains('sale') && !b.classList.contains('in-stock')) {
-                            b.classList.remove('active');
-                        }
-                    });
-                    e.target.classList.add('active');
-                }
+                this.updateFilterButtonStates();
             });
         });
 
@@ -243,6 +233,23 @@ class AnodeManager {
             filtered = filtered.filter(item => item.is_on_sale);
         }
 
+        // Sizing unit filter (check if product name/description contains standard or metric indicators)
+        if (this.filters.sizingUnit) {
+            filtered = filtered.filter(item => {
+                const nameDesc = (item.name + ' ' + (item.description || '')).toLowerCase();
+                if (this.filters.sizingUnit === 'standard') {
+                    // Look for standard measurements (inches, feet, lbs, etc.)
+                    return nameDesc.match(/\b(\d+\/\d+|\d+)\s*("|''|in|inch|inches|ft|feet|foot|lb|lbs|pound|pounds)\b/i) ||
+                           nameDesc.includes('"') || nameDesc.includes('inch');
+                } else if (this.filters.sizingUnit === 'metric') {
+                    // Look for metric measurements (mm, cm, m, kg, etc.)
+                    return nameDesc.match(/\b\d+\s*(mm|cm|m|kg|g|millimeter|centimeter|meter|kilogram|gram)\b/i) ||
+                           nameDesc.includes('mm') || nameDesc.includes('metric');
+                }
+                return true;
+            });
+        }
+
         // Pagination
         const start = (this.currentPage - 1) * this.itemsPerPage;
         const end = start + this.itemsPerPage;
@@ -317,46 +324,59 @@ class AnodeManager {
     }
 
     applyCatalogQuickFilter(filterType) {
-        // Reset filters
-        this.filters.material = '';
-        this.filters.category = '';
-        document.getElementById('material-filter').value = '';
-        document.getElementById('category-filter').value = '';
-
         switch(filterType) {
             case 'all':
-                // Show all - filters already reset
+                // Reset all filters
+                this.filters.material = '';
+                this.filters.category = '';
+                this.filters.sizingUnit = '';
                 this.filters.inStockOnly = false;
                 this.filters.onSaleOnly = false;
+                document.getElementById('material-filter').value = '';
+                document.getElementById('category-filter').value = '';
                 break;
+
+            // Material filters (mutually exclusive with each other)
             case 'zinc':
-                this.filters.material = 'zinc';
-                document.getElementById('material-filter').value = 'zinc';
-                break;
             case 'aluminum':
-                this.filters.material = 'aluminum';
-                document.getElementById('material-filter').value = 'aluminum';
-                break;
             case 'magnesium':
-                this.filters.material = 'magnesium';
-                document.getElementById('material-filter').value = 'magnesium';
+                // Toggle material filter - if same material clicked, clear it
+                if (this.filters.material === filterType) {
+                    this.filters.material = '';
+                    document.getElementById('material-filter').value = '';
+                } else {
+                    this.filters.material = filterType;
+                    document.getElementById('material-filter').value = filterType;
+                }
                 break;
+
+            // Category filters (mutually exclusive with each other)
             case 'shaft':
-                this.filters.category = 'shaft';
-                document.getElementById('category-filter').value = 'shaft';
-                break;
             case 'hull':
-                this.filters.category = 'hull';
-                document.getElementById('category-filter').value = 'hull';
-                break;
             case 'engine':
-                this.filters.category = 'engine';
-                document.getElementById('category-filter').value = 'engine';
-                break;
             case 'propeller':
-                this.filters.category = 'propeller';
-                document.getElementById('category-filter').value = 'propeller';
+                // Toggle category filter - if same category clicked, clear it
+                if (this.filters.category === filterType) {
+                    this.filters.category = '';
+                    document.getElementById('category-filter').value = '';
+                } else {
+                    this.filters.category = filterType;
+                    document.getElementById('category-filter').value = filterType;
+                }
                 break;
+
+            // Sizing unit filters (mutually exclusive with each other)
+            case 'standard':
+            case 'metric':
+                // Toggle sizing filter - if same sizing clicked, clear it
+                if (this.filters.sizingUnit === filterType) {
+                    this.filters.sizingUnit = '';
+                } else {
+                    this.filters.sizingUnit = filterType;
+                }
+                break;
+
+            // Toggle filters (can be combined with others)
             case 'on-sale':
                 this.filters.onSaleOnly = !this.filters.onSaleOnly;
                 break;
@@ -366,6 +386,30 @@ class AnodeManager {
         }
 
         this.filterCatalog();
+    }
+
+    updateFilterButtonStates() {
+        // Update all filter button states based on current filters
+        document.querySelectorAll('.catalog-filter-btn').forEach(btn => {
+            const filterType = btn.dataset.filter;
+            btn.classList.remove('active');
+
+            // Check if this button should be active
+            if (filterType === 'all' && !this.filters.material && !this.filters.category &&
+                !this.filters.sizingUnit && !this.filters.inStockOnly && !this.filters.onSaleOnly) {
+                btn.classList.add('active');
+            } else if (filterType === this.filters.material) {
+                btn.classList.add('active');
+            } else if (filterType === this.filters.category) {
+                btn.classList.add('active');
+            } else if (filterType === this.filters.sizingUnit) {
+                btn.classList.add('active');
+            } else if (filterType === 'on-sale' && this.filters.onSaleOnly) {
+                btn.classList.add('active');
+            } else if (filterType === 'in-stock' && this.filters.inStockOnly) {
+                btn.classList.add('active');
+            }
+        });
     }
 
     updateCatalogStats() {

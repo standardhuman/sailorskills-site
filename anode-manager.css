@@ -195,6 +195,15 @@ nav {
     border-color: #17a2b8;
 }
 
+.catalog-filter-btn.sizing {
+    border-color: #6f42c1;
+}
+
+.catalog-filter-btn.sizing:hover {
+    background: #e7e3f4;
+    border-color: #6f42c1;
+}
+
 /* Stats Bar */
 .stats-bar {
     background: #f8f9fa;
