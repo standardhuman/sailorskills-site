@@ -254,6 +254,18 @@ nav {
     font-weight: 600;
 }
 
+.items-per-page {
+    margin-left: auto;
+}
+
+.items-per-page select {
+    padding: 4px 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: white;
+    cursor: pointer;
+}
+
 /* Catalog Grid */
 .catalog-grid {
     display: grid;
@@ -589,8 +601,10 @@ nav {
 .pagination {
     display: flex;
     justify-content: center;
+    align-items: center;
     gap: 5px;
     margin-top: 30px;
+    flex-wrap: wrap;
 }
 
 .page-btn {
@@ -599,6 +613,7 @@ nav {
     background: white;
     cursor: pointer;
     border-radius: 4px;
+    min-width: 40px;
 }
 
 .page-btn:hover {
@@ -609,6 +624,17 @@ nav {
     background: #3498db;
     color: white;
     border-color: #3498db;
+}
+
+.page-ellipsis {
+    padding: 0 5px;
+    color: #6c757d;
+}
+
+.page-info {
+    margin-left: 15px;
+    color: #6c757d;
+    font-size: 14px;
 }
 
 /* Utility Classes */

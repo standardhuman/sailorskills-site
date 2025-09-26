@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inventory Management System</title>
-    <link rel="stylesheet" href="anode-manager.css">
+    <link rel="stylesheet" href="inventory.css">
 </head>
 <body>
     <div class="container">
@@ -95,6 +95,15 @@
                 <span>In Stock: <strong id="in-stock">0</strong></span>
                 <span>On Sale: <strong id="on-sale">0</strong></span>
                 <span>Last Sync: <strong id="last-sync">Never</strong></span>
+                <span class="items-per-page">
+                    Show:
+                    <select id="items-per-page" onchange="anodeManager.setItemsPerPage(this.value)">
+                        <option value="25">25</option>
+                        <option value="50" selected>50</option>
+                        <option value="100">100</option>
+                        <option value="200">200</option>
+                    </select>
+                </span>
             </div>
             <div id="catalog-grid" class="catalog-grid">
                 <!-- Products will be loaded here -->
@@ -636,7 +645,7 @@
         window.SUPABASE_URL = 'https://fzygakldvvzxmahkdylq.supabase.co';
         window.SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ6eWdha2xkdnZ6eG1haGtkeWxxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQwODM4OTgsImV4cCI6MjA2OTY1OTg5OH0.8BNDF5zmpk2HFdprTjsdOWTDh_XkAPdTnGo7omtiVIk';
     </script>
-    <script src="anode-manager.js"></script>
+    <script src="inventory.js"></script>
     <script src="inventory-manager.js"></script>
 </body>
 </html>

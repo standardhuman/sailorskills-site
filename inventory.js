@@ -8,7 +8,7 @@ class AnodeManager {
         this.inventoryData = [];
         this.ordersData = [];
         this.currentPage = 1;
-        this.itemsPerPage = 9999; // Effectively unlimited
+        this.itemsPerPage = 50; // Show 50 items per page for better performance
         this.filters = {
             search: '',
             mainCategory: '', // 'tools', 'equipment', 'anodes'
@@ -324,16 +324,52 @@ class AnodeManager {
 
         pagination.style.display = 'flex';
         let html = '';
-        for (let i = 1; i <= totalPages; i++) {
+
+        // Add Previous button
+        if (this.currentPage > 1) {
+            html += `<button class="page-btn" onclick="anodeManager.goToPage(${this.currentPage - 1})">← Previous</button>`;
+        }
+
+        // Show page numbers (max 5 at a time)
+        let startPage = Math.max(1, this.currentPage - 2);
+        let endPage = Math.min(totalPages, startPage + 4);
+
+        if (startPage > 1) {
+            html += `<button class="page-btn" onclick="anodeManager.goToPage(1)">1</button>`;
+            if (startPage > 2) html += '<span class="page-ellipsis">...</span>';
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
             html += `<button class="page-btn ${i === this.currentPage ? 'active' : ''}"
                      onclick="anodeManager.goToPage(${i})">${i}</button>`;
         }
+
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) html += '<span class="page-ellipsis">...</span>';
+            html += `<button class="page-btn" onclick="anodeManager.goToPage(${totalPages})">${totalPages}</button>`;
+        }
+
+        // Add Next button
+        if (this.currentPage < totalPages) {
+            html += `<button class="page-btn" onclick="anodeManager.goToPage(${this.currentPage + 1})">Next →</button>`;
+        }
+
+        // Add items info
+        const start = (this.currentPage - 1) * this.itemsPerPage + 1;
+        const end = Math.min(start + this.itemsPerPage - 1, totalItems);
+        html += `<span class="page-info">Showing ${start}-${end} of ${totalItems}</span>`;
 
         pagination.innerHTML = html;
     }
 
     goToPage(page) {
         this.currentPage = page;
+        this.renderCatalog();
+    }
+
+    setItemsPerPage(value) {
+        this.itemsPerPage = parseInt(value);
+        this.currentPage = 1; // Reset to first page
         this.renderCatalog();
     }
 
@@ -566,15 +602,6 @@ class AnodeManager {
         document.getElementById('total-products').textContent = total;
         document.getElementById('in-stock').textContent = inStock;
         document.getElementById('on-sale').textContent = onSale;
-
-        // Add "showing all" indicator
-        const statsBar = document.querySelector('.stats-bar');
-        if (statsBar && !document.getElementById('showing-all')) {
-            const showingAll = document.createElement('span');
-            showingAll.id = 'showing-all';
-            showingAll.innerHTML = '<strong style="color: #28a745;">📋 Showing All</strong>';
-            statsBar.appendChild(showingAll);
-        }
     }
 
     async showProductDetails(productId) {

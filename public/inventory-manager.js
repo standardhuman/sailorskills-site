@@ -36,6 +36,16 @@ class InventoryManager extends AnodeManager {
             this.showReplenishmentModal();
         });
 
+        // Quick filter buttons
+        document.querySelectorAll('.quick-filter-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                this.applyQuickFilter(e.target.dataset.filter);
+                // Update button states
+                document.querySelectorAll('.quick-filter-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+            });
+        });
+
         // Inventory tabs
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -127,6 +137,8 @@ class InventoryManager extends AnodeManager {
                     id: i.id,
                     sku: i.sku,
                     name: i.name,
+                    description: i.description,
+                    amazonUrl: i.amazon_url,
                     category: i.item_categories?.name || i.category_id,
                     onHand: i.quantity_on_hand,
                     allocated: i.quantity_allocated,
@@ -181,7 +193,9 @@ class InventoryManager extends AnodeManager {
                         <button class="action-btn adjust" onclick="inventoryManager.showAdjustStock('${item.id}', '${item.type}')">Adjust</button>
                         ${item.type === 'anode' ?
                             `<button class="action-btn charge" onclick="inventoryManager.showChargeCustomer('${item.id}')">Charge</button>` :
-                            ''}
+                            item.amazonUrl ?
+                                `<button class="action-btn order" onclick="inventoryManager.orderFromAmazon('${item.id}')">🛒 Order</button>` :
+                                ''}
                         <button class="action-btn edit" onclick="inventoryManager.editItem('${item.id}', '${item.type}')">Edit</button>
                     </div>
                 </td>
@@ -231,8 +245,13 @@ class InventoryManager extends AnodeManager {
         }
 
         // Stock filters
+        if (this.inventoryFilters.inStockOnly) {
+            filtered = filtered.filter(item => item.available > 0);
+            delete this.inventoryFilters.inStockOnly;
+        }
+
         if (this.inventoryFilters.lowStock) {
-            filtered = filtered.filter(item => item.available <= item.reorderPoint);
+            filtered = filtered.filter(item => item.available <= item.reorderPoint && item.available > 0);
         }
 
         if (this.inventoryFilters.outOfStock) {
@@ -241,6 +260,11 @@ class InventoryManager extends AnodeManager {
 
         if (this.inventoryFilters.critical) {
             filtered = filtered.filter(item => item.available < item.minStock);
+        }
+
+        if (this.inventoryFilters.needsReorder) {
+            filtered = filtered.filter(item => item.available <= item.reorderPoint);
+            delete this.inventoryFilters.needsReorder;
         }
 
         return filtered;
@@ -285,6 +309,45 @@ class InventoryManager extends AnodeManager {
 
     filterInventory() {
         this.renderInventory();
+    }
+
+    applyQuickFilter(filterType) {
+        // Reset all checkboxes
+        document.getElementById('show-low-stock').checked = false;
+        document.getElementById('show-out-of-stock').checked = false;
+        document.getElementById('show-critical').checked = false;
+
+        // Reset filters
+        this.inventoryFilters.lowStock = false;
+        this.inventoryFilters.outOfStock = false;
+        this.inventoryFilters.critical = false;
+
+        switch(filterType) {
+            case 'all':
+                // Show all items - filters already reset
+                break;
+            case 'in-stock':
+                // Will be handled in filterInventoryItems
+                this.inventoryFilters.inStockOnly = true;
+                break;
+            case 'low-stock':
+                this.inventoryFilters.lowStock = true;
+                document.getElementById('show-low-stock').checked = true;
+                break;
+            case 'out-of-stock':
+                this.inventoryFilters.outOfStock = true;
+                document.getElementById('show-out-of-stock').checked = true;
+                break;
+            case 'critical':
+                this.inventoryFilters.critical = true;
+                document.getElementById('show-critical').checked = true;
+                break;
+            case 'needs-reorder':
+                this.inventoryFilters.needsReorder = true;
+                break;
+        }
+
+        this.filterInventory();
     }
 
     // Modal Management
@@ -524,6 +587,7 @@ class InventoryManager extends AnodeManager {
                         name: document.getElementById('item-name').value,
                         category_id: document.getElementById('item-category').value,
                         description: document.getElementById('item-description').value,
+                        amazon_url: document.getElementById('item-amazon-url').value || null,
                         quantity_on_hand: parseInt(document.getElementById('initial-quantity').value) || 0,
                         unit_cost: parseFloat(document.getElementById('unit-cost').value) || 0,
                         minimum_stock_level: parseInt(document.getElementById('min-stock').value) || 0,
@@ -759,6 +823,60 @@ class InventoryManager extends AnodeManager {
         } catch (error) {
             console.error('Error auto-adding low stock:', error);
             alert('Failed to add low stock items: ' + error.message);
+        }
+    }
+
+    orderFromAmazon(itemId) {
+        const item = this.inventoryItems.find(i => i.id === itemId && i.type === 'item');
+        if (!item || !item.amazonUrl) return;
+
+        const quantity = prompt(`How many ${item.name} do you want to order?\n\nCurrent stock: ${item.available}\nReorder quantity: ${item.reorderQty}`, item.reorderQty);
+
+        if (quantity && parseInt(quantity) > 0) {
+            // Open Amazon URL in new tab
+            window.open(item.amazonUrl, '_blank');
+
+            // Record the order in the system
+            this.recordAmazonOrder(itemId, parseInt(quantity));
+
+            alert(`Opening Amazon to order ${quantity} x ${item.name}.\n\nPlease complete the order on Amazon, then the stock will be automatically updated when received.`);
+        }
+    }
+
+    async recordAmazonOrder(itemId, quantity) {
+        try {
+            // Record the pending order
+            const { error } = await this.supabase
+                .from('inventory_transactions')
+                .insert({
+                    transaction_type: 'pending_order',
+                    item_id: itemId,
+                    quantity: quantity,
+                    reference_type: 'amazon_order',
+                    reference_id: `AMAZON-${Date.now()}`,
+                    notes: 'Order placed via Amazon',
+                    performed_by: 'current_user'
+                });
+
+            if (error) throw error;
+
+            // Add to replenishment tracking
+            const { error: repError } = await this.supabase
+                .from('replenishment_list')
+                .insert({
+                    item_id: itemId,
+                    quantity_needed: quantity,
+                    quantity_to_order: quantity,
+                    status: 'ordered',
+                    source: 'amazon',
+                    requested_by: 'current_user',
+                    priority: 'medium'
+                });
+
+            if (repError) console.error('Error tracking replenishment:', repError);
+
+        } catch (error) {
+            console.error('Error recording Amazon order:', error);
         }
     }
 
