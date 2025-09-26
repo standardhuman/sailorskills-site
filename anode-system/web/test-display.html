@@ -80,7 +80,7 @@
         .filter-group {
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: 8px;
         }
 
         .filter-group label {
@@ -88,15 +88,54 @@
             color: #666;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            font-weight: 600;
         }
 
         .filter-group select,
         .filter-group input {
-            padding: 8px 12px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 14px;
+            padding: 12px 16px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
             background: white;
+            min-height: 48px;
+            cursor: pointer;
+        }
+
+        .filter-group select:focus,
+        .filter-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 12px 20px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background: white;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            min-height: 48px;
+            transition: all 0.2s;
+            color: #666;
+        }
+
+        .filter-btn:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
         }
 
         .btn {
@@ -203,6 +242,40 @@
             font-weight: 500;
         }
 
+        .product-description {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #e5e5e5;
+            font-size: 13px;
+            color: #666;
+            line-height: 1.5;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .product-description.expanded {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .description-toggle {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 4px 10px;
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #666;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .description-toggle:hover {
+            background: #e0e0e0;
+        }
+
         .price {
             color: #667eea;
             font-size: 20px;
@@ -298,48 +371,63 @@
         </div>
 
         <div class="filters">
-            <div class="filter-row">
-                <div class="filter-group">
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+                <!-- Search Bar -->
+                <div class="filter-group" style="max-width: 500px;">
                     <label>Search</label>
-                    <input type="text" id="searchInput" placeholder="Search products...">
+                    <input type="text" id="searchInput" placeholder="Search by name or ID..." oninput="applyFilters()">
                 </div>
+
+                <!-- Material Buttons -->
                 <div class="filter-group">
                     <label>Material</label>
-                    <select id="materialFilter">
-                        <option value="">All Materials</option>
-                        <option value="zinc">Zinc</option>
-                        <option value="aluminum">Aluminum</option>
-                        <option value="magnesium">Magnesium</option>
-                    </select>
+                    <div class="filter-buttons">
+                        <button class="filter-btn" data-filter="material" data-value="" onclick="setFilter('material', '')">All</button>
+                        <button class="filter-btn active" data-filter="material" data-value="zinc" onclick="setFilter('material', 'zinc')">Zinc</button>
+                        <button class="filter-btn" data-filter="material" data-value="aluminum" onclick="setFilter('material', 'aluminum')">Aluminum</button>
+                        <button class="filter-btn" data-filter="material" data-value="magnesium" onclick="setFilter('material', 'magnesium')">Magnesium</button>
+                    </div>
                 </div>
+
+                <!-- Category Buttons -->
                 <div class="filter-group">
                     <label>Category</label>
-                    <select id="categoryFilter">
-                        <option value="">All Categories</option>
-                    </select>
+                    <div class="filter-buttons" id="categoryButtons">
+                        <button class="filter-btn" data-filter="category" data-value="" onclick="setFilter('category', '')">All</button>
+                        <button class="filter-btn active" data-filter="category" data-value="shaft" onclick="setFilter('category', 'shaft')">Shaft</button>
+                        <button class="filter-btn" data-filter="category" data-value="hull" onclick="setFilter('category', 'hull')">Hull</button>
+                        <button class="filter-btn" data-filter="category" data-value="engine" onclick="setFilter('category', 'engine')">Engine</button>
+                        <button class="filter-btn" data-filter="category" data-value="propeller" onclick="setFilter('category', 'propeller')">Propeller</button>
+                        <button class="filter-btn" data-filter="category" data-value="rudder_trim_tab" onclick="setFilter('category', 'rudder_trim_tab')">Rudder/Trim</button>
+                        <button class="filter-btn" data-filter="category" data-value="sterndrive" onclick="setFilter('category', 'sterndrive')">Sterndrive</button>
+                        <button class="filter-btn" data-filter="category" data-value="outboard" onclick="setFilter('category', 'outboard')">Outboard</button>
+                    </div>
                 </div>
+
+                <!-- Measurement Buttons -->
                 <div class="filter-group">
-                    <label>Stock</label>
-                    <select id="stockFilter">
-                        <option value="">All</option>
-                        <option value="in_stock">In Stock</option>
-                        <option value="out_of_stock">Out of Stock</option>
-                    </select>
+                    <label>Measurement System</label>
+                    <div class="filter-buttons">
+                        <button class="filter-btn" data-filter="measurement" data-value="" onclick="setFilter('measurement', '')">All</button>
+                        <button class="filter-btn active" data-filter="measurement" data-value="standard" onclick="setFilter('measurement', 'standard')">Standard (Imperial)</button>
+                        <button class="filter-btn" data-filter="measurement" data-value="metric" onclick="setFilter('measurement', 'metric')">Metric</button>
+                    </div>
                 </div>
-                <div class="filter-group">
-                    <label>Measurement</label>
-                    <select id="measurementFilter">
-                        <option value="">All</option>
-                        <option value="standard">Standard (Imperial)</option>
-                        <option value="metric">Metric</option>
-                    </select>
+
+                <!-- Stock Status and Options -->
+                <div style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap;">
+                    <div class="filter-buttons">
+                        <button class="filter-btn" data-filter="stock" data-value="" onclick="setFilter('stock', '')">All Stock</button>
+                        <button class="filter-btn" data-filter="stock" data-value="in_stock" onclick="setFilter('stock', 'in_stock')">In Stock Only</button>
+                    </div>
+
+                    <button class="btn" onclick="resetFilters()" style="background: #dc2626;">Reset All</button>
+
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" id="showImages" checked onchange="toggleImages()" style="cursor: pointer; width: 20px; height: 20px;">
+                        <span style="font-size: 16px; color: #666; font-weight: 500;">Show Images</span>
+                    </label>
                 </div>
-                <button class="btn" onclick="applyFilters()">Apply Filters</button>
-                <button class="btn" onclick="resetFilters()">Reset</button>
-                <label style="margin-left: 20px; display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                    <input type="checkbox" id="showImages" checked onchange="toggleImages()" style="cursor: pointer;">
-                    <span style="font-size: 14px; color: #666;">Show Images</span>
-                </label>
             </div>
         </div>
 
@@ -361,6 +449,15 @@
         let filteredProducts = [];
         let showImages = true;
 
+        // Current filter states - default to zinc, shaft, standard
+        let currentFilters = {
+            material: 'zinc',
+            category: 'shaft',
+            measurement: 'standard',
+            stock: '',
+            search: ''
+        };
+
         // Load products
         async function loadProducts() {
             try {
@@ -378,11 +475,8 @@
                 // Update stats
                 updateStats();
 
-                // Populate category filter
-                populateCategoryFilter();
-
-                // Display products
-                displayProducts();
+                // Apply default filters (zinc, shaft, standard)
+                applyFilters();
 
                 // Load last sync info
                 loadLastSync();
@@ -403,17 +497,6 @@
                 allProducts.filter(p => p.is_on_sale).length;
         }
 
-        function populateCategoryFilter() {
-            const categories = [...new Set(allProducts.map(p => p.category).filter(Boolean))].sort();
-            const select = document.getElementById('categoryFilter');
-
-            categories.forEach(category => {
-                const option = document.createElement('option');
-                option.value = category;
-                option.textContent = category.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-                select.appendChild(option);
-            });
-        }
 
         async function loadLastSync() {
             try {
@@ -466,6 +549,19 @@
         function toggleImages() {
             showImages = document.getElementById('showImages').checked;
             displayProducts();
+        }
+
+        function toggleDescription(button) {
+            const description = button.nextElementSibling;
+            const isExpanded = description.classList.contains('expanded');
+
+            if (isExpanded) {
+                description.classList.remove('expanded');
+                button.textContent = 'Show Details ▼';
+            } else {
+                description.classList.add('expanded');
+                button.textContent = 'Hide Details ▲';
+            }
         }
 
         function createProductCard(product) {
@@ -524,6 +620,12 @@
                             <span class="product-detail-value">${priceHtml}</span>
                         </div>
                     </div>
+                    ${product.description ? `
+                        <button class="description-toggle" onclick="toggleDescription(this)">Show Details ▼</button>
+                        <div class="product-description">
+                            ${product.description.replace(/\n/g, '<br>')}
+                        </div>
+                    ` : ''}
                 </div>
             `;
 
@@ -540,38 +642,62 @@
                 .join(' ');
         }
 
+        function setFilter(filterType, value) {
+            // Update filter state
+            currentFilters[filterType] = value;
+
+            // Update button states
+            document.querySelectorAll(`[data-filter="${filterType}"]`).forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.value === value) {
+                    btn.classList.add('active');
+                }
+            });
+
+            // Apply filters immediately
+            applyFilters();
+        }
+
         function applyFilters() {
-            const search = document.getElementById('searchInput').value.toLowerCase();
-            const material = document.getElementById('materialFilter').value;
-            const category = document.getElementById('categoryFilter').value;
-            const stock = document.getElementById('stockFilter').value;
-            const measurement = document.getElementById('measurementFilter').value;
+            // Get search value
+            const searchValue = document.getElementById('searchInput').value.toLowerCase();
+            currentFilters.search = searchValue;
 
             filteredProducts = allProducts.filter(product => {
-                if (search && !product.name.toLowerCase().includes(search) &&
-                    !product.boatzincs_id.toLowerCase().includes(search)) {
+                // Search filter
+                if (currentFilters.search && !product.name.toLowerCase().includes(currentFilters.search) &&
+                    !product.boatzincs_id.toLowerCase().includes(currentFilters.search)) {
                     return false;
                 }
-                if (material && product.material !== material) {
+
+                // Material filter
+                if (currentFilters.material && product.material !== currentFilters.material) {
                     return false;
                 }
-                if (category && product.category !== category) {
+
+                // Category filter
+                if (currentFilters.category && product.category !== currentFilters.category) {
                     return false;
                 }
-                if (stock && product.stock_status !== stock) {
+
+                // Stock filter
+                if (currentFilters.stock && product.stock_status !== currentFilters.stock) {
                     return false;
                 }
-                if (measurement) {
+
+                // Measurement filter
+                if (currentFilters.measurement) {
                     const isMetric = product.subcategory && product.subcategory.includes('metric');
                     const isStandard = product.subcategory && product.subcategory.includes('standard');
 
-                    if (measurement === 'metric' && !isMetric) {
+                    if (currentFilters.measurement === 'metric' && !isMetric) {
                         return false;
                     }
-                    if (measurement === 'standard' && !isStandard) {
+                    if (currentFilters.measurement === 'standard' && !isStandard) {
                         return false;
                     }
                 }
+
                 return true;
             });
 
@@ -579,13 +705,31 @@
         }
 
         function resetFilters() {
+            // Reset to defaults
+            currentFilters = {
+                material: 'zinc',
+                category: 'shaft',
+                measurement: 'standard',
+                stock: '',
+                search: ''
+            };
+
+            // Clear search
             document.getElementById('searchInput').value = '';
-            document.getElementById('materialFilter').value = '';
-            document.getElementById('categoryFilter').value = '';
-            document.getElementById('stockFilter').value = '';
-            document.getElementById('measurementFilter').value = '';
-            filteredProducts = allProducts;
-            displayProducts();
+
+            // Update all button states
+            Object.keys(currentFilters).forEach(filterType => {
+                if (filterType !== 'search') {
+                    document.querySelectorAll(`[data-filter="${filterType}"]`).forEach(btn => {
+                        btn.classList.remove('active');
+                        if (btn.dataset.value === currentFilters[filterType]) {
+                            btn.classList.add('active');
+                        }
+                    });
+                }
+            });
+
+            applyFilters();
         }
 
         function showError(message) {

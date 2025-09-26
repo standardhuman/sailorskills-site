@@ -444,11 +444,11 @@ class BoatzincsScraper:
                     # Get product list
                     products = await self.scrape_product_list(category_url)
 
-                    # Get details for each product (optional, can be slow)
-                    if len(products) < 20:  # Only get details for small categories
-                        for product in tqdm(products, desc="Getting product details"):
-                            details = await self.scrape_product_details(product['product_url'])
-                            product.update(details)
+                    # Get details for each product - ALWAYS get descriptions as they contain important info
+                    logger.info(f"Getting product details for {len(products)} products...")
+                    for product in tqdm(products, desc="Getting product details"):
+                        details = await self.scrape_product_details(product['product_url'])
+                        product.update(details)
 
                     # Save to database
                     await self.save_products(products, material, category_url)
