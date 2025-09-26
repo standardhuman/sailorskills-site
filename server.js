@@ -22,15 +22,22 @@ try {
 
 // HTML routes (serve HTML without extensions in URL) - BEFORE static files
 app.get('/diving', (req, res) => {
-    res.sendFile(path.join(__dirname, 'diving.html'));
+    res.sendFile(path.join(__dirname, 'diving', 'diving.html'));
 });
 
 app.get(['/admin', '/admin/'], (req, res) => {
-    res.sendFile(path.join(__dirname, 'admin.html'));
+    res.sendFile(path.join(__dirname, 'admin', 'admin.html'));
+});
+
+app.get(['/inventory', '/inventory/'], (req, res) => {
+    res.sendFile(path.join(__dirname, 'inventory', 'inventory.html'));
 });
 
 // Serve static files (CSS, JS, images, etc) - AFTER specific routes
 app.use(express.static(__dirname));
+app.use('/admin', express.static(path.join(__dirname, 'admin')));
+app.use('/inventory', express.static(path.join(__dirname, 'inventory')));
+app.use('/diving', express.static(path.join(__dirname, 'diving')));
 
 app.get('/booking', (req, res) => {
     res.sendFile(path.join(__dirname, 'booking.html'));
@@ -51,7 +58,7 @@ app.get('/quote/:quoteNumber', (req, res) => {
 
 // Default route - serve index.html
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+    res.sendFile(path.join(__dirname, 'diving', 'index.html'));
 });
 
 // Handle 404
@@ -68,6 +75,7 @@ if (process.env.VERCEL !== '1') {
         console.log('  http://localhost:' + PORT + '/');
         console.log('  http://localhost:' + PORT + '/diving');
         console.log('  http://localhost:' + PORT + '/admin');
+        console.log('  http://localhost:' + PORT + '/inventory');
         console.log('  http://localhost:' + PORT + '/booking');
         console.log('  http://localhost:' + PORT + '/anode-quote');
         console.log('  http://localhost:' + PORT + '/comprehensive-quote');
