@@ -194,7 +194,13 @@ class AnodeManager {
 
             if (error) throw error;
 
-            this.catalogData = data;
+            // Filter out products with invalid data and ensure prices are numbers
+            this.catalogData = (data || []).map(product => ({
+                ...product,
+                list_price: parseFloat(product.list_price) || null,
+                sale_price: product.sale_price ? parseFloat(product.sale_price) : null
+            }));
+
             this.renderCatalog();
             this.updateCatalogStats();
 
@@ -259,9 +265,11 @@ class AnodeManager {
                     </div>
                     <div class="product-price">
                         ${product.is_on_sale && product.sale_price ?
-                            `<span class="price-current">$${product.sale_price.toFixed(2)}</span>
-                             <span class="price-original">$${product.list_price.toFixed(2)}</span>` :
-                            `<span class="price-current">$${product.list_price.toFixed(2)}</span>`
+                            `<span class="price-current">$${(product.sale_price || 0).toFixed(2)}</span>
+                             <span class="price-original">$${(product.list_price || 0).toFixed(2)}</span>` :
+                            product.list_price !== null && product.list_price !== undefined ?
+                                `<span class="price-current">$${product.list_price.toFixed(2)}</span>` :
+                                `<span class="price-current">Price TBD</span>`
                         }
                     </div>
                     <div class="product-stock ${this.getStockClass(product.stock_status)}">
@@ -391,7 +399,8 @@ class AnodeManager {
         document.getElementById('modal-boatzincs-id').textContent = product.boatzincs_id;
         document.getElementById('modal-category').textContent = product.category || 'N/A';
         document.getElementById('modal-material').textContent = product.material || 'N/A';
-        document.getElementById('modal-list-price').textContent = product.list_price.toFixed(2);
+        document.getElementById('modal-list-price').textContent = product.list_price !== null && product.list_price !== undefined ?
+            product.list_price.toFixed(2) : 'TBD';
         document.getElementById('modal-sale-price').textContent = product.sale_price ? product.sale_price.toFixed(2) : 'N/A';
         document.getElementById('modal-stock-status').textContent = this.getStockLabel(product.stock_status);
         document.getElementById('modal-description').textContent = product.description || 'No description available';
