@@ -325,19 +325,19 @@ class GeminiService {
         const testBody = {
             contents: [{
                 parts: [{
-                    text: "Hello, respond with a simple JSON: {\"status\": \"ok\"}"
+                    text: "Respond with: {\"status\": \"ok\"}"
                 }]
             }],
             generationConfig: {
                 temperature: 0,
-                maxOutputTokens: 50,
-                responseMimeType: "application/json"
+                maxOutputTokens: 50
             }
         };
 
         try {
+            // Try with gemini-1.5-flash first (most compatible)
             const response = await fetch(
-                `${this.apiUrl}/models/${this.model}:generateContent?key=${key}`,
+                `${this.apiUrl}/models/gemini-1.5-flash:generateContent?key=${key}`,
                 {
                     method: 'POST',
                     headers: {
@@ -347,8 +347,22 @@ class GeminiService {
                 }
             );
 
-            return response.ok;
+            if (response.ok) {
+                return true;
+            }
+
+            // Log the error for debugging
+            const errorData = await response.json();
+            console.error('API Key validation error:', errorData);
+
+            // Check if it's a quota error (which means key is valid but quota exceeded)
+            if (response.status === 429) {
+                return true; // Key is valid, just rate limited
+            }
+
+            return false;
         } catch (error) {
+            console.error('API Key validation error:', error);
             return false;
         }
     }

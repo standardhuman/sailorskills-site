@@ -614,21 +614,27 @@ class AIAssistant {
     }
 
     async saveSettings() {
-        const apiKey = document.getElementById('gemini-api-key').value;
+        const apiKey = document.getElementById('gemini-api-key').value.trim();
         const model = document.getElementById('gemini-model').value;
         const extractionMode = document.getElementById('extraction-mode').value;
 
         // Validate API key if changed
         if (apiKey && apiKey !== this.geminiService.apiKey) {
+            this.addToChat('assistant', '🔄 Validating API key...');
+
             const valid = await this.geminiService.validateApiKey(apiKey);
             if (!valid) {
-                this.showError('Invalid API key. Please check and try again.');
+                // Check console for more details
+                this.showError('Invalid API key. Please check: 1) No extra spaces, 2) Correct API key from Google AI Studio, 3) Check browser console for details');
                 return;
             }
         }
 
-        // Save settings
-        this.geminiService.setApiKey(apiKey);
+        // Save settings even without validation for testing
+        if (apiKey) {
+            this.geminiService.setApiKey(apiKey);
+        }
+
         this.geminiService.setModel(model);
         this.currentExtractionMode = extractionMode;
 
@@ -687,6 +693,56 @@ class AIAssistant {
 
     showError(message) {
         this.addToChat('assistant', `❌ ${message}`);
+    }
+
+    // Test API key directly
+    async testApiKey() {
+        const apiKey = document.getElementById('gemini-api-key').value.trim();
+
+        if (!apiKey) {
+            this.showError('Please enter an API key first');
+            return;
+        }
+
+        this.addToChat('assistant', '🔄 Testing API key...');
+
+        try {
+            // Direct test without validation wrapper
+            const response = await fetch(
+                `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{
+                                text: "Say hello"
+                            }]
+                        }]
+                    })
+                }
+            );
+
+            const data = await response.json();
+
+            if (response.ok) {
+                this.addToChat('assistant', '✅ API key is valid and working!');
+                // Auto-save the key
+                this.geminiService.setApiKey(apiKey);
+            } else {
+                console.error('API test response:', data);
+                if (data.error?.message) {
+                    this.showError(`API Error: ${data.error.message}`);
+                } else {
+                    this.showError('API key test failed. Check browser console for details.');
+                }
+            }
+        } catch (error) {
+            console.error('Test error:', error);
+            this.showError(`Connection error: ${error.message}`);
+        }
     }
 }
 
