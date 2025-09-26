@@ -879,16 +879,30 @@ class AIAssistant {
 
     // Extract text content from HTML
     extractTextFromHTML(doc) {
+        // Try multiple selectors for each field
         const elements = {
-            title: doc.querySelector('h1, #productTitle, .product-title')?.textContent?.trim() || '',
-            price: doc.querySelector('.a-price-whole, .price, [itemprop="price"]')?.textContent?.trim() || '',
-            description: Array.from(doc.querySelectorAll('#feature-bullets li, .product-description, [itemprop="description"]'))
+            title: doc.querySelector('h1, #productTitle, .product-title, [data-feature-name="title"], .a-size-large')?.textContent?.trim() ||
+                   doc.querySelector('meta[property="og:title"]')?.content || '',
+
+            price: doc.querySelector('.a-price-whole, .a-price-range, .price, [itemprop="price"], .a-price.a-text-price')?.textContent?.trim() ||
+                   doc.querySelector('meta[property="product:price:amount"]')?.content || '',
+
+            description: Array.from(doc.querySelectorAll('#feature-bullets li, .product-description, [itemprop="description"], .a-list-item'))
                 .map(el => el.textContent?.trim())
                 .filter(Boolean)
-                .join(' ') || '',
-            brand: doc.querySelector('[itemprop="brand"], #bylineInfo, .brand')?.textContent?.trim() || '',
-            sku: doc.querySelector('.sku, [itemprop="sku"]')?.textContent?.trim() || ''
+                .slice(0, 5)
+                .join(' ') ||
+                doc.querySelector('meta[name="description"]')?.content || '',
+
+            brand: doc.querySelector('[itemprop="brand"], #bylineInfo, .brand, a[href*="/stores/"]')?.textContent?.trim() ||
+                   doc.querySelector('meta[property="product:brand"]')?.content || '',
+
+            sku: this.extractASINFromDoc(doc) || ''
         };
+
+        // Get all text content as fallback
+        const bodyText = doc.body?.innerText || doc.body?.textContent || '';
+        const pageTitle = doc.title || '';
 
         // Get meta tags
         const metas = {};
@@ -900,33 +914,89 @@ class AIAssistant {
             }
         });
 
-        return JSON.stringify({ elements, metas }, null, 2);
+        return JSON.stringify({
+            elements,
+            metas,
+            pageTitle,
+            bodyPreview: bodyText.substring(0, 3000)
+        }, null, 2);
+    }
+
+    // Extract ASIN from document
+    extractASINFromDoc(doc) {
+        // Try various methods to find ASIN
+        const asinPatterns = [
+            /\/dp\/([A-Z0-9]{10})/,
+            /\/gp\/product\/([A-Z0-9]{10})/,
+            /ASIN[:\s]+([A-Z0-9]{10})/i
+        ];
+
+        // Check URL
+        const url = doc.location?.href || '';
+        for (const pattern of asinPatterns) {
+            const match = url.match(pattern);
+            if (match) return match[1];
+        }
+
+        // Check page content
+        const pageText = doc.body?.textContent || '';
+        for (const pattern of asinPatterns) {
+            const match = pageText.match(pattern);
+            if (match) return match[1];
+        }
+
+        // Check data attributes
+        const asinElement = doc.querySelector('[data-asin]');
+        if (asinElement) {
+            return asinElement.getAttribute('data-asin');
+        }
+
+        return null;
     }
 
     // Analyze text with Gemini
     async analyzeTextWithGemini(textContent, url) {
+        // Extract ASIN from URL if it's Amazon
+        let asin = '';
+        const asinMatch = url.match(/\/dp\/([A-Z0-9]{10})|\/gp\/product\/([A-Z0-9]{10})/);
+        if (asinMatch) {
+            asin = asinMatch[1] || asinMatch[2];
+        }
+
         const prompt = `Extract product information from this webpage content.
         The URL is: ${url}
+        ${asin ? `Amazon ASIN: ${asin}` : ''}
 
-        Content:
-        ${textContent.substring(0, 5000)}
+        Webpage content to analyze:
+        ${textContent.substring(0, 8000)}
+
+        Instructions:
+        1. Look for product title in elements.title, metas.og:title, or pageTitle
+        2. Look for price in elements.price or any text with $ symbol
+        3. Look for brand in elements.brand or metas
+        4. Use the ASIN as SKU if this is Amazon
+        5. If you can't find specific data, look in the bodyPreview text
 
         Return ONLY valid JSON in this format:
         {
             "items": [{
-                "name": "product name",
-                "sku": "SKU or product ID",
-                "price": price as number,
+                "name": "exact product name from the page",
+                "sku": "${asin || 'SKU if found'}",
+                "price": price as number (remove $ symbol),
                 "quantity": 1,
-                "category": "category",
-                "supplier": "website name",
-                "brand": "brand name",
-                "description": "brief description",
+                "category": "tools or anodes or equipment",
+                "supplier": "Amazon",
+                "brand": "brand name if found",
+                "description": "key features or description",
                 "url": "${url}"
             }]
         }
 
-        Important: Extract actual values from the content. Include the full URL for reordering.`;
+        IMPORTANT:
+        - Always include at least the product name
+        - If price is not found, use 0
+        - Include the full URL for reordering
+        - Return valid JSON only, no explanations`;
 
         try {
             const response = await fetch(
