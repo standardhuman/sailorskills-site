@@ -11,9 +11,10 @@ class AnodeManager {
         this.itemsPerPage = 9999; // Effectively unlimited
         this.filters = {
             search: '',
-            material: '',
-            category: '',
-            sizingUnit: '', // 'standard' or 'metric'
+            mainCategory: '', // 'tools', 'equipment', 'anodes'
+            material: '',     // for anodes: 'zinc', 'aluminum', 'magnesium'
+            application: '',  // for anodes: 'shaft', 'hull', 'engine', etc.
+            sizingUnit: '',   // 'standard' or 'metric'
             inStock: false,
             lowStock: false
         };
@@ -31,6 +32,9 @@ class AnodeManager {
 
         // Load initial data
         await this.loadCatalog();
+
+        // Initialize filter visibility
+        this.updateFilterVisibility();
 
         // Check for sync status
         await this.checkSyncStatus();
@@ -75,12 +79,14 @@ class AnodeManager {
             this.updateFilterButtonStates();
         });
 
-        // Catalog quick filter buttons
+        // Hierarchical filter buttons
         document.querySelectorAll('.catalog-filter-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const filterType = e.target.dataset.filter;
-                this.applyCatalogQuickFilter(filterType);
+                const filterLevel = e.target.dataset.level;
+                this.applyHierarchicalFilter(filterType, filterLevel);
                 this.updateFilterButtonStates();
+                this.updateFilterVisibility();
             });
         });
 
@@ -216,12 +222,25 @@ class AnodeManager {
             );
         }
 
+        // Main category filter
+        if (this.filters.mainCategory) {
+            if (this.filters.mainCategory === 'anodes') {
+                // For now, filter to items that have material property (indicates anode)
+                filtered = filtered.filter(item => item.material);
+            } else if (this.filters.mainCategory === 'tools' || this.filters.mainCategory === 'equipment') {
+                // Filter to non-anode items
+                filtered = filtered.filter(item => !item.material || item.item_type === this.filters.mainCategory);
+            }
+        }
+
+        // Material filter (only for anodes)
         if (this.filters.material) {
             filtered = filtered.filter(item => item.material === this.filters.material);
         }
 
-        if (this.filters.category) {
-            filtered = filtered.filter(item => item.category === this.filters.category);
+        // Application filter (category in the old system)
+        if (this.filters.application) {
+            filtered = filtered.filter(item => item.category === this.filters.application);
         }
 
         // Additional quick filters
@@ -323,6 +342,103 @@ class AnodeManager {
         this.renderCatalog();
     }
 
+    applyHierarchicalFilter(filterType, filterLevel) {
+        switch(filterLevel) {
+            case 'main':
+                // Main category selection
+                if (filterType === 'all') {
+                    this.filters.mainCategory = '';
+                    this.filters.material = '';
+                    this.filters.application = '';
+                    this.filters.sizingUnit = '';
+                } else {
+                    this.filters.mainCategory = filterType;
+                    // Reset sub-filters when changing main category
+                    this.filters.material = '';
+                    this.filters.application = '';
+                    this.filters.sizingUnit = '';
+                }
+                break;
+
+            case 'material':
+                // Material selection (only for anodes)
+                if (filterType === 'all-materials') {
+                    this.filters.material = '';
+                    this.filters.application = '';
+                    this.filters.sizingUnit = '';
+                } else {
+                    this.filters.material = filterType;
+                    // Reset downstream filters
+                    this.filters.application = '';
+                    this.filters.sizingUnit = '';
+                }
+                break;
+
+            case 'application':
+                // Application selection
+                if (filterType === 'all-applications') {
+                    this.filters.application = '';
+                    this.filters.sizingUnit = '';
+                } else {
+                    this.filters.application = filterType;
+                    // Reset downstream filters
+                    this.filters.sizingUnit = '';
+                }
+                break;
+
+            case 'sizing':
+                // Sizing selection
+                if (filterType === 'all-sizing') {
+                    this.filters.sizingUnit = '';
+                } else {
+                    this.filters.sizingUnit = filterType;
+                }
+                break;
+
+            default:
+                // Toggle filters (on-sale, in-stock)
+                if (filterType === 'on-sale') {
+                    this.filters.onSaleOnly = !this.filters.onSaleOnly;
+                } else if (filterType === 'in-stock') {
+                    this.filters.inStockOnly = !this.filters.inStockOnly;
+                }
+                break;
+        }
+
+        this.filterCatalog();
+    }
+
+    updateFilterVisibility() {
+        // Show/hide filter levels based on current selections
+        const materialFilters = document.getElementById('material-filters');
+        const applicationFilters = document.getElementById('application-filters');
+        const sizingFilters = document.getElementById('sizing-filters');
+
+        // Show material filters only if anodes is selected
+        if (this.filters.mainCategory === 'anodes') {
+            materialFilters.style.display = 'flex';
+        } else {
+            materialFilters.style.display = 'none';
+            applicationFilters.style.display = 'none';
+            sizingFilters.style.display = 'none';
+        }
+
+        // Show application filters only if a material is selected
+        if (this.filters.material && this.filters.mainCategory === 'anodes') {
+            applicationFilters.style.display = 'flex';
+        } else {
+            applicationFilters.style.display = 'none';
+            sizingFilters.style.display = 'none';
+        }
+
+        // Show sizing filters only if an application is selected
+        if (this.filters.application && this.filters.material) {
+            sizingFilters.style.display = 'flex';
+        } else {
+            sizingFilters.style.display = 'none';
+        }
+    }
+
     applyCatalogQuickFilter(filterType) {
         switch(filterType) {
             case 'all':
@@ -392,22 +508,52 @@ class AnodeManager {
         // Update all filter button states based on current filters
         document.querySelectorAll('.catalog-filter-btn').forEach(btn => {
             const filterType = btn.dataset.filter;
+            const filterLevel = btn.dataset.level;
             btn.classList.remove('active');
 
-            // Check if this button should be active
-            if (filterType === 'all' && !this.filters.material && !this.filters.category &&
-                !this.filters.sizingUnit && !this.filters.inStockOnly && !this.filters.onSaleOnly) {
-                btn.classList.add('active');
-            } else if (filterType === this.filters.material) {
-                btn.classList.add('active');
-            } else if (filterType === this.filters.category) {
-                btn.classList.add('active');
-            } else if (filterType === this.filters.sizingUnit) {
-                btn.classList.add('active');
-            } else if (filterType === 'on-sale' && this.filters.onSaleOnly) {
-                btn.classList.add('active');
-            } else if (filterType === 'in-stock' && this.filters.inStockOnly) {
-                btn.classList.add('active');
+            // Main category level
+            if (filterLevel === 'main') {
+                if (filterType === 'all' && !this.filters.mainCategory) {
+                    btn.classList.add('active');
+                } else if (filterType === this.filters.mainCategory) {
+                    btn.classList.add('active');
+                }
+            }
+
+            // Material level
+            else if (filterLevel === 'material') {
+                if (filterType === 'all-materials' && !this.filters.material) {
+                    btn.classList.add('active');
+                } else if (filterType === this.filters.material) {
+                    btn.classList.add('active');
+                }
+            }
+
+            // Application level
+            else if (filterLevel === 'application') {
+                if (filterType === 'all-applications' && !this.filters.application) {
+                    btn.classList.add('active');
+                } else if (filterType === this.filters.application) {
+                    btn.classList.add('active');
+                }
+            }
+
+            // Sizing level
+            else if (filterLevel === 'sizing') {
+                if (filterType === 'all-sizing' && !this.filters.sizingUnit) {
+                    btn.classList.add('active');
+                } else if (filterType === this.filters.sizingUnit) {
+                    btn.classList.add('active');
+                }
+            }
+
+            // Toggle filters
+            else {
+                if (filterType === 'on-sale' && this.filters.onSaleOnly) {
+                    btn.classList.add('active');
+                } else if (filterType === 'in-stock' && this.filters.inStockOnly) {
+                    btn.classList.add('active');
+                }
             }
         });
     }
