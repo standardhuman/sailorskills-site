@@ -187,19 +187,38 @@ class BoatzincsScraper:
                         logger.error(f"Error extracting product: {e}")
                         self.stats['items_failed'] += 1
 
-                # Check for next page - look for "Next" link in pagination
-                next_button = await self.page.query_selector('a:has-text("Next")')
-                if not next_button:
-                    # Also check for numbered pagination
-                    current_page_element = await self.page.query_selector('.pagination .active')
-                    if current_page_element:
-                        next_page_link = await self.page.query_selector(f'.pagination a:has-text("{page_num + 1}")')
-                        if not next_page_link:
-                            logger.info(f"No more pages for {category_url}")
-                            break
-                    else:
-                        logger.info(f"No more pages for {category_url}")
+                # Check for next page by looking for pagination links
+                pagination_exists = await self.page.query_selector('.pagination')
+                if pagination_exists:
+                    # Try to find next page link - could be "Next" or numbered
+                    next_selectors = [
+                        f'.pagination a[href*="page={page_num + 1}"]',  # Direct page number
+                        '.pagination-item--next:not(.pagination-item--disabled) a',  # Next button
+                        f'a:has-text("{page_num + 1}")'  # Text-based page number
+                    ]
+
+                    next_link = None
+                    for selector in next_selectors:
+                        try:
+                            next_link = await self.page.query_selector(selector)
+                            if next_link:
+                                # Check if it's not disabled
+                                parent = await next_link.evaluate_handle('el => el.parentElement')
+                                classes = await parent.evaluate('el => el.className')
+                                if 'disabled' in str(classes):
+                                    next_link = None
+                                else:
+                                    break
+                        except:
+                            continue
+
+                    if not next_link:
+                        logger.info(f"No more pages for {category_url} (ended at page {page_num})")
                         break
+                else:
+                    # No pagination means single page
+                    logger.info(f"No pagination found for {category_url}")
+                    break
 
                 page_num += 1
 

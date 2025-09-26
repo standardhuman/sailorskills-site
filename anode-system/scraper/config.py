@@ -35,29 +35,63 @@ CACHE_DIR = DATA_DIR / 'cache'
 for directory in [DATA_DIR, IMAGES_DIR, LOGS_DIR, CACHE_DIR]:
     directory.mkdir(parents=True, exist_ok=True)
 
-# Category mappings
+# Category mappings - Updated with correct subcategory URLs
 CATEGORIES = {
     'zinc': {
         'url': '/categories/zinc-anodes.html',
         'subcategories': [
+            # Shaft Anodes
             'shaft-anodes/standard',
             'shaft-anodes/metric',
-            'hull-anodes',
-            'engine-anodes',
+            # Hull Anodes
+            'hull-anodes/bolt-on',
+            'hull-anodes/weld-on',
+            'hull-anodes/plates',
+            # Rudder & Trim Tab
             'rudder-trim-tab-anodes',
-            'propeller-anodes',
+            'rudder-trim-tab-anodes-two-piece',
+            'one-piece-trim-tab-anodes',
+            'rudder-trim-tab-anodes/other',
+            # Engine Anodes
+            'engine-anodes/caterpillar',
+            'engine-anodes/chrysler',
+            'engine-anodes/cummins',
+            'engine-anodes/crusader',
+            'engine-anodes/detroit-diesel',
+            'engine-anodes/john-deere',
+            'engine-anodes/universal',
+            'engine-anodes/westerbeke',
+            'engine-anodes/yanmar',
+            # Propeller Anodes
+            'propeller-anodes/beneteau',
+            'propeller-anodes/max-prop',
+            # Collar Anodes
             'collar-anodes',
-            'sterndrive-anodes',
-            'outboard-anodes',
+            # Sterndrive Anodes
+            'sterndrive-anodes/mercruiser',
+            'sterndrive-anodes/omc',
+            'sterndrive-anodes/volvo',
+            # Outboard Anodes
+            'outboard-anodes/honda',
+            'outboard-anodes/johnson-evinrude',
+            'outboard-anodes/mercury',
+            'outboard-anodes/nissan-tohatsu',
+            'outboard-anodes/suzuki',
+            'outboard-anodes/yamaha',
+            # Other
             'bow-thruster-anodes',
-            'saildrive-anodes'
+            'saildrive-anodes',
+            'keel-cooler-anodes',
+            'commercial-anodes'
         ]
     },
     'aluminum': {
         'url': '/categories/aluminum-anodes.html',
         'subcategories': [
-            'shaft-anodes',
-            'hull-anodes',
+            'shaft-anodes/standard',
+            'shaft-anodes/metric',
+            'hull-anodes/bolt-on',
+            'hull-anodes/weld-on',
             'engine-anodes',
             'rudder-trim-tab-anodes',
             'propeller-anodes',
