@@ -730,15 +730,20 @@ class AIAssistant {
     // Fetch product from URL
     async fetchProductFromURL() {
         const urlInput = document.getElementById('url-input');
-        const url = urlInput.value.trim();
+        let url = urlInput.value.trim();
 
         if (!url) {
             this.showError('Please enter a URL');
             return;
         }
 
+        // Add https:// if missing
+        if (!url.startsWith('http://') && !url.startsWith('https://')) {
+            url = 'https://' + url;
+        }
+
         if (!this.urlScraper.isValidURL(url)) {
-            this.showError('Please enter a valid URL (starting with http:// or https://)');
+            this.showError('Please enter a valid URL');
             return;
         }
 
@@ -746,6 +751,16 @@ class AIAssistant {
         this.showProcessing(true);
 
         try {
+            // Check if it's an Amazon short link that needs expansion
+            if (url.includes('a.co/') || url.includes('amzn.to/')) {
+                this.addToChat('assistant', '🔄 Expanding Amazon short link...');
+                url = await this.expandShortURL(url);
+                if (!url) {
+                    throw new Error('Could not expand short link. Please use the full Amazon URL or take a screenshot.');
+                }
+                this.addToChat('assistant', `Expanded to: ${url}`);
+            }
+
             // First, try to scrape directly
             const scrapedData = await this.urlScraper.extractFromURL(url);
 
@@ -759,13 +774,51 @@ class AIAssistant {
                 await this.fetchAndAnalyzeWithGemini(url);
             }
 
-            // Clear URL input
+            // Clear URL input only on success
             urlInput.value = '';
 
         } catch (error) {
+            console.error('URL fetch error:', error);
             this.showError(`Failed to fetch URL: ${error.message}`);
+
+            // Provide helpful message for short links
+            if (url.includes('a.co/') || url.includes('amzn.to/')) {
+                this.addToChat('assistant', '💡 Tip: Amazon short links sometimes fail. Try visiting the link in your browser, then copy the full URL from the address bar.');
+            } else {
+                this.addToChat('assistant', '💡 Tip: If URL fetching fails, take a screenshot of the product page and upload it instead.');
+            }
         } finally {
             this.showProcessing(false);
+        }
+    }
+
+    // Expand short URLs (like a.co links)
+    async expandShortURL(shortUrl) {
+        try {
+            // Try to fetch with no-redirect to get the Location header
+            const response = await fetch('https://corsproxy.io/?' + encodeURIComponent(shortUrl), {
+                method: 'HEAD',
+                redirect: 'manual'
+            });
+
+            // Try to get the expanded URL from response
+            const expandedUrl = response.headers.get('location') || response.url;
+
+            if (expandedUrl && expandedUrl !== shortUrl) {
+                return expandedUrl;
+            }
+
+            // Fallback: try to fetch and look for redirect
+            const fullResponse = await fetch('https://corsproxy.io/?' + encodeURIComponent(shortUrl));
+
+            if (fullResponse.url && fullResponse.url !== shortUrl) {
+                return fullResponse.url;
+            }
+
+            return null;
+        } catch (error) {
+            console.error('Error expanding URL:', error);
+            return null;
         }
     }
 
@@ -785,10 +838,17 @@ class AIAssistant {
             const response = await fetch(corsProxy + encodeURIComponent(url));
 
             if (!response.ok) {
+                console.error('Fetch failed:', response.status, response.statusText);
                 throw new Error('Could not fetch page. Try taking a screenshot instead.');
             }
 
             const html = await response.text();
+
+            // Check if we got actual HTML content
+            if (!html || html.length < 100) {
+                console.error('HTML too short:', html.substring(0, 200));
+                throw new Error('Page content is empty or blocked. Try taking a screenshot instead.');
+            }
 
             // Create a simplified version of the HTML for Gemini
             const parser = new DOMParser();
@@ -797,15 +857,18 @@ class AIAssistant {
             // Extract key text content
             const textContent = this.extractTextFromHTML(doc);
 
+            console.log('Extracted text for analysis:', textContent.substring(0, 500));
+
             // Send to Gemini for extraction
             const geminiResponse = await this.analyzeTextWithGemini(textContent, url);
 
-            if (geminiResponse && geminiResponse.items) {
+            if (geminiResponse && geminiResponse.items && geminiResponse.items.length > 0) {
                 this.extractedData = geminiResponse.items;
                 this.addToChat('assistant', `✅ Extracted ${this.extractedData.length} product(s) from ${new URL(url).hostname}`);
                 this.showDataModal();
             } else {
-                throw new Error('Could not extract product information');
+                console.error('No items extracted from Gemini response:', geminiResponse);
+                throw new Error('Could not extract product information. The page might be blocking automated access.');
             }
 
         } catch (error) {

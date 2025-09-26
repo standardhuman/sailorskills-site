@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Amazon URL</title>
+    <style>
+        body { font-family: Arial; max-width: 800px; margin: 50px auto; padding: 20px; }
+        .test { margin: 20px 0; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+        input { width: 100%; padding: 10px; margin: 10px 0; }
+        button { padding: 10px 20px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .result { margin-top: 20px; padding: 15px; background: #f0f0f0; border-radius: 4px; }
+        pre { background: #f4f4f4; padding: 10px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>Test Amazon Short Link</h1>
+
+    <div class="test">
+        <h2>Test URL: https://a.co/d/erEWqSD</h2>
+        <button onclick="testDirectFetch()">Test Direct Fetch</button>
+        <button onclick="testWithProxy()">Test with CORS Proxy</button>
+        <button onclick="testExpansion()">Test URL Expansion</button>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const testUrl = 'https://a.co/d/erEWqSD';
+
+        async function testDirectFetch() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p>Testing direct fetch...</p>';
+
+            try {
+                const response = await fetch(testUrl, {
+                    method: 'HEAD',
+                    redirect: 'manual'
+                });
+
+                resultDiv.innerHTML = `
+                    <h3>Direct Fetch Result:</h3>
+                    <p>Status: ${response.status}</p>
+                    <p>Type: ${response.type}</p>
+                    <p>URL: ${response.url}</p>
+                    <p>Headers:</p>
+                    <pre>${JSON.stringify([...response.headers.entries()], null, 2)}</pre>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <h3>Direct Fetch Error:</h3>
+                    <p style="color: red;">${error.message}</p>
+                    <p>This is expected due to CORS policy.</p>
+                `;
+            }
+        }
+
+        async function testWithProxy() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p>Testing with CORS proxy...</p>';
+
+            try {
+                const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(testUrl);
+
+                const response = await fetch(proxyUrl);
+
+                const finalUrl = response.url;
+                const text = await response.text();
+
+                // Try to extract product info from HTML
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(text, 'text/html');
+
+                const title = doc.querySelector('#productTitle, h1')?.textContent?.trim();
+                const price = doc.querySelector('.a-price-whole, .a-price')?.textContent?.trim();
+
+                resultDiv.innerHTML = `
+                    <h3>CORS Proxy Result:</h3>
+                    <p>Status: ${response.status}</p>
+                    <p>Final URL: ${finalUrl}</p>
+                    <p>HTML Length: ${text.length} characters</p>
+                    <p>Title Found: ${title || 'Not found'}</p>
+                    <p>Price Found: ${price || 'Not found'}</p>
+                    <details>
+                        <summary>First 1000 chars of HTML</summary>
+                        <pre>${text.substring(0, 1000)}</pre>
+                    </details>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <h3>Proxy Fetch Error:</h3>
+                    <p style="color: red;">${error.message}</p>
+                `;
+            }
+        }
+
+        async function testExpansion() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p>Testing URL expansion...</p>';
+
+            try {
+                // Method 1: Try to get redirect URL
+                const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(testUrl);
+                const response = await fetch(proxyUrl, {
+                    redirect: 'follow'
+                });
+
+                const finalUrl = response.url;
+
+                // Check if it's actually an Amazon product page
+                const text = await response.text();
+                const hasProduct = text.includes('productTitle') || text.includes('add-to-cart');
+
+                resultDiv.innerHTML = `
+                    <h3>URL Expansion Result:</h3>
+                    <p>Original: ${testUrl}</p>
+                    <p>Expanded: ${finalUrl}</p>
+                    <p>Is Product Page: ${hasProduct ? 'Yes' : 'No'}</p>
+                    <p>Recommendation: ${hasProduct ? 'URL can be processed' : 'Take a screenshot instead'}</p>
+                `;
+
+                // Try alternative method
+                if (!hasProduct) {
+                    resultDiv.innerHTML += `
+                        <h4>Alternative:</h4>
+                        <p>1. Open the link in your browser: <a href="${testUrl}" target="_blank">${testUrl}</a></p>
+                        <p>2. Copy the full URL from the address bar</p>
+                        <p>3. Or take a screenshot of the product page</p>
+                    `;
+                }
+
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <h3>Expansion Error:</h3>
+                    <p style="color: red;">${error.message}</p>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
