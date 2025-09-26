@@ -15,6 +15,9 @@ class AIAssistant {
         // Initialize Supabase
         this.initSupabase();
 
+        // Initialize URL scraper
+        this.urlScraper = new URLScraper();
+
         // Set up event listeners
         this.setupEventListeners();
 
@@ -77,6 +80,28 @@ class AIAssistant {
             if (files.length > 0) {
                 this.handleFileSelect(files);
             }
+        });
+
+        // URL input handling
+        document.getElementById('fetch-url-btn')?.addEventListener('click', () => {
+            this.fetchProductFromURL();
+        });
+
+        document.getElementById('url-input')?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                this.fetchProductFromURL();
+            }
+        });
+
+        // Also handle paste events in URL input
+        document.getElementById('url-input')?.addEventListener('paste', (e) => {
+            setTimeout(() => {
+                const url = e.target.value.trim();
+                if (url && this.urlScraper.isValidURL(url)) {
+                    // Auto-fetch if it's a valid URL
+                    this.fetchProductFromURL();
+                }
+            }, 100);
         });
 
         // Process button
@@ -700,6 +725,182 @@ class AIAssistant {
 
     showError(message) {
         this.addToChat('assistant', `❌ ${message}`);
+    }
+
+    // Fetch product from URL
+    async fetchProductFromURL() {
+        const urlInput = document.getElementById('url-input');
+        const url = urlInput.value.trim();
+
+        if (!url) {
+            this.showError('Please enter a URL');
+            return;
+        }
+
+        if (!this.urlScraper.isValidURL(url)) {
+            this.showError('Please enter a valid URL (starting with http:// or https://)');
+            return;
+        }
+
+        this.addToChat('user', `Fetching product from: ${url}`);
+        this.showProcessing(true);
+
+        try {
+            // First, try to scrape directly
+            const scrapedData = await this.urlScraper.extractFromURL(url);
+
+            if (scrapedData.success && scrapedData.data.items.length > 0) {
+                // If scraping worked, use that data
+                this.extractedData = scrapedData.data.items;
+                this.addToChat('assistant', `Found ${this.extractedData.length} product(s) from the URL.`);
+                this.showDataModal();
+            } else {
+                // If scraping failed, use Gemini to analyze the page
+                await this.fetchAndAnalyzeWithGemini(url);
+            }
+
+            // Clear URL input
+            urlInput.value = '';
+
+        } catch (error) {
+            this.showError(`Failed to fetch URL: ${error.message}`);
+        } finally {
+            this.showProcessing(false);
+        }
+    }
+
+    // Fetch URL and analyze with Gemini
+    async fetchAndAnalyzeWithGemini(url) {
+        if (!this.geminiService.isConfigured()) {
+            this.showError('Please configure your Gemini API key in settings');
+            this.openSettingsModal();
+            return;
+        }
+
+        this.addToChat('assistant', '🔄 Fetching page content and analyzing with AI...');
+
+        try {
+            // Fetch the page content
+            const corsProxy = 'https://corsproxy.io/?';
+            const response = await fetch(corsProxy + encodeURIComponent(url));
+
+            if (!response.ok) {
+                throw new Error('Could not fetch page. Try taking a screenshot instead.');
+            }
+
+            const html = await response.text();
+
+            // Create a simplified version of the HTML for Gemini
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+
+            // Extract key text content
+            const textContent = this.extractTextFromHTML(doc);
+
+            // Send to Gemini for extraction
+            const geminiResponse = await this.analyzeTextWithGemini(textContent, url);
+
+            if (geminiResponse && geminiResponse.items) {
+                this.extractedData = geminiResponse.items;
+                this.addToChat('assistant', `✅ Extracted ${this.extractedData.length} product(s) from ${new URL(url).hostname}`);
+                this.showDataModal();
+            } else {
+                throw new Error('Could not extract product information');
+            }
+
+        } catch (error) {
+            this.showError(error.message);
+            this.addToChat('assistant', '💡 Tip: If the URL fetch fails, try taking a screenshot of the product page and uploading it instead.');
+        }
+    }
+
+    // Extract text content from HTML
+    extractTextFromHTML(doc) {
+        const elements = {
+            title: doc.querySelector('h1, #productTitle, .product-title')?.textContent?.trim() || '',
+            price: doc.querySelector('.a-price-whole, .price, [itemprop="price"]')?.textContent?.trim() || '',
+            description: Array.from(doc.querySelectorAll('#feature-bullets li, .product-description, [itemprop="description"]'))
+                .map(el => el.textContent?.trim())
+                .filter(Boolean)
+                .join(' ') || '',
+            brand: doc.querySelector('[itemprop="brand"], #bylineInfo, .brand')?.textContent?.trim() || '',
+            sku: doc.querySelector('.sku, [itemprop="sku"]')?.textContent?.trim() || ''
+        };
+
+        // Get meta tags
+        const metas = {};
+        doc.querySelectorAll('meta[property], meta[name]').forEach(meta => {
+            const key = meta.getAttribute('property') || meta.getAttribute('name');
+            const value = meta.getAttribute('content');
+            if (key && value) {
+                metas[key] = value;
+            }
+        });
+
+        return JSON.stringify({ elements, metas }, null, 2);
+    }
+
+    // Analyze text with Gemini
+    async analyzeTextWithGemini(textContent, url) {
+        const prompt = `Extract product information from this webpage content.
+        The URL is: ${url}
+
+        Content:
+        ${textContent.substring(0, 5000)}
+
+        Return ONLY valid JSON in this format:
+        {
+            "items": [{
+                "name": "product name",
+                "sku": "SKU or product ID",
+                "price": price as number,
+                "quantity": 1,
+                "category": "category",
+                "supplier": "website name",
+                "brand": "brand name",
+                "description": "brief description",
+                "url": "${url}"
+            }]
+        }
+
+        Important: Extract actual values from the content. Include the full URL for reordering.`;
+
+        try {
+            const response = await fetch(
+                `https://generativelanguage.googleapis.com/v1beta/models/${this.geminiService.model}:generateContent?key=${this.geminiService.apiKey}`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{
+                                text: prompt
+                            }]
+                        }],
+                        generationConfig: {
+                            temperature: 0.1,
+                            maxOutputTokens: 1024
+                        }
+                    })
+                }
+            );
+
+            const data = await response.json();
+
+            if (response.ok) {
+                const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+                const cleanJson = responseText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+                return JSON.parse(cleanJson);
+            } else {
+                throw new Error('Gemini API error');
+            }
+
+        } catch (error) {
+            console.error('Gemini analysis error:', error);
+            return null;
+        }
     }
 
     // Test API key directly

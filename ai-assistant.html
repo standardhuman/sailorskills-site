@@ -42,6 +42,17 @@
 
             <!-- Input Area -->
             <div class="input-area">
+                <!-- URL Input Section -->
+                <div class="url-input-section">
+                    <div class="url-input-wrapper">
+                        <input type="url" id="url-input" placeholder="Paste Amazon or product URL here (e.g., https://www.amazon.com/dp/...)" class="url-input">
+                        <button class="btn btn-primary" id="fetch-url-btn">Fetch Product</button>
+                    </div>
+                    <div class="input-divider">
+                        <span>OR</span>
+                    </div>
+                </div>
+
                 <div id="drop-zone" class="drop-zone">
                     <div class="drop-zone-content">
                         <svg class="upload-icon" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -238,6 +249,7 @@
         window.SUPABASE_URL = 'https://fzygakldvvzxmahkdylq.supabase.co';
         window.SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ6eWdha2xkdnZ6eG1haGtkeWxxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQwODM4OTgsImV4cCI6MjA2OTY1OTg5OH0.8BNDF5zmpk2HFdprTjsdOWTDh_XkAPdTnGo7omtiVIk';
     </script>
+    <script src="url-scraper.js"></script>
     <script src="gemini-service.js"></script>
     <script src="ai-assistant.js"></script>
 </body>
