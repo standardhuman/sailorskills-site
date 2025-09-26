@@ -151,6 +151,22 @@
             flex-direction: column;
         }
 
+        .product-card.compact {
+            max-height: none;
+        }
+
+        .product-card.compact .product-image {
+            display: none;
+        }
+
+        .product-card.compact .product-content {
+            padding: 15px;
+        }
+
+        .products-grid.compact {
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        }
+
         .product-id {
             color: #999;
             font-size: 12px;
@@ -320,6 +336,10 @@
                 </div>
                 <button class="btn" onclick="applyFilters()">Apply Filters</button>
                 <button class="btn" onclick="resetFilters()">Reset</button>
+                <label style="margin-left: 20px; display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <input type="checkbox" id="showImages" checked onchange="toggleImages()" style="cursor: pointer;">
+                    <span style="font-size: 14px; color: #666;">Show Images</span>
+                </label>
             </div>
         </div>
 
@@ -339,6 +359,7 @@
 
         let allProducts = [];
         let filteredProducts = [];
+        let showImages = true;
 
         // Load products
         async function loadProducts() {
@@ -419,6 +440,13 @@
             const grid = document.getElementById('productsGrid');
             grid.innerHTML = '';
 
+            // Apply compact class based on image toggle
+            if (showImages) {
+                grid.classList.remove('compact');
+            } else {
+                grid.classList.add('compact');
+            }
+
             if (filteredProducts.length === 0) {
                 grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 50px; color: white;">No products found</div>';
                 return;
@@ -435,9 +463,14 @@
             }
         }
 
+        function toggleImages() {
+            showImages = document.getElementById('showImages').checked;
+            displayProducts();
+        }
+
         function createProductCard(product) {
             const card = document.createElement('div');
-            card.className = 'product-card';
+            card.className = showImages ? 'product-card' : 'product-card compact';
 
             const materialClass = `material-${product.material}`;
             const stockClass = product.stock_status === 'in_stock' ? 'in-stock' : 'out-of-stock';
