@@ -145,6 +145,10 @@ class AIAssistant {
             this.addManualDataRow();
         });
 
+        document.getElementById('cancel-import')?.addEventListener('click', () => {
+            document.getElementById('data-modal').classList.remove('active');
+        });
+
         document.getElementById('select-all-items')?.addEventListener('change', (e) => {
             this.toggleAllItems(e.target.checked);
         });
@@ -310,8 +314,8 @@ class AIAssistant {
         row.dataset.index = index;
         row.innerHTML = `
             <td><input type="checkbox" class="item-select" checked></td>
-            <td><input type="text" class="item-name" value="${item.name || ''}" required></td>
-            <td><input type="text" class="item-sku" value="${item.sku || ''}"></td>
+            <td><input type="text" class="item-name" value="${this.escapeHtml(item.name || '')}" required></td>
+            <td><input type="text" class="item-sku" value="${this.escapeHtml(item.sku || '')}"></td>
             <td><input type="number" class="item-quantity" value="${item.quantity || 1}" min="0"></td>
             <td><input type="number" class="item-price" value="${item.price || ''}" step="0.01" min="0"></td>
             <td>
@@ -324,10 +328,11 @@ class AIAssistant {
                     <option value="other" ${item.category === 'other' ? 'selected' : ''}>Other</option>
                 </select>
             </td>
-            <td><input type="text" class="item-supplier" value="${item.supplier || ''}"></td>
-            <td><input type="text" class="item-description" value="${item.description || ''}"></td>
+            <td><input type="text" class="item-supplier" value="${this.escapeHtml(item.supplier || '')}"></td>
+            <td><input type="text" class="item-description" value="${this.escapeHtml(item.description || '')}"></td>
+            <td><input type="url" class="item-url" value="${this.escapeHtml(item.url || '')}" placeholder="Reorder URL"></td>
             <td>
-                <button class="btn-remove" onclick="aiAssistant.removeDataRow(${index})">Remove</button>
+                <button class="btn-remove" onclick="aiAssistant.removeDataRow(${index})">×</button>
             </td>
         `;
 
@@ -337,6 +342,13 @@ class AIAssistant {
         });
 
         return row;
+    }
+
+    // Helper to escape HTML
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
     }
 
     addManualDataRow() {
@@ -387,7 +399,8 @@ class AIAssistant {
                     price: parseFloat(row.querySelector('.item-price').value) || 0,
                     category: row.querySelector('.item-category').value,
                     supplier: row.querySelector('.item-supplier').value,
-                    description: row.querySelector('.item-description').value
+                    description: row.querySelector('.item-description').value,
+                    url: row.querySelector('.item-url')?.value || ''
                 };
 
                 if (item.name) {
@@ -509,7 +522,8 @@ class AIAssistant {
                 .from('inventory_items')
                 .update({
                     quantity_on_hand: existing.quantity_on_hand + item.quantity,
-                    last_purchase_price: item.price
+                    last_purchase_price: item.price,
+                    notes: item.url ? `Reorder URL: ${item.url}` : existing.notes
                 })
                 .eq('id', existing.id);
 
@@ -536,7 +550,8 @@ class AIAssistant {
                     unit_cost: item.price,
                     last_purchase_price: item.price,
                     reorder_point: 5,
-                    reorder_quantity: 10
+                    reorder_quantity: 10,
+                    notes: item.url ? `Reorder URL: ${item.url}` : null
                 })
                 .select()
                 .single();

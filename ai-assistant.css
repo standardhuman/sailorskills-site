@@ -374,14 +374,25 @@
     min-width: 200px;
 }
 
+.item-url {
+    min-width: 180px;
+    font-size: 12px;
+}
+
 .btn-remove {
-    padding: 4px 12px;
+    padding: 4px 8px;
     background: #ef4444;
     color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    font-size: 12px;
+    font-size: 18px;
+    font-weight: bold;
+    min-width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .btn-remove:hover {
