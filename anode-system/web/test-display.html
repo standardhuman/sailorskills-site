@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anode Catalog Test Display</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .stats {
+            display: flex;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .stat {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-value {
+            color: #333;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .filters {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .filter-group label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .filter-group select,
+        .filter-group input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            background: white;
+        }
+
+        .btn {
+            padding: 8px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background: #5a67d8;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .product-id {
+            color: #999;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        .product-name {
+            color: #333;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            line-height: 1.3;
+        }
+
+        .product-details {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-top: 10px;
+        }
+
+        .product-detail {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+        }
+
+        .product-detail-label {
+            color: #666;
+        }
+
+        .product-detail-value {
+            color: #333;
+            font-weight: 500;
+        }
+
+        .price {
+            color: #667eea;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .sale-price {
+            color: #48bb78;
+        }
+
+        .stock-status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-top: 5px;
+        }
+
+        .in-stock {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .out-of-stock {
+            background: #feb2b2;
+            color: #742a2a;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: white;
+            font-size: 18px;
+        }
+
+        .error {
+            background: #fc8181;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .material-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-right: 5px;
+        }
+
+        .material-zinc {
+            background: #e6f3ff;
+            color: #0066cc;
+        }
+
+        .material-aluminum {
+            background: #f0f0f0;
+            color: #666;
+        }
+
+        .material-magnesium {
+            background: #fff4e6;
+            color: #cc6600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Anode Catalog - Test Display</h1>
+            <div class="stats">
+                <div class="stat">
+                    <span class="stat-label">Total Products</span>
+                    <span class="stat-value" id="totalProducts">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">In Stock</span>
+                    <span class="stat-value" id="inStockCount">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">On Sale</span>
+                    <span class="stat-value" id="onSaleCount">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Last Sync</span>
+                    <span class="stat-value" id="lastSync">-</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="filters">
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label>Search</label>
+                    <input type="text" id="searchInput" placeholder="Search products...">
+                </div>
+                <div class="filter-group">
+                    <label>Material</label>
+                    <select id="materialFilter">
+                        <option value="">All Materials</option>
+                        <option value="zinc">Zinc</option>
+                        <option value="aluminum">Aluminum</option>
+                        <option value="magnesium">Magnesium</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Category</label>
+                    <select id="categoryFilter">
+                        <option value="">All Categories</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Stock</label>
+                    <select id="stockFilter">
+                        <option value="">All</option>
+                        <option value="in_stock">In Stock</option>
+                        <option value="out_of_stock">Out of Stock</option>
+                    </select>
+                </div>
+                <button class="btn" onclick="applyFilters()">Apply Filters</button>
+                <button class="btn" onclick="resetFilters()">Reset</button>
+            </div>
+        </div>
+
+        <div id="loading" class="loading">Loading products...</div>
+        <div id="error" class="error" style="display: none;"></div>
+        <div id="productsGrid" class="products-grid"></div>
+    </div>
+
+    <script>
+        // Configuration
+        const SUPABASE_URL = prompt('Enter Supabase URL:');
+        const SUPABASE_KEY = prompt('Enter Supabase Anon Key:');
+
+        if (!SUPABASE_URL || !SUPABASE_KEY) {
+            document.getElementById('loading').innerHTML = 'Supabase credentials required. Please reload the page.';
+            throw new Error('Missing credentials');
+        }
+
+        // Initialize Supabase
+        const { createClient } = supabase;
+        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let allProducts = [];
+        let filteredProducts = [];
+
+        // Load products
+        async function loadProducts() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('anodes_catalog')
+                    .select('*')
+                    .eq('is_active', true)
+                    .order('name');
+
+                if (error) throw error;
+
+                allProducts = data;
+                filteredProducts = data;
+
+                // Update stats
+                updateStats();
+
+                // Populate category filter
+                populateCategoryFilter();
+
+                // Display products
+                displayProducts();
+
+                // Load last sync info
+                loadLastSync();
+
+            } catch (error) {
+                console.error('Error loading products:', error);
+                showError('Failed to load products: ' + error.message);
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('totalProducts').textContent = allProducts.length;
+            document.getElementById('inStockCount').textContent =
+                allProducts.filter(p => p.stock_status === 'in_stock').length;
+            document.getElementById('onSaleCount').textContent =
+                allProducts.filter(p => p.is_on_sale).length;
+        }
+
+        function populateCategoryFilter() {
+            const categories = [...new Set(allProducts.map(p => p.category).filter(Boolean))].sort();
+            const select = document.getElementById('categoryFilter');
+
+            categories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category;
+                option.textContent = category.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                select.appendChild(option);
+            });
+        }
+
+        async function loadLastSync() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('anode_sync_logs')
+                    .select('*')
+                    .eq('status', 'completed')
+                    .order('completed_at', { ascending: false })
+                    .limit(1);
+
+                if (data && data.length > 0) {
+                    const lastSync = new Date(data[0].completed_at);
+                    const hours = Math.floor((Date.now() - lastSync) / (1000 * 60 * 60));
+                    document.getElementById('lastSync').textContent = hours < 24
+                        ? `${hours}h ago`
+                        : `${Math.floor(hours / 24)}d ago`;
+                }
+            } catch (error) {
+                console.error('Error loading sync info:', error);
+            }
+        }
+
+        function displayProducts() {
+            const grid = document.getElementById('productsGrid');
+            grid.innerHTML = '';
+
+            if (filteredProducts.length === 0) {
+                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 50px; color: white;">No products found</div>';
+                return;
+            }
+
+            filteredProducts.slice(0, 50).forEach(product => {
+                const card = createProductCard(product);
+                grid.appendChild(card);
+            });
+
+            if (filteredProducts.length > 50) {
+                grid.innerHTML += `<div style="grid-column: 1/-1; text-align: center; padding: 20px; color: white;">
+                    Showing first 50 of ${filteredProducts.length} products</div>`;
+            }
+        }
+
+        function createProductCard(product) {
+            const card = document.createElement('div');
+            card.className = 'product-card';
+
+            const materialClass = `material-${product.material}`;
+            const stockClass = product.stock_status === 'in_stock' ? 'in-stock' : 'out-of-stock';
+            const stockText = product.stock_status === 'in_stock' ? 'In Stock' : 'Out of Stock';
+
+            let priceHtml = '';
+            if (product.sale_price && product.sale_price < product.list_price) {
+                priceHtml = `
+                    <span style="text-decoration: line-through; color: #999; font-size: 14px;">$${product.list_price}</span>
+                    <span class="price sale-price">$${product.sale_price}</span>
+                `;
+            } else {
+                priceHtml = `<span class="price">$${product.list_price || 'N/A'}</span>`;
+            }
+
+            card.innerHTML = `
+                <div class="product-id">${product.boatzincs_id}</div>
+                <div class="product-name">${product.name}</div>
+                <div>
+                    <span class="material-badge ${materialClass}">${product.material}</span>
+                    <span class="stock-status ${stockClass}">${stockText}</span>
+                </div>
+                <div class="product-details">
+                    <div class="product-detail">
+                        <span class="product-detail-label">Category:</span>
+                        <span class="product-detail-value">${formatCategory(product.category)}</span>
+                    </div>
+                    ${product.subcategory ? `
+                    <div class="product-detail">
+                        <span class="product-detail-label">Type:</span>
+                        <span class="product-detail-value">${formatCategory(product.subcategory)}</span>
+                    </div>` : ''}
+                    <div class="product-detail">
+                        <span class="product-detail-label">Price:</span>
+                        <span class="product-detail-value">${priceHtml}</span>
+                    </div>
+                </div>
+            `;
+
+            return card;
+        }
+
+        function formatCategory(category) {
+            if (!category) return 'N/A';
+            return category
+                .replace(/_/g, ' ')
+                .replace(/-/g, ' ')
+                .split(' ')
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' ');
+        }
+
+        function applyFilters() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const material = document.getElementById('materialFilter').value;
+            const category = document.getElementById('categoryFilter').value;
+            const stock = document.getElementById('stockFilter').value;
+
+            filteredProducts = allProducts.filter(product => {
+                if (search && !product.name.toLowerCase().includes(search) &&
+                    !product.boatzincs_id.toLowerCase().includes(search)) {
+                    return false;
+                }
+                if (material && product.material !== material) {
+                    return false;
+                }
+                if (category && product.category !== category) {
+                    return false;
+                }
+                if (stock && product.stock_status !== stock) {
+                    return false;
+                }
+                return true;
+            });
+
+            displayProducts();
+        }
+
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('materialFilter').value = '';
+            document.getElementById('categoryFilter').value = '';
+            document.getElementById('stockFilter').value = '';
+            filteredProducts = allProducts;
+            displayProducts();
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+
+        // Add enter key support for search
+        document.getElementById('searchInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                applyFilters();
+            }
+        });
+
+        // Initialize
+        loadProducts();
+    </script>
+</body>
+</html>

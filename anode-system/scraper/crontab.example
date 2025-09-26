@@ -1,0 +1,16 @@
+# Anode Scraper Crontab Configuration
+# Add these lines to your crontab with: crontab -e
+#
+# Format: minute hour day month day-of-week command
+# Use full paths for reliability
+
+# Price update - Twice daily at 8 AM and 8 PM
+0 8,20 * * * /path/to/cost-calculator/anode-system/scraper/cron_runner.sh prices
+
+# Full catalog scrape - Weekly on Sunday at 2 AM
+0 2 * * 0 /path/to/cost-calculator/anode-system/scraper/cron_runner.sh full
+
+# Optional: Inventory check - Daily at 10 AM (if you add inventory checking)
+# 0 10 * * * /path/to/cost-calculator/anode-system/scraper/cron_runner.sh inventory
+
+# Note: Replace /path/to/ with your actual path to the project

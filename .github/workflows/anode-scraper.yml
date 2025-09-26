@@ -1,0 +1,67 @@
+name: Anode Scraper Schedule
+
+on:
+  schedule:
+    # Price update - Twice daily at 8 AM and 8 PM UTC
+    - cron: '0 8,20 * * *'
+    # Full catalog - Weekly on Sunday at 2 AM UTC
+    - cron: '0 2 * * 0'
+  workflow_dispatch:  # Allow manual trigger
+    inputs:
+      scrape_type:
+        description: 'Scrape type (full or prices)'
+        required: true
+        default: 'prices'
+        type: choice
+        options:
+          - prices
+          - full
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      working-directory: ./anode-system/scraper
+      run: |
+        pip install -r requirements.txt
+        playwright install chromium
+
+    - name: Determine scrape type
+      id: scrape_type
+      run: |
+        if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+          echo "type=${{ github.event.inputs.scrape_type }}" >> $GITHUB_OUTPUT
+        elif [ "$(date +%w)" == "0" ] && [ "$(date +%H)" == "02" ]; then
+          echo "type=full" >> $GITHUB_OUTPUT
+        else
+          echo "type=prices" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Run scraper
+      working-directory: ./anode-system/scraper
+      env:
+        VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+        SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        BOATZINCS_USERNAME: ${{ secrets.BOATZINCS_USERNAME }}
+        BOATZINCS_PASSWORD: ${{ secrets.BOATZINCS_PASSWORD }}
+        SCRAPER_HEADLESS: 'true'
+      run: |
+        python boatzincs_scraper.py ${{ steps.scrape_type.outputs.type }}
+
+    - name: Upload logs
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: scraper-logs-${{ github.run_number }}
+        path: anode-system/scraper/data/logs/
+        retention-days: 30
