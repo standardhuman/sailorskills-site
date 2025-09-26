@@ -124,14 +124,31 @@
         .product-card {
             background: white;
             border-radius: 10px;
-            padding: 20px;
+            overflow: hidden;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s, box-shadow 0.3s;
+            display: flex;
+            flex-direction: column;
         }
 
         .product-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            object-fit: contain;
+            background: #f8f9fa;
+            padding: 10px;
+        }
+
+        .product-content {
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
         }
 
         .product-id {
@@ -293,6 +310,14 @@
                         <option value="out_of_stock">Out of Stock</option>
                     </select>
                 </div>
+                <div class="filter-group">
+                    <label>Measurement</label>
+                    <select id="measurementFilter">
+                        <option value="">All</option>
+                        <option value="standard">Standard (Imperial)</option>
+                        <option value="metric">Metric</option>
+                    </select>
+                </div>
                 <button class="btn" onclick="applyFilters()">Apply Filters</button>
                 <button class="btn" onclick="resetFilters()">Reset</button>
             </div>
@@ -304,14 +329,9 @@
     </div>
 
     <script>
-        // Configuration
-        const SUPABASE_URL = prompt('Enter Supabase URL:');
-        const SUPABASE_KEY = prompt('Enter Supabase Anon Key:');
-
-        if (!SUPABASE_URL || !SUPABASE_KEY) {
-            document.getElementById('loading').innerHTML = 'Supabase credentials required. Please reload the page.';
-            throw new Error('Missing credentials');
-        }
+        // Configuration - hardcoded for local testing
+        const SUPABASE_URL = 'https://fzygakldvvzxmahkdylq.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ6eWdha2xkdnZ6eG1haGtkeWxxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQwODM4OTgsImV4cCI6MjA2OTY1OTg5OH0.8BNDF5zmpk2HFdprTjsdOWTDh_XkAPdTnGo7omtiVIk';
 
         // Initialize Supabase
         const { createClient } = supabase;
@@ -433,26 +453,43 @@
                 priceHtml = `<span class="price">$${product.list_price || 'N/A'}</span>`;
             }
 
+            // Determine if metric or standard
+            let measurementBadge = '';
+            if (product.subcategory) {
+                if (product.subcategory.includes('metric')) {
+                    measurementBadge = '<span style="background: #e6f3ff; color: #0066cc; padding: 2px 6px; border-radius: 3px; font-size: 11px; font-weight: 600;">METRIC</span>';
+                } else if (product.subcategory.includes('standard')) {
+                    measurementBadge = '<span style="background: #f0f0f0; color: #666; padding: 2px 6px; border-radius: 3px; font-size: 11px; font-weight: 600;">STANDARD</span>';
+                }
+            }
+
+            // Handle image URL
+            const imageUrl = product.image_url || product.thumbnail_url || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRjBGMEYwIi8+CjxwYXRoIGQ9Ik04NSA2MEg1MEw2NSA4NUw1MCAxMTBIODVMNzAgODVMODUgNjBaIiBmaWxsPSIjQzBDMEMwIi8+CjxwYXRoIGQ9Ik0xMTUgNjBIMTUwTDEzNSA4NUwxNTAgMTEwSDExNUwxMzAgODVMMTE1IDYwWiIgZmlsbD0iI0MwQzBDMCIvPgo8dGV4dCB4PSI1MCUiIHk9IjcwJSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzk5OSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTIiPk5vIEltYWdlPC90ZXh0Pgo8L3N2Zz4=';
+
             card.innerHTML = `
-                <div class="product-id">${product.boatzincs_id}</div>
-                <div class="product-name">${product.name}</div>
-                <div>
-                    <span class="material-badge ${materialClass}">${product.material}</span>
-                    <span class="stock-status ${stockClass}">${stockText}</span>
-                </div>
-                <div class="product-details">
-                    <div class="product-detail">
-                        <span class="product-detail-label">Category:</span>
-                        <span class="product-detail-value">${formatCategory(product.category)}</span>
+                <img src="${imageUrl}" alt="${product.name}" class="product-image" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRjBGMEYwIi8+CjxwYXRoIGQ9Ik04NSA2MEg1MEw2NSA4NUw1MCAxMTBIODVMNzAgODVMODUgNjBaIiBmaWxsPSIjQzBDMEMwIi8+CjxwYXRoIGQ9Ik0xMTUgNjBIMTUwTDEzNSA4NUwxNTAgMTEwSDExNUwxMzAgODVMMTE1IDYwWiIgZmlsbD0iI0MwQzBDMCIvPgo8dGV4dCB4PSI1MCUiIHk9IjcwJSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzk5OSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTIiPk5vIEltYWdlPC90ZXh0Pgo8L3N2Zz4='">
+                <div class="product-content">
+                    <div class="product-id">${product.boatzincs_id}</div>
+                    <div class="product-name">${product.name}</div>
+                    <div style="margin-bottom: 10px;">
+                        <span class="material-badge ${materialClass}">${product.material}</span>
+                        ${measurementBadge}
+                        <span class="stock-status ${stockClass}">${stockText}</span>
                     </div>
-                    ${product.subcategory ? `
-                    <div class="product-detail">
-                        <span class="product-detail-label">Type:</span>
-                        <span class="product-detail-value">${formatCategory(product.subcategory)}</span>
-                    </div>` : ''}
-                    <div class="product-detail">
-                        <span class="product-detail-label">Price:</span>
-                        <span class="product-detail-value">${priceHtml}</span>
+                    <div class="product-details">
+                        <div class="product-detail">
+                            <span class="product-detail-label">Category:</span>
+                            <span class="product-detail-value">${formatCategory(product.category)}</span>
+                        </div>
+                        ${product.subcategory ? `
+                        <div class="product-detail">
+                            <span class="product-detail-label">Type:</span>
+                            <span class="product-detail-value">${formatCategory(product.subcategory)}</span>
+                        </div>` : ''}
+                        <div class="product-detail">
+                            <span class="product-detail-label">Price:</span>
+                            <span class="product-detail-value">${priceHtml}</span>
+                        </div>
                     </div>
                 </div>
             `;
@@ -475,6 +512,7 @@
             const material = document.getElementById('materialFilter').value;
             const category = document.getElementById('categoryFilter').value;
             const stock = document.getElementById('stockFilter').value;
+            const measurement = document.getElementById('measurementFilter').value;
 
             filteredProducts = allProducts.filter(product => {
                 if (search && !product.name.toLowerCase().includes(search) &&
@@ -490,6 +528,17 @@
                 if (stock && product.stock_status !== stock) {
                     return false;
                 }
+                if (measurement) {
+                    const isMetric = product.subcategory && product.subcategory.includes('metric');
+                    const isStandard = product.subcategory && product.subcategory.includes('standard');
+
+                    if (measurement === 'metric' && !isMetric) {
+                        return false;
+                    }
+                    if (measurement === 'standard' && !isStandard) {
+                        return false;
+                    }
+                }
                 return true;
             });
 
@@ -501,6 +550,7 @@
             document.getElementById('materialFilter').value = '';
             document.getElementById('categoryFilter').value = '';
             document.getElementById('stockFilter').value = '';
+            document.getElementById('measurementFilter').value = '';
             filteredProducts = allProducts;
             displayProducts();
         }
