@@ -2,7 +2,6 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import 'dotenv/config';
-import quoteRoutes from './api/save-quote.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -13,9 +12,10 @@ const PORT = process.env.PORT || 3000;
 // Middleware for parsing JSON
 app.use(express.json());
 
-// API routes - wrapped to handle errors gracefully
+// API routes - conditionally load if available
 try {
-    app.use(quoteRoutes);
+    const quoteRoutes = await import('./api/save-quote.js');
+    app.use(quoteRoutes.default);
 } catch (error) {
     console.warn('Quote routes not available:', error.message);
 }
@@ -33,27 +33,16 @@ app.get(['/inventory', '/inventory/'], (req, res) => {
     res.sendFile(path.join(__dirname, 'inventory', 'inventory.html'));
 });
 
-// Serve static files (CSS, JS, images, etc) - AFTER specific routes
-app.use(express.static(__dirname));
+// Serve static files for specific directories first
 app.use('/admin', express.static(path.join(__dirname, 'admin')));
 app.use('/inventory', express.static(path.join(__dirname, 'inventory')));
 app.use('/diving', express.static(path.join(__dirname, 'diving')));
 
+// Serve other static files from public directory
+app.use(express.static(path.join(__dirname, 'public')));
+
 app.get('/booking', (req, res) => {
     res.sendFile(path.join(__dirname, 'booking.html'));
-});
-
-app.get('/anode-quote', (req, res) => {
-    res.sendFile(path.join(__dirname, 'anode-quote.html'));
-});
-
-app.get('/comprehensive-quote', (req, res) => {
-    res.sendFile(path.join(__dirname, 'comprehensive-quote.html'));
-});
-
-// Quote viewer route
-app.get('/quote/:quoteNumber', (req, res) => {
-    res.sendFile(path.join(__dirname, 'quote-viewer.html'));
 });
 
 // Default route - serve index.html
@@ -77,8 +66,6 @@ if (process.env.VERCEL !== '1') {
         console.log('  http://localhost:' + PORT + '/admin');
         console.log('  http://localhost:' + PORT + '/inventory');
         console.log('  http://localhost:' + PORT + '/booking');
-        console.log('  http://localhost:' + PORT + '/anode-quote');
-        console.log('  http://localhost:' + PORT + '/comprehensive-quote');
     });
 }
 
