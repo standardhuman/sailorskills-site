@@ -10,8 +10,8 @@ env_path = Path(__file__).parent.parent.parent / '.env'
 load_dotenv(env_path)
 
 # Supabase configuration
-SUPABASE_URL = os.getenv('SUPABASE_URL')
-SUPABASE_KEY = os.getenv('SUPABASE_SERVICE_ROLE_KEY')  # Use service role for full access
+SUPABASE_URL = os.getenv('VITE_SUPABASE_URL')
+SUPABASE_KEY = os.getenv('SUPABASE_SERVICE_KEY')  # Use service role for full access
 
 # Boatzincs configuration
 BOATZINCS_BASE_URL = 'https://boatzincs.com'
@@ -78,18 +78,19 @@ CATEGORIES = {
 # Product selectors (CSS)
 SELECTORS = {
     'product_grid': '.productGrid',
-    'product_card': '.productGrid-item',
-    'product_link': '.productCard-link',
-    'product_image': '.productCard-image img',
-    'product_title': '.productCard-title',
+    'product_card': '.product',
+    'product_link': '.card-title a',
+    'product_image': 'img',
+    'product_title': '.card-title',
     'list_price': '.price--rrp',
-    'sale_price': '.price--selling',
-    'stock_status': '.productCard-stock',
+    'sale_price': '.price--withoutTax',
+    'our_price': '.our_price .price',
+    'stock_status': '.stock-status',
     'pagination': '.pagination',
     'next_page': '.pagination-item--next a',
 
     # Product detail page
-    'detail_sku': '.productView-sku',
+    'detail_sku': '.productView-info-value',
     'detail_description': '.productView-description',
     'detail_specs': '.productView-info',
     'detail_stock': '.productView-stock',

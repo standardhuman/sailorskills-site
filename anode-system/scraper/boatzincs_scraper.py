@@ -132,43 +132,53 @@ class BoatzincsScraper:
 
                 for element in product_elements:
                     try:
+                        # Get data attributes for basic info
+                        product_name = await element.get_attribute('data-name')
+                        product_id = await element.get_attribute('data-entity-id')
+
                         # Get product URL
-                        link_element = await element.query_selector('a')
+                        link_element = await element.query_selector(config.SELECTORS['product_link'])
                         product_url = await link_element.get_attribute('href') if link_element else None
 
                         if not product_url:
                             continue
 
-                        # Get basic product info
-                        title_element = await element.query_selector('.productCard-title')
-                        title = await title_element.inner_text() if title_element else ''
+                        # Get title (fallback if data-name is empty)
+                        if not product_name:
+                            title_element = await element.query_selector(config.SELECTORS['product_title'])
+                            product_name = await title_element.inner_text() if title_element else ''
 
-                        # Extract prices
-                        list_price_element = await element.query_selector('.price--rrp')
-                        sale_price_element = await element.query_selector('.price--selling')
-
+                        # Extract list price
+                        list_price_element = await element.query_selector(config.SELECTORS['list_price'])
                         list_price_text = await list_price_element.inner_text() if list_price_element else ''
-                        sale_price_text = await sale_price_element.inner_text() if sale_price_element else ''
+
+                        # Extract sale/our price
+                        our_price_element = await element.query_selector(config.SELECTORS['our_price'])
+                        sale_price_text = await our_price_element.inner_text() if our_price_element else ''
 
                         # Clean prices
                         list_price = self.clean_price(list_price_text)
                         sale_price = self.clean_price(sale_price_text)
 
+                        # If no sale price, use list price
+                        if not sale_price:
+                            sale_price = list_price
+
                         # Get image URL
-                        img_element = await element.query_selector('img')
+                        img_element = await element.query_selector(config.SELECTORS['product_image'])
                         image_url = await img_element.get_attribute('src') if img_element else None
 
-                        # Extract SKU from URL or data attributes
-                        sku = self.extract_sku_from_url(product_url)
+                        # Use product ID as SKU, or extract from URL
+                        sku = product_id or self.extract_sku_from_url(product_url)
 
                         product = {
-                            'name': title.strip(),
-                            'product_url': urljoin(config.BOATZINCS_BASE_URL, product_url),
+                            'name': product_name.strip() if product_name else '',
+                            'product_url': product_url if product_url.startswith('http') else urljoin(config.BOATZINCS_BASE_URL, product_url),
                             'boatzincs_id': sku,
-                            'list_price': list_price or sale_price,
+                            'list_price': list_price,
                             'sale_price': sale_price if sale_price != list_price else None,
-                            'is_on_sale': bool(sale_price and sale_price != list_price),
-                            'image_url': urljoin(config.BOATZINCS_BASE_URL, image_url) if image_url else None
+                            'is_on_sale': bool(sale_price and sale_price < list_price),
+                            'image_url': image_url if image_url else None
                         }
 
                         products.append(product)
@@ -177,11 +187,19 @@ class BoatzincsScraper:
                         logger.error(f"Error extracting product: {e}")
                         self.stats['items_failed'] += 1
 
-                # Check for next page
-                next_button = await self.page.query_selector(config.SELECTORS['next_page'])
-                if not next_button or not await next_button.is_enabled():
-                    logger.info(f"No more pages for {category_url}")
-                    break
+                # Check for next page - look for "Next" link in pagination
+                next_button = await self.page.query_selector('a:has-text("Next")')
+                if not next_button:
+                    # Also check for numbered pagination
+                    current_page_element = await self.page.query_selector('.pagination .active')
+                    if current_page_element:
+                        next_page_link = await self.page.query_selector(f'.pagination a:has-text("{page_num + 1}")')
+                        if not next_page_link:
+                            logger.info(f"No more pages for {category_url}")
+                            break
+                    else:
+                        logger.info(f"No more pages for {category_url}")
+                        break
 
                 page_num += 1
 
