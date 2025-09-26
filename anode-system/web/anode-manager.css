@@ -558,6 +558,195 @@ nav {
     100% { transform: rotate(360deg); }
 }
 
+/* Enhanced Inventory Styles */
+.inventory-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #e1e8ed;
+}
+
+.tab-btn {
+    background: none;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    color: #666;
+    font-size: 14px;
+    transition: all 0.3s;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+}
+
+.tab-btn:hover {
+    color: #2c3e50;
+}
+
+.tab-btn.active {
+    color: #3498db;
+    border-bottom-color: #3498db;
+    font-weight: 600;
+}
+
+.inventory-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.search-bar {
+    flex: 1;
+    max-width: 400px;
+}
+
+.stock-alerts {
+    margin-bottom: 20px;
+}
+
+.alert {
+    padding: 12px 20px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+}
+
+.alert-danger {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.alert-warning {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+}
+
+/* Form Enhancements */
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+}
+
+.modal-lg {
+    max-width: 900px;
+}
+
+.charge-items {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+}
+
+.charge-item {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+    align-items: center;
+}
+
+.charge-anode-select {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.charge-quantity {
+    width: 80px;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.btn-remove {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+}
+
+.btn-remove:hover {
+    background: #c0392b;
+}
+
+.replenishment-controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+/* Action Buttons in Tables */
+.action-btns {
+    display: flex;
+    gap: 5px;
+}
+
+.action-btn {
+    padding: 4px 8px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.3s;
+}
+
+.action-btn.edit {
+    background: #3498db;
+    color: white;
+}
+
+.action-btn.delete {
+    background: #e74c3c;
+    color: white;
+}
+
+.action-btn.charge {
+    background: #27ae60;
+    color: white;
+}
+
+.action-btn.adjust {
+    background: #f39c12;
+    color: white;
+}
+
+/* Stock Level Indicators */
+.stock-level {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.stock-critical {
+    background: #e74c3c;
+    color: white;
+}
+
+.stock-low {
+    background: #f39c12;
+    color: white;
+}
+
+.stock-adequate {
+    background: #27ae60;
+    color: white;
+}
+
+.stock-excess {
+    background: #95a5a6;
+    color: white;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .container {
@@ -584,5 +773,27 @@ nav {
     .nav-btn {
         flex: 1;
         min-width: 100px;
+    }
+
+    .inventory-tabs {
+        overflow-x: auto;
+    }
+
+    .tab-btn {
+        white-space: nowrap;
+    }
+
+    .inventory-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .search-bar {
+        max-width: none;
+        margin-bottom: 10px;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
     }
 }
