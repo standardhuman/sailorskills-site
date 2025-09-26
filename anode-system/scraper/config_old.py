@@ -1,5 +1,5 @@
 """
-Complete configuration for Boatzincs Scraper with all subcategories
+Configuration for Boatzincs Scraper
 """
 import os
 from pathlib import Path
@@ -35,7 +35,7 @@ CACHE_DIR = DATA_DIR / 'cache'
 for directory in [DATA_DIR, IMAGES_DIR, LOGS_DIR, CACHE_DIR]:
     directory.mkdir(parents=True, exist_ok=True)
 
-# Complete category mappings with all subcategories
+# Category mappings - Updated with correct subcategory URLs
 CATEGORIES = {
     'zinc': {
         'url': '/categories/zinc-anodes.html',
@@ -43,23 +43,15 @@ CATEGORIES = {
             # Shaft Anodes
             'shaft-anodes/standard',
             'shaft-anodes/metric',
-
             # Hull Anodes
             'hull-anodes/bolt-on',
             'hull-anodes/weld-on',
             'hull-anodes/plates',
-
             # Rudder & Trim Tab
+            'rudder-trim-tab-anodes',
             'rudder-trim-tab-anodes-two-piece',
             'one-piece-trim-tab-anodes',
             'rudder-trim-tab-anodes/other',
-
-            # Collar Anodes
-            'collar-anodes/standard',
-            'collar-anodes/metric',
-            'collar-anodes/beneteau',
-            'collar-anodes/micro-thin',
-
             # Engine Anodes
             'engine-anodes/caterpillar',
             'engine-anodes/chrysler',
@@ -70,26 +62,15 @@ CATEGORIES = {
             'engine-anodes/universal',
             'engine-anodes/westerbeke',
             'engine-anodes/yanmar',
-
             # Propeller Anodes
-            'propeller-anodes/prop-nut-anodes',
-            'propeller-anodes/acorn',
-            'propeller-anodes/autoprop',
-            'propeller-anodes/autostream',
-            'propeller-anodes/azimut-radice',
             'propeller-anodes/beneteau',
-            'propeller-anodes/gori',
             'propeller-anodes/max-prop',
-            'propeller-anodes/michigan',
-            'propeller-anodes/radice',
-            'propeller-anodes/varifold',
-            'propeller-anodes/volvo-folding',
-
+            # Collar Anodes
+            'collar-anodes',
             # Sterndrive Anodes
             'sterndrive-anodes/mercruiser',
             'sterndrive-anodes/omc',
-            'sterndrive-anodes/volvo-penta',
-
+            'sterndrive-anodes/volvo',
             # Outboard Anodes
             'outboard-anodes/honda',
             'outboard-anodes/johnson-evinrude',
@@ -97,38 +78,11 @@ CATEGORIES = {
             'outboard-anodes/nissan-tohatsu',
             'outboard-anodes/suzuki',
             'outboard-anodes/yamaha',
-
-            # Saildrive Anodes
-            'saildrive-anodes/bukh',
-            'saildrive-anodes/max-prop',
-            'saildrive-anodes/volvo-penta',
-            'saildrive-anodes/yanmar',
-
-            # Jet Drive Anodes
-            'jet-drive-anodes/hamilton-jet',
-            'jet-drive-anodes/ultrajet',
-
-            # Bow Thruster Anodes
-            'bow-thruster-anodes/lewmar',
-            'bow-thruster-anodes/max-power',
-            'bow-thruster-anodes/side-power',
-            'bow-thruster-anodes/sleipner',
-            'bow-thruster-anodes/vetus',
-
-            # Keel Cooler Anodes
-            'keel-cooler-anodes/duramax',
-            'keel-cooler-anodes/fernstrum',
-            'keel-cooler-anodes/walter',
-
-            # Commercial Anodes
-            'commercial-anodes/divers-anodes',
-            'commercial-anodes/teardrop-anodes',
-
-            # Other Pleasurecraft Anodes
-            'pleasurecraft-anodes/berkley-jet',
-            'pleasurecraft-anodes/hardin-marine',
-            'pleasurecraft-anodes/jet-boat',
-            'pleasurecraft-anodes/sea-doo',
+            # Other
+            'bow-thruster-anodes',
+            'saildrive-anodes',
+            'keel-cooler-anodes',
+            'commercial-anodes'
         ]
     },
     'aluminum': {
@@ -138,15 +92,11 @@ CATEGORIES = {
             'shaft-anodes/metric',
             'hull-anodes/bolt-on',
             'hull-anodes/weld-on',
-            'rudder-trim-tab-anodes',
             'engine-anodes',
+            'rudder-trim-tab-anodes',
             'propeller-anodes',
-            'sterndrive-anodes/mercruiser',
-            'sterndrive-anodes/omc',
-            'sterndrive-anodes/volvo-penta',
-            'outboard-anodes/honda',
-            'outboard-anodes/mercury',
-            'outboard-anodes/yamaha',
+            'sterndrive-anodes',
+            'outboard-anodes'
         ]
     },
     'magnesium': {
