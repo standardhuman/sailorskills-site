@@ -140,7 +140,38 @@ nav {
     background: #e67e22;
 }
 
-/* Catalog Quick Filters */
+/* Hierarchical Filter System */
+.filter-hierarchy {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    margin: 20px 0;
+}
+
+.filter-level {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.filter-level:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.filter-label {
+    font-weight: 600;
+    color: #495057;
+    min-width: 100px;
+    margin-right: 10px;
+}
+
+/* Catalog Quick Filters (Legacy - keeping for compatibility) */
 .catalog-quick-filters {
     display: flex;
     flex-wrap: wrap;

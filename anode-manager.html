@@ -44,23 +44,51 @@
                 </div>
             </div>
 
-            <!-- Touch-friendly Quick Filter Buttons -->
-            <div class="catalog-quick-filters">
-                <button class="catalog-filter-btn active" data-filter="all">All Products</button>
-                <button class="catalog-filter-btn" data-filter="zinc">Zinc</button>
-                <button class="catalog-filter-btn" data-filter="aluminum">Aluminum</button>
-                <button class="catalog-filter-btn" data-filter="magnesium">Magnesium</button>
-                <div class="filter-separator"></div>
-                <button class="catalog-filter-btn" data-filter="shaft">Shaft</button>
-                <button class="catalog-filter-btn" data-filter="hull">Hull</button>
-                <button class="catalog-filter-btn" data-filter="engine">Engine</button>
-                <button class="catalog-filter-btn" data-filter="propeller">Propeller</button>
-                <div class="filter-separator"></div>
-                <button class="catalog-filter-btn sizing" data-filter="standard">📐 Standard</button>
-                <button class="catalog-filter-btn sizing" data-filter="metric">📏 Metric</button>
-                <div class="filter-separator"></div>
-                <button class="catalog-filter-btn sale" data-filter="on-sale">🏷️ On Sale</button>
-                <button class="catalog-filter-btn in-stock" data-filter="in-stock">✅ In Stock</button>
+            <!-- Hierarchical Filter System -->
+            <div class="filter-hierarchy">
+                <!-- Main Categories -->
+                <div class="filter-level" id="main-categories">
+                    <span class="filter-label">Category:</span>
+                    <button class="catalog-filter-btn active" data-filter="all" data-level="main">All Items</button>
+                    <button class="catalog-filter-btn" data-filter="anodes" data-level="main">⚓ Anodes</button>
+                    <button class="catalog-filter-btn" data-filter="tools" data-level="main">🔧 Tools</button>
+                    <button class="catalog-filter-btn" data-filter="equipment" data-level="main">⚙️ Equipment</button>
+                </div>
+
+                <!-- Material Sub-filters (shown when Anodes selected) -->
+                <div class="filter-level" id="material-filters" style="display: none;">
+                    <span class="filter-label">Material:</span>
+                    <button class="catalog-filter-btn" data-filter="all-materials" data-level="material">All Materials</button>
+                    <button class="catalog-filter-btn" data-filter="zinc" data-level="material">Zinc</button>
+                    <button class="catalog-filter-btn" data-filter="aluminum" data-level="material">Aluminum</button>
+                    <button class="catalog-filter-btn" data-filter="magnesium" data-level="material">Magnesium</button>
+                </div>
+
+                <!-- Application Sub-filters (shown when material selected) -->
+                <div class="filter-level" id="application-filters" style="display: none;">
+                    <span class="filter-label">Application:</span>
+                    <button class="catalog-filter-btn" data-filter="all-applications" data-level="application">All Applications</button>
+                    <button class="catalog-filter-btn" data-filter="shaft" data-level="application">Shaft</button>
+                    <button class="catalog-filter-btn" data-filter="hull" data-level="application">Hull</button>
+                    <button class="catalog-filter-btn" data-filter="engine" data-level="application">Engine</button>
+                    <button class="catalog-filter-btn" data-filter="propeller" data-level="application">Propeller</button>
+                    <button class="catalog-filter-btn" data-filter="rudder" data-level="application">Rudder/Trim</button>
+                </div>
+
+                <!-- Sizing Sub-filters (shown when application selected) -->
+                <div class="filter-level" id="sizing-filters" style="display: none;">
+                    <span class="filter-label">Sizing:</span>
+                    <button class="catalog-filter-btn" data-filter="all-sizing" data-level="sizing">All Sizes</button>
+                    <button class="catalog-filter-btn sizing" data-filter="standard" data-level="sizing">📐 Standard</button>
+                    <button class="catalog-filter-btn sizing" data-filter="metric" data-level="sizing">📏 Metric</button>
+                </div>
+
+                <!-- Toggle Filters (always visible) -->
+                <div class="filter-level" id="toggle-filters">
+                    <span class="filter-label">Show:</span>
+                    <button class="catalog-filter-btn sale" data-filter="on-sale">🏷️ On Sale</button>
+                    <button class="catalog-filter-btn in-stock" data-filter="in-stock">✅ In Stock</button>
+                </div>
             </div>
             <div class="stats-bar">
                 <span>Total Products: <strong id="total-products">0</strong></span>
