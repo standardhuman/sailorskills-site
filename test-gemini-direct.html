@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Gemini API Key</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        button {
+            padding: 10px 20px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        pre {
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Direct Gemini API Key Test</h1>
+
+    <div class="test-section">
+        <h2>Testing API Key:</h2>
+        <code id="api-key">AIzaSyAlBkhti-IvArv6ejMXmWJfAkPVnAUXvog</code>
+
+        <br><br>
+        <button onclick="testAPIKey()">Test API Key</button>
+
+        <div id="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Image Extraction:</h2>
+        <input type="file" id="file-input" accept="image/*">
+        <button onclick="testImageExtraction()">Test Image Processing</button>
+
+        <div id="image-result"></div>
+    </div>
+
+    <script>
+        const API_KEY = 'AIzaSyAlBkhti-IvArv6ejMXmWJfAkPVnAUXvog';
+        const API_URL = 'https://generativelanguage.googleapis.com/v1beta';
+
+        async function testAPIKey() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<div class="info">Testing API key...</div>';
+
+            try {
+                // Test with different models
+                const models = [
+                    'gemini-1.5-flash',
+                    'gemini-1.5-flash-latest',
+                    'gemini-1.5-pro',
+                    'gemini-pro'
+                ];
+
+                let successModel = null;
+
+                for (const model of models) {
+                    console.log(`Testing model: ${model}`);
+
+                    const response = await fetch(
+                        `${API_URL}/models/${model}:generateContent?key=${API_KEY}`,
+                        {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                contents: [{
+                                    parts: [{
+                                        text: "Simply respond with: Hello World"
+                                    }]
+                                }],
+                                generationConfig: {
+                                    temperature: 0,
+                                    maxOutputTokens: 50
+                                }
+                            })
+                        }
+                    );
+
+                    const data = await response.json();
+                    console.log(`Response for ${model}:`, data);
+
+                    if (response.ok) {
+                        successModel = model;
+                        const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response text';
+
+                        resultDiv.innerHTML = `
+                            <div class="success">
+                                <h3>✅ Success!</h3>
+                                <p><strong>Working Model:</strong> ${model}</p>
+                                <p><strong>API Response:</strong> ${responseText}</p>
+                                <p><strong>Status:</strong> API key is valid and working!</p>
+                            </div>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        `;
+                        break;
+                    } else {
+                        console.error(`Failed for ${model}:`, data);
+                    }
+                }
+
+                if (!successModel) {
+                    // Show the last error
+                    const lastResponse = await fetch(
+                        `${API_URL}/models/gemini-1.5-flash:generateContent?key=${API_KEY}`,
+                        {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                contents: [{
+                                    parts: [{
+                                        text: "Hello"
+                                    }]
+                                }]
+                            })
+                        }
+                    );
+
+                    const errorData = await lastResponse.json();
+
+                    resultDiv.innerHTML = `
+                        <div class="error">
+                            <h3>❌ API Key Test Failed</h3>
+                            <p><strong>Status Code:</strong> ${lastResponse.status}</p>
+                            <p><strong>Error:</strong> ${errorData.error?.message || 'Unknown error'}</p>
+                            <p>Tried models: ${models.join(', ')}</p>
+                        </div>
+                        <pre>${JSON.stringify(errorData, null, 2)}</pre>
+                    `;
+                }
+
+            } catch (error) {
+                console.error('Test error:', error);
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h3>❌ Connection Error</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function testImageExtraction() {
+            const file = document.getElementById('file-input').files[0];
+            if (!file) {
+                alert('Please select an image first');
+                return;
+            }
+
+            const resultDiv = document.getElementById('image-result');
+            resultDiv.innerHTML = '<div class="info">Processing image...</div>';
+
+            try {
+                // Convert to base64
+                const reader = new FileReader();
+                reader.onload = async function(e) {
+                    const base64 = e.target.result.split(',')[1];
+
+                    const response = await fetch(
+                        `${API_URL}/models/gemini-1.5-flash:generateContent?key=${API_KEY}`,
+                        {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                contents: [{
+                                    parts: [
+                                        {
+                                            text: `Extract any product information from this image and return as JSON:
+                                            {
+                                                "items": [
+                                                    {
+                                                        "name": "product name",
+                                                        "quantity": 1,
+                                                        "price": 0
+                                                    }
+                                                ]
+                                            }`
+                                        },
+                                        {
+                                            inline_data: {
+                                                mime_type: file.type,
+                                                data: base64
+                                            }
+                                        }
+                                    ]
+                                }],
+                                generationConfig: {
+                                    temperature: 0.1,
+                                    maxOutputTokens: 1024
+                                }
+                            })
+                        }
+                    );
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response';
+
+                        resultDiv.innerHTML = `
+                            <div class="success">
+                                <h3>✅ Image Processed Successfully!</h3>
+                                <p><strong>Extracted Data:</strong></p>
+                                <pre>${responseText}</pre>
+                            </div>
+                        `;
+                    } else {
+                        resultDiv.innerHTML = `
+                            <div class="error">
+                                <h3>❌ Image Processing Failed</h3>
+                                <p>${data.error?.message || 'Unknown error'}</p>
+                            </div>
+                        `;
+                    }
+                };
+                reader.readAsDataURL(file);
+
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h3>❌ Error</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Auto-test on load
+        window.onload = function() {
+            console.log('Page loaded, ready to test API key:', API_KEY);
+        };
+    </script>
+</body>
+</html>

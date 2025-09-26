@@ -3,7 +3,7 @@
 class GeminiService {
     constructor() {
         this.apiKey = localStorage.getItem('gemini_api_key') || '';
-        this.model = localStorage.getItem('gemini_model') || 'gemini-1.5-flash';
+        this.model = localStorage.getItem('gemini_model') || 'gemini-1.5-flash-8b';
         this.apiUrl = 'https://generativelanguage.googleapis.com/v1beta';
         this.requestCount = 0;
         this.dailyLimit = 25;
