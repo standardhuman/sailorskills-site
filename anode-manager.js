@@ -8,7 +8,7 @@ class AnodeManager {
         this.inventoryData = [];
         this.ordersData = [];
         this.currentPage = 1;
-        this.itemsPerPage = 20;
+        this.itemsPerPage = 9999; // Effectively unlimited
         this.filters = {
             search: '',
             material: '',
@@ -281,6 +281,14 @@ class AnodeManager {
 
         const totalPages = Math.ceil(totalItems / this.itemsPerPage);
 
+        // Hide pagination if showing all items (only 1 page)
+        if (totalPages <= 1) {
+            pagination.innerHTML = '';
+            pagination.style.display = 'none';
+            return;
+        }
+
+        pagination.style.display = 'flex';
         let html = '';
         for (let i = 1; i <= totalPages; i++) {
             html += `<button class="page-btn ${i === this.currentPage ? 'active' : ''}"
@@ -360,6 +368,15 @@ class AnodeManager {
         document.getElementById('total-products').textContent = total;
         document.getElementById('in-stock').textContent = inStock;
         document.getElementById('on-sale').textContent = onSale;
+
+        // Add "showing all" indicator
+        const statsBar = document.querySelector('.stats-bar');
+        if (statsBar && !document.getElementById('showing-all')) {
+            const showingAll = document.createElement('span');
+            showingAll.id = 'showing-all';
+            showingAll.innerHTML = '<strong style="color: #28a745;">📋 Showing All</strong>';
+            statsBar.appendChild(showingAll);
+        }
     }
 
     async showProductDetails(productId) {
