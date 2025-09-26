@@ -608,6 +608,82 @@ class AnodeManager {
         document.getElementById('product-modal').classList.add('active');
     }
 
+    showOrderModal() {
+        document.getElementById('order-modal').classList.add('active');
+    }
+
+    async createAutoReorder() {
+        try {
+            // Get low stock items
+            const lowStockItems = this.inventoryData.filter(item =>
+                item.available <= item.reorderPoint
+            );
+
+            if (lowStockItems.length === 0) {
+                alert('No items need reordering');
+                return;
+            }
+
+            // Create order
+            const { data: order, error: orderError } = await this.supabase
+                .from('inventory_orders')
+                .insert({
+                    order_type: 'reorder',
+                    status: 'draft',
+                    notes: `Auto-reorder for ${lowStockItems.length} low stock items`
+                })
+                .select()
+                .single();
+
+            if (orderError) throw orderError;
+
+            // Add items to order
+            const orderItems = lowStockItems.map(item => ({
+                order_id: order.id,
+                item_id: item.type === 'item' ? item.id : null,
+                anode_id: item.type === 'anode' ? item.id : null,
+                quantity: item.reorderQty || 10,
+                unit_price: item.unitCost || 0
+            }));
+
+            const { error: itemsError } = await this.supabase
+                .from('inventory_order_items')
+                .insert(orderItems);
+
+            if (itemsError) throw itemsError;
+
+            alert(`Auto-reorder created with ${lowStockItems.length} items`);
+            this.loadOrders();
+
+        } catch (error) {
+            console.error('Error creating auto-reorder:', error);
+            alert('Failed to create auto-reorder: ' + error.message);
+        }
+    }
+
+    async submitOrderForProcessing(orderId) {
+        try {
+            const { error } = await this.supabase
+                .from('inventory_orders')
+                .update({ status: 'submitted' })
+                .eq('id', orderId);
+
+            if (error) throw error;
+
+            alert('Order submitted successfully');
+            this.loadOrders();
+
+        } catch (error) {
+            console.error('Error submitting order:', error);
+            alert('Failed to submit order: ' + error.message);
+        }
+    }
+
+    viewOrder(orderId) {
+        // TODO: Implement order details view
+        alert('Order details view coming soon');
+    }
+
     closeModal() {
         document.querySelectorAll('.modal').forEach(modal => {
             modal.classList.remove('active');
@@ -713,12 +789,13 @@ class AnodeManager {
     async loadOrders(statusFilter = '') {
         try {
             let query = this.supabase
-                .from('anode_orders')
+                .from('inventory_orders')
                 .select(`
                     *,
-                    items:anode_order_items(count)
+                    suppliers(name),
+                    inventory_order_items(count)
                 `)
-                .order('created_at', { ascending: false });
+                .order('order_date', { ascending: false });
 
             if (statusFilter) {
                 query = query.eq('status', statusFilter);
@@ -728,7 +805,7 @@ class AnodeManager {
 
             if (error) throw error;
 
-            this.ordersData = data;
+            this.ordersData = data || [];
             this.renderOrders();
 
         } catch (error) {
@@ -746,23 +823,26 @@ class AnodeManager {
             return;
         }
 
-        tbody.innerHTML = this.ordersData.map(order => `
-            <tr>
-                <td>${order.order_number || order.id.substring(0, 8)}</td>
-                <td>${new Date(order.created_at).toLocaleDateString()}</td>
-                <td>${order.order_type}</td>
-                <td><span class="badge badge-${this.getStatusBadge(order.status)}">${order.status}</span></td>
-                <td>${order.items[0].count} items</td>
-                <td>$${(order.total_amount || 0).toFixed(2)}</td>
-                <td>
-                    <button class="btn btn-sm" onclick="anodeManager.viewOrder('${order.id}')">View</button>
-                    ${order.status === 'draft' ?
-                        `<button class="btn btn-sm btn-primary" onclick="anodeManager.submitOrder('${order.id}')">Submit</button>` :
+        tbody.innerHTML = this.ordersData.map(order => {
+            const itemCount = order.inventory_order_items ? order.inventory_order_items[0]?.count || 0 : 0;
+            return `
+                <tr>
+                    <td>${order.order_number || order.id.substring(0, 8)}</td>
+                    <td>${new Date(order.order_date || order.created_at).toLocaleDateString()}</td>
+                    <td>${order.order_type || 'manual'}</td>
+                    <td><span class="badge badge-${this.getStatusBadge(order.status)}">${order.status}</span></td>
+                    <td>${itemCount} items</td>
+                    <td>$${(order.total_amount || 0).toFixed(2)}</td>
+                    <td>
+                        <button class="btn btn-sm" onclick="anodeManager.viewOrder('${order.id}')">View</button>
+                        ${order.status === 'draft' ?
+                            `<button class="btn btn-sm btn-primary" onclick="anodeManager.submitOrderForProcessing('${order.id}')">Submit</button>` :
                         ''
                     }
                 </td>
             </tr>
-        `).join('');
+            `;
+        }).join('');
     }
 
     async startSync(syncType) {
