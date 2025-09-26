@@ -22,6 +22,10 @@
       "use": "@vercel/static"
     },
     {
+      "src": "public/**",
+      "use": "@vercel/static"
+    },
+    {
       "src": "images/**",
       "use": "@vercel/static"
     },
@@ -37,6 +41,8 @@
     { "source": "/booking", "destination": "/booking.html" },
     { "source": "/anode-quote", "destination": "/anode-quote.html" },
     { "source": "/comprehensive-quote", "destination": "/comprehensive-quote.html" },
-    { "source": "/quote/:quoteNumber", "destination": "/quote-viewer.html" }
+    { "source": "/quote/:quoteNumber", "destination": "/quote-viewer.html" },
+    { "source": "/anode-manager", "destination": "/anode-manager.html" },
+    { "source": "/inventory", "destination": "/anode-manager.html" }
   ]
 }

@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anode Management System</title>
+    <link rel="stylesheet" href="anode-manager.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>⚓ Anode Management System</h1>
+            <nav>
+                <button class="nav-btn active" data-view="catalog">Catalog</button>
+                <button class="nav-btn" data-view="inventory">Inventory</button>
+                <button class="nav-btn" data-view="orders">Orders</button>
+                <button class="nav-btn" data-view="sync">Sync</button>
+                <button class="nav-btn" data-view="reports">Reports</button>
+            </nav>
+        </header>
+
+        <!-- Catalog View -->
+        <section id="catalog-view" class="view active">
+            <div class="view-header">
+                <h2>Boatzincs Catalog</h2>
+                <div class="controls">
+                    <input type="text" id="catalog-search" placeholder="Search anodes..." class="search-input">
+                    <select id="material-filter" class="filter-select">
+                        <option value="">All Materials</option>
+                        <option value="zinc">Zinc</option>
+                        <option value="aluminum">Aluminum</option>
+                        <option value="magnesium">Magnesium</option>
+                    </select>
+                    <select id="category-filter" class="filter-select">
+                        <option value="">All Categories</option>
+                        <option value="shaft">Shaft</option>
+                        <option value="hull">Hull</option>
+                        <option value="engine">Engine</option>
+                        <option value="propeller">Propeller</option>
+                        <option value="rudder">Rudder/Trim Tab</option>
+                        <option value="other">Other</option>
+                    </select>
+                    <button id="refresh-catalog" class="btn btn-secondary">↻ Refresh</button>
+                </div>
+            </div>
+            <div class="stats-bar">
+                <span>Total Products: <strong id="total-products">0</strong></span>
+                <span>In Stock: <strong id="in-stock">0</strong></span>
+                <span>On Sale: <strong id="on-sale">0</strong></span>
+                <span>Last Sync: <strong id="last-sync">Never</strong></span>
+            </div>
+            <div id="catalog-grid" class="catalog-grid">
+                <!-- Products will be loaded here -->
+            </div>
+            <div id="catalog-pagination" class="pagination"></div>
+        </section>
+
+        <!-- Inventory View -->
+        <section id="inventory-view" class="view">
+            <div class="view-header">
+                <h2>Inventory Management</h2>
+                <div class="controls">
+                    <button id="add-item" class="btn btn-primary">+ Add Item</button>
+                    <button id="add-stock" class="btn btn-secondary">📦 Receive Stock</button>
+                    <button id="inventory-count" class="btn btn-secondary">📊 Count Inventory</button>
+                    <button id="replenishment-list" class="btn btn-warning">📋 Replenishment List</button>
+                </div>
+            </div>
+
+            <!-- Inventory Tabs -->
+            <div class="inventory-tabs">
+                <button class="tab-btn active" data-tab="all-items">All Items</button>
+                <button class="tab-btn" data-tab="anodes">Anodes</button>
+                <button class="tab-btn" data-tab="tools">Tools</button>
+                <button class="tab-btn" data-tab="equipment">Equipment</button>
+                <button class="tab-btn" data-tab="consumables">Consumables</button>
+            </div>
+
+            <!-- Filters and Search -->
+            <div class="inventory-controls">
+                <div class="search-bar">
+                    <input type="text" id="inventory-search" placeholder="Search items..." class="search-input">
+                </div>
+                <div class="inventory-filters">
+                    <label>
+                        <input type="checkbox" id="show-low-stock"> Low Stock Only
+                    </label>
+                    <label>
+                        <input type="checkbox" id="show-out-of-stock"> Out of Stock
+                    </label>
+                    <label>
+                        <input type="checkbox" id="show-critical"> Critical Items
+                    </label>
+                </div>
+            </div>
+
+            <!-- Stock Level Alerts -->
+            <div id="stock-alerts" class="stock-alerts hidden">
+                <div class="alert alert-danger">
+                    <strong>⚠️ Critical Stock:</strong> <span id="critical-count">0</span> items need immediate attention
+                </div>
+                <div class="alert alert-warning">
+                    <strong>📉 Low Stock:</strong> <span id="low-stock-count">0</span> items below reorder point
+                </div>
+            </div>
+
+            <!-- Inventory Table -->
+            <table id="inventory-table" class="data-table">
+                <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>SKU</th>
+                        <th>Name</th>
+                        <th>Category</th>
+                        <th>On Hand</th>
+                        <th>Allocated</th>
+                        <th>Available</th>
+                        <th>Min Stock</th>
+                        <th>Reorder Point</th>
+                        <th>Location</th>
+                        <th>Unit Cost</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Inventory rows will be loaded here -->
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Orders View -->
+        <section id="orders-view" class="view">
+            <div class="view-header">
+                <h2>Order Management</h2>
+                <div class="controls">
+                    <button id="create-order" class="btn btn-primary">+ Create Order</button>
+                    <button id="auto-reorder" class="btn btn-secondary">🔄 Auto-Reorder</button>
+                    <select id="order-status-filter" class="filter-select">
+                        <option value="">All Statuses</option>
+                        <option value="draft">Draft</option>
+                        <option value="submitted">Submitted</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="shipped">Shipped</option>
+                        <option value="delivered">Delivered</option>
+                    </select>
+                </div>
+            </div>
+            <table id="orders-table" class="data-table">
+                <thead>
+                    <tr>
+                        <th>Order #</th>
+                        <th>Date</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th>Items</th>
+                        <th>Total</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Orders will be loaded here -->
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Sync View -->
+        <section id="sync-view" class="view">
+            <div class="view-header">
+                <h2>Data Synchronization</h2>
+            </div>
+            <div class="sync-controls">
+                <div class="sync-card">
+                    <h3>🔄 Full Catalog Sync</h3>
+                    <p>Scrape entire Boatzincs catalog (takes 30-60 minutes)</p>
+                    <button id="sync-full" class="btn btn-primary">Start Full Sync</button>
+                    <div class="last-run">Last run: <span id="last-full-sync">Never</span></div>
+                </div>
+                <div class="sync-card">
+                    <h3>💰 Price Update</h3>
+                    <p>Quick price check for existing products (takes 5-10 minutes)</p>
+                    <button id="sync-prices" class="btn btn-primary">Update Prices</button>
+                    <div class="last-run">Last run: <span id="last-price-sync">Never</span></div>
+                </div>
+                <div class="sync-card">
+                    <h3>📦 Stock Check</h3>
+                    <p>Check stock status for all products</p>
+                    <button id="sync-stock" class="btn btn-primary">Check Stock</button>
+                    <div class="last-run">Last run: <span id="last-stock-sync">Never</span></div>
+                </div>
+            </div>
+            <div class="sync-logs">
+                <h3>Recent Sync History</h3>
+                <table id="sync-logs-table" class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Date/Time</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                            <th>Processed</th>
+                            <th>Added</th>
+                            <th>Updated</th>
+                            <th>Failed</th>
+                            <th>Duration</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Sync logs will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+            <div id="sync-progress" class="sync-progress hidden">
+                <h3>Sync in Progress...</h3>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 0%"></div>
+                </div>
+                <div class="progress-text">Starting...</div>
+            </div>
+        </section>
+
+        <!-- Reports View -->
+        <section id="reports-view" class="view">
+            <div class="view-header">
+                <h2>Reports & Analytics</h2>
+            </div>
+            <div class="reports-grid">
+                <div class="report-card">
+                    <h3>📈 Price Changes</h3>
+                    <p>Products with recent price changes</p>
+                    <button class="btn btn-secondary" onclick="anodeManager.loadPriceChanges()">View Report</button>
+                </div>
+                <div class="report-card">
+                    <h3>📉 Low Stock Alert</h3>
+                    <p>Items below reorder point</p>
+                    <button class="btn btn-warning" onclick="anodeManager.loadLowStock()">View Report</button>
+                </div>
+                <div class="report-card">
+                    <h3>💵 Order History</h3>
+                    <p>Historical ordering data</p>
+                    <button class="btn btn-secondary" onclick="anodeManager.loadOrderHistory()">View Report</button>
+                </div>
+                <div class="report-card">
+                    <h3>📊 Inventory Value</h3>
+                    <p>Total inventory valuation</p>
+                    <button class="btn btn-secondary" onclick="anodeManager.loadInventoryValue()">View Report</button>
+                </div>
+            </div>
+            <div id="report-content" class="report-content">
+                <!-- Report content will be loaded here -->
+            </div>
+        </section>
+
+        <!-- Modals -->
+        <div id="product-modal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2 id="modal-product-name"></h2>
+                <div class="modal-body">
+                    <img id="modal-product-image" src="" alt="Product Image">
+                    <div class="product-details">
+                        <p><strong>SKU:</strong> <span id="modal-sku"></span></p>
+                        <p><strong>Boatzincs ID:</strong> <span id="modal-boatzincs-id"></span></p>
+                        <p><strong>Category:</strong> <span id="modal-category"></span></p>
+                        <p><strong>Material:</strong> <span id="modal-material"></span></p>
+                        <p><strong>List Price:</strong> $<span id="modal-list-price"></span></p>
+                        <p><strong>Sale Price:</strong> $<span id="modal-sale-price"></span></p>
+                        <p><strong>Stock Status:</strong> <span id="modal-stock-status"></span></p>
+                        <p><strong>Description:</strong> <span id="modal-description"></span></p>
+                        <p><strong>Last Updated:</strong> <span id="modal-last-updated"></span></p>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn btn-primary" onclick="anodeManager.addToInventory()">Add to Inventory</button>
+                        <button class="btn btn-secondary" onclick="anodeManager.viewOnBoatzincs()">View on Boatzincs</button>
+                        <button class="btn btn-secondary" onclick="anodeManager.updatePrice()">Update Price</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="order-modal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Create Order</h2>
+                <div class="modal-body">
+                    <form id="order-form">
+                        <div class="form-group">
+                            <label>Order Type:</label>
+                            <select id="order-type">
+                                <option value="manual">Manual</option>
+                                <option value="reorder">Reorder</option>
+                                <option value="emergency">Emergency</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Items:</label>
+                            <div id="order-items-list">
+                                <!-- Order items will be added here -->
+                            </div>
+                            <button type="button" class="btn btn-secondary" onclick="anodeManager.addOrderItem()">+ Add Item</button>
+                        </div>
+                        <div class="form-group">
+                            <label>Notes:</label>
+                            <textarea id="order-notes" rows="3"></textarea>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Create Order</button>
+                            <button type="button" class="btn btn-secondary" onclick="anodeManager.closeModal()">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Item Modal -->
+        <div id="add-item-modal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Add New Inventory Item</h2>
+                <div class="modal-body">
+                    <form id="add-item-form">
+                        <div class="form-group">
+                            <label>Item Type:</label>
+                            <select id="item-type" onchange="anodeManager.toggleItemType(this.value)">
+                                <option value="general">General Item</option>
+                                <option value="anode">Anode from Catalog</option>
+                            </select>
+                        </div>
+
+                        <!-- General Item Fields -->
+                        <div id="general-item-fields">
+                            <div class="form-group">
+                                <label>SKU:</label>
+                                <input type="text" id="item-sku" placeholder="Optional">
+                            </div>
+                            <div class="form-group">
+                                <label>Name:*</label>
+                                <input type="text" id="item-name" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Category:*</label>
+                                <select id="item-category" required>
+                                    <option value="">Select Category</option>
+                                    <option value="tools">Tools</option>
+                                    <option value="safety">Safety Equipment</option>
+                                    <option value="fasteners">Fasteners</option>
+                                    <option value="cleaning">Cleaning Supplies</option>
+                                    <option value="consumables">Consumables</option>
+                                    <option value="equipment">Equipment</option>
+                                    <option value="parts">Parts</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Description:</label>
+                                <textarea id="item-description" rows="2"></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Anode Selection (hidden by default) -->
+                        <div id="anode-item-fields" class="hidden">
+                            <div class="form-group">
+                                <label>Select Anode from Catalog:*</label>
+                                <select id="anode-select" class="anode-select">
+                                    <option value="">Search or select an anode...</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Common Fields -->
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Initial Quantity:</label>
+                                <input type="number" id="initial-quantity" value="0" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label>Unit Cost:</label>
+                                <input type="number" id="unit-cost" step="0.01" min="0">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Minimum Stock Level:</label>
+                                <input type="number" id="min-stock" value="0" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label>Reorder Point:</label>
+                                <input type="number" id="reorder-point" value="5" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label>Reorder Quantity:</label>
+                                <input type="number" id="reorder-qty" value="10" min="1">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Primary Location:</label>
+                                <input type="text" id="primary-location" placeholder="e.g., Shelf A-1">
+                            </div>
+                            <div class="form-group">
+                                <label>Bin Number:</label>
+                                <input type="text" id="bin-number" placeholder="e.g., BIN-001">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Notes:</label>
+                            <textarea id="item-notes" rows="2"></textarea>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Add Item</button>
+                            <button type="button" class="btn btn-secondary" onclick="anodeManager.closeModal()">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stock Transaction Modal -->
+        <div id="stock-transaction-modal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Stock Transaction</h2>
+                <div class="modal-body">
+                    <form id="stock-transaction-form">
+                        <div class="form-group">
+                            <label>Transaction Type:</label>
+                            <select id="transaction-type" onchange="anodeManager.updateTransactionForm(this.value)">
+                                <option value="purchase">Receive Purchase</option>
+                                <option value="adjustment">Stock Adjustment</option>
+                                <option value="count">Physical Count</option>
+                                <option value="customer_charge">Customer Charge</option>
+                                <option value="damage">Damage/Loss</option>
+                                <option value="return">Return to Supplier</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Item:</label>
+                            <select id="transaction-item" required>
+                                <option value="">Select an item...</option>
+                            </select>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Current Stock:</label>
+                                <input type="text" id="current-stock" readonly>
+                            </div>
+                            <div class="form-group" id="quantity-group">
+                                <label>Quantity:</label>
+                                <input type="number" id="transaction-quantity" required>
+                            </div>
+                            <div class="form-group hidden" id="new-count-group">
+                                <label>New Count:</label>
+                                <input type="number" id="new-count">
+                            </div>
+                        </div>
+
+                        <div class="form-group" id="reference-group">
+                            <label>Reference:</label>
+                            <input type="text" id="transaction-reference" placeholder="PO#, Customer name, etc.">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Notes:</label>
+                            <textarea id="transaction-notes" rows="2"></textarea>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Process Transaction</button>
+                            <button type="button" class="btn btn-secondary" onclick="anodeManager.closeModal()">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Replenishment List Modal -->
+        <div id="replenishment-modal" class="modal">
+            <div class="modal-content modal-lg">
+                <span class="close">&times;</span>
+                <h2>Replenishment List</h2>
+                <div class="modal-body">
+                    <div class="replenishment-controls">
+                        <button class="btn btn-primary" onclick="anodeManager.generatePO()">Generate PO</button>
+                        <button class="btn btn-secondary" onclick="anodeManager.exportReplenishment()">Export List</button>
+                        <button class="btn btn-warning" onclick="anodeManager.autoAddLowStock()">Auto-Add Low Stock</button>
+                    </div>
+
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox" id="select-all-replenish"></th>
+                                <th>Item</th>
+                                <th>SKU</th>
+                                <th>Current Stock</th>
+                                <th>Reorder Point</th>
+                                <th>Qty Needed</th>
+                                <th>Qty to Order</th>
+                                <th>Unit Cost</th>
+                                <th>Total</th>
+                                <th>Priority</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="replenishment-items">
+                            <!-- Replenishment items will be loaded here -->
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="7"><strong>Total:</strong></td>
+                                <td><strong id="replenishment-total">$0.00</strong></td>
+                                <td colspan="3"></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Customer Charge Modal -->
+        <div id="charge-modal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Charge Customer for Anodes</h2>
+                <div class="modal-body">
+                    <form id="charge-form">
+                        <div class="form-group">
+                            <label>Customer Name:*</label>
+                            <input type="text" id="charge-customer" required>
+                        </div>
+
+                        <div class="charge-items">
+                            <h3>Items Used</h3>
+                            <div id="charge-items-list">
+                                <div class="charge-item">
+                                    <select class="charge-anode-select">
+                                        <option value="">Select anode...</option>
+                                    </select>
+                                    <input type="number" class="charge-quantity" placeholder="Qty" min="1" value="1">
+                                    <button type="button" class="btn-remove" onclick="anodeManager.removeChargeItem(this)">×</button>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-secondary" onclick="anodeManager.addChargeItem()">+ Add Another</button>
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="add-to-replenishment" checked>
+                                Add to replenishment list if below reorder point
+                            </label>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Notes:</label>
+                            <textarea id="charge-notes" rows="2" placeholder="Service details, boat info, etc."></textarea>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Process Charge</button>
+                            <button type="button" class="btn btn-secondary" onclick="anodeManager.closeModal()">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="anode-manager.js"></script>
+    <script src="inventory-manager.js"></script>
+</body>
+</html>
