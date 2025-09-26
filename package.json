@@ -11,7 +11,15 @@
     "compare-headers": "node compare-headers.js",
     "server": "node api/index.js",
     "start": "node server.js",
-    "dev:server": "nodemon server.js"
+    "dev:server": "nodemon server.js",
+    "scrape:anodes": "node anode-system/scripts/manual-triggers.js scrape:full",
+    "scrape:prices": "node anode-system/scripts/manual-triggers.js scrape:prices",
+    "scrape:inventory": "node anode-system/scripts/manual-triggers.js scrape:inventory",
+    "order:generate": "node anode-system/scripts/manual-triggers.js order:create",
+    "order:submit": "node anode-system/scripts/manual-triggers.js order:submit",
+    "anode:install": "node anode-system/scripts/manual-triggers.js setup:install",
+    "anode:check": "node anode-system/scripts/manual-triggers.js setup:check",
+    "anode:menu": "bash anode-system/scripts/run-scraper.sh"
   },
   "keywords": [],
   "author": "",
