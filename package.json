@@ -8,7 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "compare-headers": "node compare-headers.js",
+    "compare-headers": "node scripts/analyze/compare-headers.js",
     "server": "node api/index.js",
     "start": "node server.js",
     "dev:server": "nodemon server.js",
