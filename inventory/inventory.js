@@ -1149,6 +1149,35 @@ class AnodeManager {
     }
 }
 
+// Toggle catalog images visibility
+let showCatalogImages = true;
+
+function toggleCatalogImages() {
+    showCatalogImages = !showCatalogImages;
+    const toggleBtn = document.getElementById('toggle-images');
+    const catalogGrid = document.getElementById('catalog-grid');
+
+    if (toggleBtn) {
+        toggleBtn.classList.toggle('active', showCatalogImages);
+    }
+
+    if (catalogGrid) {
+        if (showCatalogImages) {
+            catalogGrid.classList.remove('hide-images');
+        } else {
+            catalogGrid.classList.add('hide-images');
+        }
+    }
+
+    // Refresh the view to apply changes
+    if (window.anodeManager) {
+        window.anodeManager.renderCatalog();
+    }
+}
+
+// Make function globally available
+window.toggleCatalogImages = toggleCatalogImages;
+
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
     window.anodeManager = new AnodeManager();
