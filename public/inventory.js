@@ -1178,7 +1178,50 @@ function toggleCatalogImages() {
 // Make function globally available
 window.toggleCatalogImages = toggleCatalogImages;
 
+// Full-size image viewer functionality
+function setupImageViewer() {
+    const modalImage = document.getElementById('modal-product-image');
+    const imageViewerModal = document.getElementById('image-viewer-modal');
+    const fullSizeImage = document.getElementById('full-size-image');
+    const imageViewerClose = document.querySelector('.image-viewer-close');
+
+    // Open full-size image when clicking on modal image
+    if (modalImage) {
+        modalImage.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (this.src && this.src !== '') {
+                fullSizeImage.src = this.src;
+                imageViewerModal.classList.add('active');
+            }
+        });
+    }
+
+    // Close image viewer when clicking the X
+    if (imageViewerClose) {
+        imageViewerClose.addEventListener('click', function() {
+            imageViewerModal.classList.remove('active');
+        });
+    }
+
+    // Close image viewer when clicking outside the image
+    if (imageViewerModal) {
+        imageViewerModal.addEventListener('click', function(e) {
+            if (e.target === imageViewerModal || e.target === fullSizeImage) {
+                imageViewerModal.classList.remove('active');
+            }
+        });
+    }
+
+    // Close with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && imageViewerModal.classList.contains('active')) {
+            imageViewerModal.classList.remove('active');
+        }
+    });
+}
+
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
     window.anodeManager = new AnodeManager();
+    setupImageViewer();
 });
