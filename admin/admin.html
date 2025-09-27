@@ -1466,12 +1466,6 @@
                 <a href="#" onclick="event.preventDefault(); window.location.assign(window.location.protocol + '//' + window.location.host + '/inventory'); return false;" class="admin-tool-btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px; text-decoration: none; text-align: center; font-weight: 600; font-size: 16px; display: flex; flex-direction: column; align-items: center; gap: 10px; transition: all 0.3s; box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3); cursor: pointer;">
                     📦 Inventory Management
                 </a>
-                <a href="#" onclick="event.preventDefault(); window.location.assign(window.location.protocol + '//' + window.location.host + '/diving'); return false;" class="admin-tool-btn" style="background: linear-gradient(135deg, #3494E6 0%, #EC6EAD 100%); color: white; padding: 20px; border-radius: 10px; text-decoration: none; text-align: center; font-weight: 600; font-size: 16px; display: flex; flex-direction: column; align-items: center; gap: 10px; transition: all 0.3s; box-shadow: 0 4px 8px rgba(52, 148, 230, 0.3); cursor: pointer;">
-                    🤿 Diving Calculator
-                </a>
-                <a href="#" onclick="alert('Quote Viewer coming soon!'); return false;" class="admin-tool-btn" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; padding: 20px; border-radius: 10px; text-decoration: none; text-align: center; font-weight: 600; font-size: 16px; display: flex; flex-direction: column; align-items: center; gap: 10px; transition: all 0.3s; box-shadow: 0 4px 8px rgba(17, 153, 142, 0.3);">
-                    📋 Quote Viewer
-                </a>
             </div>
         </div>
 
@@ -2786,7 +2780,7 @@
             }
             
             // Find customer details
-            const customer = customers.find(c => c.id === customerId) || selectedCustomer;
+            const customer = customers.find(c => c.id === customerId) || window.selectedCustomer;
             if (!customer) {
                 alert('Please select a customer first');
                 return;
@@ -2955,8 +2949,8 @@
             `).join('');
 
             // Re-select if a customer was already selected
-            if (selectedCustomer) {
-                const selectedEl = document.querySelector(`[onclick*="${selectedCustomer.id}"]`);
+            if (window.selectedCustomer) {
+                const selectedEl = document.querySelector(`[onclick*="${window.selectedCustomer.id}"]`);
                 if (selectedEl) {
                     selectedEl.classList.add('selected');
                 }
@@ -2968,7 +2962,7 @@
             selectedCustomer = customers.find(c => c.id === customerId);
             window.selectedCustomer = selectedCustomer; // Update global reference
 
-            if (!selectedCustomer) return;
+            if (!window.selectedCustomer) return;
             
             // Update UI
             document.querySelectorAll('.customer-item').forEach(el => {
@@ -2983,8 +2977,8 @@
             const selectedDisplay = document.getElementById('selectedCustomer');
             selectedDisplay.classList.add('active');
             document.getElementById('selectedCustomerInfo').textContent = 
-                `${selectedCustomer.name || 'Unnamed'} (${selectedCustomer.email}) - ${
-                    selectedCustomer.payment_method ? 'Card ending in ' + selectedCustomer.payment_method.card.last4 : 'No card on file'
+                `${window.selectedCustomer.name || 'Unnamed'} (${window.selectedCustomer.email}) - ${
+                    window.selectedCustomer.payment_method ? 'Card ending in ' + window.selectedCustomer.payment_method.card.last4 : 'No card on file'
                 }`;
             
             updateChargeSummary();
@@ -3988,8 +3982,8 @@
             chargeButton.disabled = !window.currentServiceKey;
 
             // Update button text based on customer selection
-            if (selectedCustomer) {
-                chargeButton.textContent = selectedCustomer.payment_method ?
+            if (window.selectedCustomer) {
+                chargeButton.textContent = window.selectedCustomer.payment_method ?
                     `💳 Charge $${editableAmount.toFixed(2)}` : `💳 Charge $${editableAmount.toFixed(2)} (No card on file)`;
             } else {
                 chargeButton.textContent = `💳 Charge $${editableAmount.toFixed(2)}`;
@@ -4006,13 +4000,13 @@
             }
 
             // If no customer selected, show the modal
-            if (!selectedCustomer) {
+            if (!window.selectedCustomer) {
                 openCustomerSelectionModal();
                 return;
             }
 
             // If customer selected but no payment method
-            if (!selectedCustomer.payment_method) {
+            if (!window.selectedCustomer.payment_method) {
                 alert('Please add a payment method for this customer');
                 return;
             }
@@ -4060,7 +4054,7 @@
             const serviceKeyFromElement = selectedServiceEl ? selectedServiceEl.dataset.serviceKey : '';
             const serviceTitleEl = selectedServiceEl ? selectedServiceEl.querySelector('.service-title') : null;
             const serviceName = serviceTitleEl ? serviceTitleEl.textContent : '';
-            const boatLength = document.getElementById('boatLength').value;
+            const boatLength = document.getElementById('boatLength')?.value || '0';
             const boatName = document.getElementById('boatName')?.value || '';
 
             // Build comprehensive metadata for transaction history
@@ -4077,8 +4071,8 @@
             }
             
             // Include customer's boat details from their profile
-            if (selectedCustomer.boat_name && !boatName) {
-                metadata.boat_name = selectedCustomer.boat_name;
+            if (window.selectedCustomer && window.selectedCustomer.boat_name && !boatName) {
+                metadata.boat_name = window.selectedCustomer.boat_name;
             }
             
             // Only include boat details for cleaning services
@@ -4165,7 +4159,7 @@
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        customerId: selectedCustomer.id,
+                        customerId: window.selectedCustomer.id,
                         amount: Math.round(price * 100), // Convert to cents
                         description: description,
                         metadata: metadata
@@ -4176,12 +4170,12 @@
                 
                 if (result.success) {
                     showResult('success', 
-                        `✅ Successfully charged $${price.toFixed(2)} to ${selectedCustomer.name || selectedCustomer.email}<br>
+                        `✅ Successfully charged $${price.toFixed(2)} to ${window.selectedCustomer.name || window.selectedCustomer.email}<br>
                          Payment ID: ${result.paymentIntent.id}`);
                     
                     // Reset selection after success
                     setTimeout(() => {
-                        selectedCustomer = null;
+                        window.selectedCustomer = null;
                         document.getElementById('selectedCustomer').classList.remove('active');
                         document.querySelectorAll('.customer-item').forEach(el => {
                             el.classList.remove('selected');
@@ -4205,7 +4199,7 @@
             const editableAmount = parseFloat(document.getElementById('editableAmount')?.value || 0);
             const chargeButton = document.getElementById('chargeButton');
             
-            if (selectedCustomer && selectedCustomer.payment_method) {
+            if (window.selectedCustomer && window.selectedCustomer.payment_method) {
                 chargeButton.disabled = editableAmount === 0;
                 chargeButton.textContent = `Charge $${editableAmount.toFixed(2)}`;
             }
@@ -4313,10 +4307,10 @@
             }
 
             // Check if customer has payment method
-            if (!selectedCustomer.payment_method) {
+            if (!window.selectedCustomer.payment_method) {
                 if (confirm('This customer has no payment method on file. Would you like to add one now?')) {
                     closeCustomerSelectionModal();
-                    showAddPaymentMethod(selectedCustomer.id);
+                    showAddPaymentMethod(window.selectedCustomer.id);
                     return;
                 } else {
                     return;
@@ -4416,6 +4410,7 @@
         // Anode Charging Functions
         let anodeCart = {};
         let selectedBoat = null;
+        window.selectedBoat = selectedBoat; // Make globally accessible
         let anodeCatalog = [];
         let currentCategory = 'all';
         
@@ -4716,6 +4711,7 @@
         // Select boat from schedule
         window.selectBoatFromSchedule = function(boatId, boatName, customerName) {
             selectedBoat = { id: boatId, name: boatName, customer: customerName };
+            window.selectedBoat = selectedBoat; // Update global reference
             
             // Update UI
             document.querySelectorAll('.boat-schedule-item').forEach(item => {
@@ -4748,12 +4744,12 @@
             params.append('tax', taxRate);
             params.append('labor', laborCharge);
             
-            if (selectedCustomer) {
-                params.append('customer', selectedCustomer.name || selectedCustomer.email || '');
+            if (window.selectedCustomer) {
+                params.append('customer', window.selectedCustomer.name || window.selectedCustomer.email || '');
             }
-            
-            if (selectedBoat) {
-                params.append('boat', selectedBoat.name || '');
+
+            if (window.selectedBoat) {
+                params.append('boat', window.selectedBoat.name || '');
             }
             
             // Open quote page in new tab
@@ -4776,8 +4772,8 @@
             
             // Build quote data
             const quoteData = {
-                customer: selectedCustomer ? (selectedCustomer.name || selectedCustomer.email || '') : '',
-                boat: selectedBoat ? selectedBoat.name : '',
+                customer: window.selectedCustomer ? (window.selectedCustomer.name || window.selectedCustomer.email || '') : '',
+                boat: window.selectedBoat ? window.selectedBoat.name : ''
                 boatLength: boatLength,
                 service: {
                     name: serviceName,
@@ -4801,7 +4797,7 @@
 
         // Charge customer for anodes
         window.chargeAnodes = async function() {
-            if (!selectedCustomer || Object.keys(anodeCart).length === 0) return;
+            if (!window.selectedCustomer || Object.keys(anodeCart).length === 0) return;
             
             // Get configurable rates
             const taxRate = parseFloat(document.getElementById('taxRate').value) / 100 || 0.1075;
@@ -4827,12 +4823,12 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        customerId: selectedCustomer.stripe_customer_id,
+                        customerId: window.selectedCustomer.stripe_customer_id,
                         amount: Math.round(total * 100), // Convert to cents
                         description: `Anode Replacement: ${description}`,
                         metadata: {
-                            boat_id: selectedBoat?.id,
-                            boat_name: selectedBoat?.name,
+                            boat_id: window.selectedBoat?.id,
+                            boat_name: window.selectedBoat?.name,
                             items: JSON.stringify(items),
                             subtotal: subtotal.toFixed(2),
                             labor: laborTotal.toFixed(2),
