@@ -56,9 +56,12 @@ class AnodeManager {
     setupEventListeners() {
         // Navigation
         document.querySelectorAll('.nav-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                this.switchView(e.target.dataset.view);
-            });
+            // Only add click handler to buttons with data-view attribute, not links
+            if (btn.dataset.view) {
+                btn.addEventListener('click', (e) => {
+                    this.switchView(e.target.dataset.view);
+                });
+            }
         });
 
         // Catalog filters
@@ -146,11 +149,11 @@ class AnodeManager {
     }
 
     switchView(view) {
-        // Update navigation
-        document.querySelectorAll('.nav-btn').forEach(btn => {
+        // Update navigation - only update buttons with data-view
+        document.querySelectorAll('.nav-btn[data-view]').forEach(btn => {
             btn.classList.remove('active');
         });
-        document.querySelector(`[data-view="${view}"]`).classList.add('active');
+        document.querySelector(`[data-view="${view}"]`)?.classList.add('active');
 
         // Update view
         document.querySelectorAll('.view').forEach(v => {
