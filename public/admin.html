@@ -1256,7 +1256,7 @@
         }
     </style>
     <!-- Load admin.css AFTER inline styles to override them -->
-    <link rel="stylesheet" href="admin.css">
+    <link rel="stylesheet" href="admin.css?v=2.0">
 </head>
 <body>
     <!-- Navigation Header with Hamburger Menu -->
@@ -1486,33 +1486,27 @@
         <!-- Service Selection -->
         <div class="service-selector">
             <h2>Select Service Type</h2>
-            <div class="simple-service-buttons" id="simpleServiceButtons">
+            <div class="simple-service-buttons" id="simpleServiceButtons" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin: 20px 0;">
                 <!-- Cleaning Services Group -->
-                <button onclick="if(window.selectServiceDirect) selectServiceDirect('recurring_cleaning')" class="simple-service-btn service-recurring">
-                    <span class="service-emoji">🔄</span>
-                    <span class="service-name">Recurring Cleaning</span>
+                <button onclick="if(window.selectServiceDirect) selectServiceDirect('recurring_cleaning')" class="simple-service-btn" style="padding: 16px 20px; background: linear-gradient(135deg, #5B3A99 0%, #6B4A9E 100%); color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 15px; font-weight: 600; box-shadow: 0 4px 6px rgba(91, 58, 153, 0.3); transition: all 0.3s; text-shadow: 0 1px 2px rgba(0,0,0,0.2); min-height: 60px; display: flex; align-items: center; justify-content: center;">
+                    🔄 Recurring Cleaning
                 </button>
-                <button onclick="if(window.selectServiceDirect) selectServiceDirect('onetime_cleaning')" class="simple-service-btn service-onetime">
-                    <span class="service-emoji">🧽</span>
-                    <span class="service-name">One-Time Cleaning</span>
+                <button onclick="if(window.selectServiceDirect) selectServiceDirect('onetime_cleaning')" class="simple-service-btn" style="padding: 16px 20px; background: linear-gradient(135deg, #1E5F8E 0%, #2471A3 100%); color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 15px; font-weight: 600; box-shadow: 0 4px 6px rgba(30, 95, 142, 0.3); transition: all 0.3s; text-shadow: 0 1px 2px rgba(0,0,0,0.2); min-height: 60px; display: flex; align-items: center; justify-content: center;">
+                    🧽 One-Time Cleaning
                 </button>
 
                 <!-- Underwater Services Group -->
-                <button onclick="if(window.selectServiceDirect) selectServiceDirect('underwater_inspection')" class="simple-service-btn service-inspection">
-                    <span class="service-emoji">🤿</span>
-                    <span class="service-name">Underwater Inspection</span>
+                <button onclick="if(window.selectServiceDirect) selectServiceDirect('underwater_inspection')" class="simple-service-btn" style="padding: 16px 20px; background: linear-gradient(135deg, #0E7BA7 0%, #138FB5 100%); color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 15px; font-weight: 600; box-shadow: 0 4px 6px rgba(14, 123, 167, 0.3); transition: all 0.3s; text-shadow: 0 1px 2px rgba(0,0,0,0.2); min-height: 60px; display: flex; align-items: center; justify-content: center;">
+                    🤿 Underwater Inspection
                 </button>
-                <button onclick="if(window.selectServiceDirect) selectServiceDirect('item_recovery')" class="simple-service-btn service-recovery">
-                    <span class="service-emoji">🔍</span>
-                    <span class="service-name">Item Recovery</span>
+                <button onclick="if(window.selectServiceDirect) selectServiceDirect('item_recovery')" class="simple-service-btn" style="padding: 16px 20px; background: linear-gradient(135deg, #C73E79 0%, #D84361 100%); color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 15px; font-weight: 600; box-shadow: 0 4px 6px rgba(199, 62, 121, 0.3); transition: all 0.3s; text-shadow: 0 1px 2px rgba(0,0,0,0.2); min-height: 60px; display: flex; align-items: center; justify-content: center;">
+                    🔍 Item Recovery
                 </button>
-                <button onclick="if(window.selectServiceDirect) selectServiceDirect('propeller_service')" class="simple-service-btn service-propeller">
-                    <span class="service-emoji">⚙️</span>
-                    <span class="service-name">Propeller Service</span>
+                <button onclick="if(window.selectServiceDirect) selectServiceDirect('propeller_service')" class="simple-service-btn" style="padding: 16px 20px; background: linear-gradient(135deg, #D68910 0%, #E59E1B 100%); color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 15px; font-weight: 600; box-shadow: 0 4px 6px rgba(214, 137, 16, 0.3); transition: all 0.3s; text-shadow: 0 1px 2px rgba(0,0,0,0.2); min-height: 60px; display: flex; align-items: center; justify-content: center;">
+                    ⚙️ Propeller Service
                 </button>
-                <button onclick="if(window.selectServiceDirect) selectServiceDirect('anodes_only')" class="simple-service-btn service-anodes">
-                    <span class="service-emoji">⚡</span>
-                    <span class="service-name">Anodes Only</span>
+                <button onclick="if(window.selectServiceDirect) selectServiceDirect('anodes_only')" class="simple-service-btn" style="padding: 16px 20px; background: linear-gradient(135deg, #C0392B 0%, #E74C3C 100%); color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 15px; font-weight: 600; box-shadow: 0 4px 6px rgba(192, 57, 43, 0.3); transition: all 0.3s; text-shadow: 0 1px 2px rgba(0,0,0,0.2); min-height: 60px; display: flex; align-items: center; justify-content: center;">
+                    ⚡ Anodes Only
                 </button>
             </div>
             
