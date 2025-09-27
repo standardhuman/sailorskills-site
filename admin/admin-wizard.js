@@ -336,6 +336,24 @@ window.updateWizardDisplay = function() {
     }
 };
 
+// Update pricing function
+window.updatePricing = function() {
+    console.log('updatePricing called - calculating price based on current inputs');
+
+    // This would normally calculate pricing based on all the form inputs
+    // For now, just update the charge summary if it exists
+    if (window.updateChargeSummary && typeof window.updateChargeSummary === 'function') {
+        window.updateChargeSummary();
+    }
+};
+
+// Make functions globally available immediately
+window.selectWizardPaintCondition = selectWizardPaintCondition;
+window.renderConsolidatedForm = renderConsolidatedForm;
+window.updateGrowthDisplay = updateGrowthDisplay;
+window.navigateWizard = navigateWizard;
+window.updateWizardDisplay = updateWizardDisplay;
+
 // Export for use in other modules
 export {
     selectWizardPaintCondition,

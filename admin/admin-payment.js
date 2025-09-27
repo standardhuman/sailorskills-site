@@ -561,9 +561,51 @@ async function chargeAnodes() {
     }
 }
 
-// Make functions globally available
+// Update charge summary
+window.updateChargeSummary = function() {
+    const summaryContent = document.getElementById('chargeSummaryContent');
+    if (!summaryContent) return;
+
+    const service = window.currentServiceKey;
+    const customer = window.selectedCustomer;
+
+    if (!service) {
+        summaryContent.innerHTML = '<p>Select a service to see pricing</p>';
+        return;
+    }
+
+    if (!customer) {
+        summaryContent.innerHTML = '<p>Select a customer and service to see pricing</p>';
+        return;
+    }
+
+    // Basic summary display
+    summaryContent.innerHTML = `
+        <div class="charge-detail-row">
+            <span>Service:</span>
+            <span>${service.replace(/_/g, ' ')}</span>
+        </div>
+        <div class="charge-detail-row">
+            <span>Customer:</span>
+            <span>${customer.name || customer.email}</span>
+        </div>
+        <div class="charge-detail-row">
+            <span>Total:</span>
+            <span>Calculate based on selections</span>
+        </div>
+    `;
+
+    // Enable/disable charge button based on selections
+    const chargeButton = document.getElementById('chargeButton');
+    if (chargeButton) {
+        chargeButton.disabled = !customer || !customer.payment_method || !service;
+    }
+};
+
+// Make functions globally available immediately
 window.chargeCustomer = chargeCustomer;
 window.updateChargeButton = updateChargeButton;
+window.updateChargeSummary = updateChargeSummary;
 window.showPaymentMethodForm = showPaymentMethodForm;
 window.closePaymentMethodForm = closePaymentMethodForm;
 window.openCustomerSelectionModal = openCustomerSelectionModal;

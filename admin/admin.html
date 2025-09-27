@@ -67,7 +67,7 @@
         <!-- New Customer Modal -->
         <div id="newCustomerModal" class="modal" style="display: none;">
             <div class="modal-content">
-                <span class="close" onclick="closeCreateCustomerForm()">&times;</span>
+                <span class="close" onclick="window.adminApp.closeCreateCustomerForm()">&times;</span>
                 <h2>Create New Customer</h2>
                 <form id="newCustomerForm">
                     <div class="form-group">
@@ -119,7 +119,7 @@
                         <textarea id="newCustomerNotes" name="description" rows="3" placeholder="Any additional notes about the customer or boat..."></textarea>
                     </div>
                     <div class="form-actions">
-                        <button type="button" onclick="closeCreateCustomerForm()" class="cancel-btn">Cancel</button>
+                        <button type="button" onclick="window.adminApp.closeCreateCustomerForm()" class="cancel-btn">Cancel</button>
                         <button type="submit" class="submit-btn">Create Customer</button>
                     </div>
                 </form>
@@ -151,9 +151,9 @@
                            class="customer-search-input"
                            placeholder="Search by name, email, or boat name...">
                     <div class="customer-buttons">
-                        <button onclick="searchCustomers()" class="customer-btn">Search</button>
-                        <button onclick="loadRecentCustomers()" class="customer-btn">Show Recent</button>
-                        <button onclick="showCreateCustomerForm()" class="customer-btn new-customer-btn">+ New Customer</button>
+                        <button onclick="window.adminApp.searchCustomers()" class="customer-btn">Search</button>
+                        <button onclick="window.adminApp.loadRecentCustomers()" class="customer-btn">Show Recent</button>
+                        <button onclick="window.adminApp.showCreateCustomerForm()" class="customer-btn new-customer-btn">+ New Customer</button>
                     </div>
                 </div>
                 <div id="customerList" class="customer-list" style="display: none;"></div>
@@ -226,7 +226,7 @@
                     <button id="chargeButton" class="charge-button" disabled onclick="chargeCustomer()">
                         💳 Charge Customer
                     </button>
-                    <button class="charge-button quote-button" onclick="generateQuote()">
+                    <button class="charge-button quote-button" onclick="window.adminApp.generateQuote()">
                         📄 Generate Quote
                     </button>
                 </div>
