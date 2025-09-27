@@ -636,6 +636,12 @@ select:focus-visible {
     outline-offset: 2px;
 }
 
+/* Admin Tool Button Hover Effects */
+.admin-tool-btn:hover {
+    transform: translateY(-5px) scale(1.05) !important;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2) !important;
+}
+
 /* Loading state for buttons */
 .charge-button.loading {
     position: relative;
