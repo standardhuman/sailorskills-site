@@ -575,6 +575,31 @@ body {
     transition: all 0.1s ease;
 }
 
+/* Service-specific colors */
+.service-recurring {
+    background: linear-gradient(135deg, #5B3A99 0%, #6B4A9E 100%);
+}
+
+.service-onetime {
+    background: linear-gradient(135deg, #1E5F8E 0%, #2471A3 100%);
+}
+
+.service-inspection {
+    background: linear-gradient(135deg, #0E7BA7 0%, #138FB5 100%);
+}
+
+.service-recovery {
+    background: linear-gradient(135deg, #C73E79 0%, #D84361 100%);
+}
+
+.service-propeller {
+    background: linear-gradient(135deg, #D68910 0%, #E59E1B 100%);
+}
+
+.service-anodes {
+    background: linear-gradient(135deg, #C0392B 0%, #E74C3C 100%);
+}
+
 /* Service-specific hover brightness adjustments */
 .simple-service-btn:hover::after {
     content: '';
