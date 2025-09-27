@@ -48,10 +48,13 @@ nav {
     cursor: pointer;
     transition: all 0.3s;
     font-size: 14px;
+    text-decoration: none;
+    display: inline-block;
 }
 
 .nav-btn:hover {
     background: rgba(255, 255, 255, 0.2);
+    color: white;
 }
 
 .nav-btn.active {
