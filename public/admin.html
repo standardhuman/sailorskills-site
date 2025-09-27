@@ -1475,29 +1475,6 @@
             </div>
         </div>
 
-        <!-- Customer Selector Section -->
-        <div class="customer-section">
-            <h2 style="margin-bottom: 15px;">Select Customer</h2>
-            <div class="customer-controls" style="margin-bottom: 15px;">
-                <input type="text"
-                       id="customerSearch"
-                       class="customer-search-input"
-                       placeholder="Search by name, email, or boat name..."
-                       style="width: 100%; box-sizing: border-box;">
-                <div style="display: flex; gap: 8px; justify-content: flex-start;">
-                    <button onclick="searchCustomers()" class="customer-btn">Search</button>
-                    <button onclick="loadRecentCustomers()" class="customer-btn">Show Recent</button>
-                    <button onclick="showCreateCustomerForm()" class="customer-btn" style="background-color: #27ae60;">+ New Customer</button>
-                </div>
-            </div>
-            <div id="customerList" class="customer-list" style="display: none;">
-                <div class="no-customers">Loading customers...</div>
-            </div>
-            <div id="selectedCustomer" class="selected-customer-display">
-                <strong>Selected Customer:</strong> 
-                <span id="selectedCustomerInfo"></span>
-            </div>
-        </div>
 
         <!-- Service Selection -->
         <div class="service-selector">
@@ -2361,9 +2338,32 @@
         <!-- Charge Summary Section -->
         <div class="charge-summary">
             <h3>💳 Charge Summary</h3>
+
+            <!-- Customer Selection (moved here) -->
+            <div class="customer-controls" style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50;">Customer:</label>
+                <input type="text"
+                       id="customerSearch"
+                       class="customer-search-input"
+                       placeholder="Search by name, email, or boat name..."
+                       style="width: 100%; box-sizing: border-box; margin-bottom: 10px;">
+                <div style="display: flex; gap: 8px; justify-content: flex-start; flex-wrap: wrap;">
+                    <button onclick="searchCustomers()" class="customer-btn" style="flex: 1; min-width: 80px;">🔍 Search</button>
+                    <button onclick="loadRecentCustomers()" class="customer-btn" style="flex: 1; min-width: 100px;">📋 Recent</button>
+                    <button onclick="showCreateCustomerForm()" class="customer-btn" style="background-color: #27ae60; flex: 1; min-width: 100px;">➕ New</button>
+                </div>
+                <div id="customerList" class="customer-list" style="display: none; margin-top: 10px; max-height: 200px; overflow-y: auto;">
+                    <div class="no-customers">Loading customers...</div>
+                </div>
+                <div id="selectedCustomer" class="selected-customer-display" style="margin-top: 10px;">
+                    <strong>Selected:</strong>
+                    <span id="selectedCustomerInfo" style="color: #e74c3c;">None</span>
+                </div>
+            </div>
+
             <div class="charge-details" id="chargeDetails">
                 <div style="text-align: center; color: #7f8c8d;">
-                    Select a customer and configure service details
+                    Configure service details above
                 </div>
             </div>
             <div class="button-group">
@@ -2558,6 +2558,9 @@
 
             let selectedCustomer = null;
             let customers = [];
+
+            // Make selectedCustomer globally accessible for updateChargeSummary
+            window.selectedCustomer = selectedCustomer;
 
             console.log('Variables declared successfully');
 
@@ -2963,7 +2966,8 @@
         // Select a customer
         function selectCustomer(customerId, event) {
             selectedCustomer = customers.find(c => c.id === customerId);
-            
+            window.selectedCustomer = selectedCustomer; // Update global reference
+
             if (!selectedCustomer) return;
             
             // Update UI
@@ -3869,21 +3873,21 @@
             let detailsHTML = '';
 
             // Show customer info if selected, otherwise show placeholder
-            if (selectedCustomer) {
+            if (window.selectedCustomer) {
                 detailsHTML = `
                     <div class="charge-detail-row">
                         <span>Customer:</span>
-                        <span>${selectedCustomer.name || 'Unnamed'}</span>
+                        <span>${window.selectedCustomer.name || 'Unnamed'}</span>
                     </div>
                     <div class="charge-detail-row">
                         <span>Email:</span>
-                        <span>${selectedCustomer.email}</span>
+                        <span>${window.selectedCustomer.email}</span>
                     </div>
                     <div class="charge-detail-row">
                         <span>Payment Method:</span>
-                        <span style="color: ${selectedCustomer.payment_method ? '#27ae60' : '#e74c3c'}">
-                            ${selectedCustomer.payment_method ?
-                                `Card ending in ${selectedCustomer.payment_method.card.last4}` :
+                        <span style="color: ${window.selectedCustomer.payment_method ? '#27ae60' : '#e74c3c'}">
+                            ${window.selectedCustomer.payment_method ?
+                                `Card ending in ${window.selectedCustomer.payment_method.card.last4}` :
                                 'No card on file'}
                         </span>
                     </div>
@@ -4019,14 +4023,36 @@
             button.classList.add('processing');
             button.disabled = true;
 
-            // Get price from the editable amount field if it exists, otherwise from totalCostDisplay
+            // Get price from the editable amount field if it exists, otherwise calculate total with anodes
             const editableAmountEl = document.getElementById('editableAmount');
             let price;
             if (editableAmountEl) {
                 price = parseFloat(editableAmountEl.value) || 0;
             } else {
+                // Get base service price
                 const totalElement = document.getElementById('totalCostDisplay');
-                price = totalElement ? parseFloat(totalElement.textContent.replace('$', '').replace(',', '')) : 0;
+                const servicePrice = totalElement ? parseFloat(totalElement.textContent.replace('$', '').replace(',', '')) : 0;
+
+                // Calculate anode costs if any
+                let anodeTotalPrice = 0;
+                const anodeItems = Object.values(window.anodeCart || {});
+                if (anodeItems.length > 0) {
+                    const taxRate = parseFloat(document.getElementById('taxRate')?.value || 10.75) / 100;
+                    const markupRate = parseFloat(document.getElementById('markupRate')?.value || 20) / 100;
+                    const laborCharge = parseFloat(document.getElementById('laborCharge')?.value || 15);
+
+                    const anodeSubtotal = anodeItems.reduce((sum, item) => sum + (item.list_price * item.quantity), 0);
+                    const totalAnodeCount = anodeItems.reduce((sum, item) => sum + item.quantity, 0);
+                    const anodeLaborTotal = totalAnodeCount * laborCharge;
+                    const anodeSubtotalWithLabor = anodeSubtotal + anodeLaborTotal;
+                    const anodeMarkup = anodeSubtotalWithLabor * markupRate;
+                    const anodeSubtotalWithMarkup = anodeSubtotalWithLabor + anodeMarkup;
+                    const anodeTax = anodeSubtotalWithMarkup * taxRate;
+                    anodeTotalPrice = anodeSubtotalWithMarkup + anodeTax;
+                }
+
+                // Total price includes service + anodes
+                price = servicePrice + anodeTotalPrice;
             }
             
             // Get selected service key and details
@@ -4098,9 +4124,29 @@
                 }
             }
             
+            // Add anode details to metadata if present
+            const anodeItems = Object.values(window.anodeCart || {});
+            if (anodeItems.length > 0) {
+                const totalAnodeCount = anodeItems.reduce((sum, item) => sum + item.quantity, 0);
+                metadata.anodes_included = true;
+                metadata.anode_count = totalAnodeCount;
+                metadata.anode_details = anodeItems.map(item => ({
+                    id: item.id,
+                    name: item.name,
+                    quantity: item.quantity,
+                    unit_price: item.list_price
+                }));
+            }
+
             // Build detailed description for Stripe transaction
             let description = serviceName || service.replace(/_/g, ' ');
-            
+
+            // Add anode information to description
+            if (anodeItems.length > 0) {
+                const totalAnodeCount = anodeItems.reduce((sum, item) => sum + item.quantity, 0);
+                description += ` + ${totalAnodeCount} Anode${totalAnodeCount !== 1 ? 's' : ''}`;
+            }
+
             // Add boat details to description
             if (boatName) {
                 description = `${description} - ${boatName}`;
@@ -4108,7 +4154,7 @@
             if (!isFlatRateService && boatLength) {
                 description += ` (${boatLength}ft)`;
             }
-            
+
             // Add service date
             description += ` - ${new Date().toLocaleDateString()}`;
 
