@@ -323,21 +323,26 @@
                 <h2 id="modal-product-name"></h2>
                 <div class="modal-body">
                     <img id="modal-product-image" src="" alt="Product Image">
-                    <div class="product-details">
-                        <p><strong>SKU:</strong> <span id="modal-sku"></span></p>
-                        <p><strong>Boatzincs ID:</strong> <span id="modal-boatzincs-id"></span></p>
-                        <p><strong>Category:</strong> <span id="modal-category"></span></p>
-                        <p><strong>Material:</strong> <span id="modal-material"></span></p>
-                        <p><strong>List Price:</strong> $<span id="modal-list-price"></span></p>
-                        <p><strong>Sale Price:</strong> $<span id="modal-sale-price"></span></p>
-                        <p><strong>Stock Status:</strong> <span id="modal-stock-status"></span></p>
-                        <p><strong>Description:</strong> <span id="modal-description"></span></p>
-                        <p><strong>Last Updated:</strong> <span id="modal-last-updated"></span></p>
-                    </div>
-                    <div class="modal-actions">
-                        <button class="btn btn-primary" onclick="anodeManager.addToInventory()">Add to Inventory</button>
-                        <button class="btn btn-secondary" onclick="anodeManager.viewOnBoatzincs()">View on Boatzincs</button>
-                        <button class="btn btn-secondary" onclick="anodeManager.updatePrice()">Update Price</button>
+                    <div class="product-details-wrapper">
+                        <div class="product-details">
+                            <p><strong>SKU:</strong> <span id="modal-sku"></span></p>
+                            <p><strong>Boatzincs ID:</strong> <span id="modal-boatzincs-id"></span></p>
+                            <p><strong>Category:</strong> <span id="modal-category"></span></p>
+                            <p><strong>Material:</strong> <span id="modal-material"></span></p>
+                            <p><strong>List Price:</strong> <span>$<span id="modal-list-price"></span></span></p>
+                            <p><strong>Sale Price:</strong> <span>$<span id="modal-sale-price"></span></span></p>
+                            <p><strong>Stock Status:</strong> <span id="modal-stock-status"></span></p>
+                            <p><strong>Last Updated:</strong> <span id="modal-last-updated"></span></p>
+                        </div>
+                        <div class="product-description-row">
+                            <strong>Description:</strong>
+                            <div id="modal-description"></div>
+                        </div>
+                        <div class="modal-actions">
+                            <button class="btn btn-primary" onclick="anodeManager.addToInventory()">Add to Inventory</button>
+                            <button class="btn btn-secondary" onclick="anodeManager.viewOnBoatzincs()">View on Boatzincs</button>
+                            <button class="btn btn-secondary" onclick="anodeManager.updatePrice()">Update Price</button>
+                        </div>
                     </div>
                 </div>
             </div>
