@@ -208,7 +208,7 @@
                     <input type="number" id="editableAmount" class="amount-input" step="0.01" min="0"
                            style="width: 150px; padding: 10px; font-size: 18px; margin-right: 10px;"
                            onchange="updateChargeButton()">
-                    <button id="chargeButton" class="charge-button" onclick="chargeCustomer()" disabled>
+                    <button id="pricingChargeButton" class="charge-button" onclick="chargeCustomer()" disabled>
                         💳 Charge Customer
                     </button>
                 </div>
@@ -313,6 +313,15 @@
 
         // Initialize admin app
         window.adminApp = new AdminApp();
+
+        // Make sure functions are globally available
+        window.updatePricing = window.updatePricing || function() {
+            console.log('updatePricing called');
+        };
+
+        window.updateChargeSummary = window.updateChargeSummary || function() {
+            console.log('updateChargeSummary called');
+        };
 
         // Initialize service selection
         window.selectServiceDirect = function(serviceKey) {
