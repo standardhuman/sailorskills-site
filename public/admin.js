@@ -1061,6 +1061,13 @@ export class AdminApp {
         const anodeData = JSON.parse(atob(button.dataset.anode));
         const change = parseInt(button.dataset.change);
         this.updateAnodeQuantity(anodeData.id, change, anodeData.price, anodeData.name);
+
+        // Update the quantity display immediately
+        const quantitySpan = button.parentElement.querySelector('.quantity');
+        if (quantitySpan) {
+            const currentQuantity = this.selectedAnodes[anodeData.id]?.quantity || 0;
+            quantitySpan.textContent = currentQuantity;
+        }
     }
 
     updateAnodeQuantity(sku, change, price, name) {
