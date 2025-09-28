@@ -341,8 +341,8 @@ const renderConsolidatedForm = function(isCleaningService, serviceKey) {
 
             <div class="anode-selector">
                 <div class="anode-categories" style="margin-top: 15px;">
-                    <button type="button" class="category-btn active" onclick="if(window.adminApp) adminApp.filterByCategory('none')">None</button>
-                    <button type="button" class="category-btn" onclick="if(window.adminApp) adminApp.filterByCategory('all')">All</button>
+                    <button type="button" class="category-btn" onclick="if(window.adminApp) adminApp.filterByCategory('none')">None</button>
+                    <button type="button" class="category-btn active" onclick="if(window.adminApp) adminApp.filterByCategory('all')">All</button>
                     <button type="button" class="category-btn" onclick="if(window.adminApp) adminApp.filterByCategory('shaft')">Shaft</button>
                     <button type="button" class="category-btn" onclick="if(window.adminApp) adminApp.filterByCategory('propeller')">Prop</button>
                     <button type="button" class="category-btn" onclick="if(window.adminApp) adminApp.filterByCategory('hull')">Hull</button>
@@ -368,7 +368,7 @@ const renderConsolidatedForm = function(isCleaningService, serviceKey) {
                     <button type="button" class="subfilter-btn" onclick="if(window.adminApp) adminApp.filterShaftType('metric')">Metric</button>
                 </div>
 
-                <div id="anodeGrid" class="anode-grid" style="display: none; max-height: 400px; overflow-y: auto; margin-top: 15px; border: 1px solid #ddd; border-radius: 8px; padding: 15px;">
+                <div id="anodeGrid" class="anode-grid" style="display: grid; max-height: 400px; overflow-y: auto; margin-top: 15px; border: 1px solid #ddd; border-radius: 8px; padding: 15px;">
                     <!-- Anodes will be populated here -->
                     <p style="color: #999;">Select a category above to view anodes</p>
                 </div>

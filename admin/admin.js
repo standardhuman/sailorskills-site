@@ -888,7 +888,19 @@ export class AdminApp {
     displayAnodes(category = 'all', searchTerm = '') {
         if (!this.anodeCatalog) return;
 
-        const grid = document.getElementById('anodeGrid');
+        // Get the visible anode grid (there may be multiple)
+        const grids = document.querySelectorAll('#anodeGrid');
+        let grid = null;
+        for (let g of grids) {
+            if (g.offsetParent !== null) { // Check if element is visible
+                grid = g;
+                break;
+            }
+        }
+        if (!grid && grids.length > 0) {
+            grid = grids[0]; // Fallback to first grid
+        }
+        if (!grid) return;
         let filtered = this.anodeCatalog;
 
         // Filter out polishing strips and free items
@@ -951,7 +963,7 @@ export class AdminApp {
                     <div class="anode-price">$${price.toFixed(2)}</div>
                     <div class="anode-controls">
                         <button data-anode="${dataAttr}" data-change="-1" onclick="adminApp.handleAnodeClick(this)">−</button>
-                        <span class="quantity" id="qty-${anode.id}">${quantity}</span>
+                        <span class="quantity" id="qty-${anodeId}">${quantity}</span>
                         <button data-anode="${dataAttr}" data-change="1" onclick="adminApp.handleAnodeClick(this)">+</button>
                     </div>
                 </div>
@@ -1036,7 +1048,7 @@ export class AdminApp {
         }
 
         // Show elements for other categories
-        if (anodeGrid) anodeGrid.style.display = 'block';
+        if (anodeGrid) anodeGrid.style.display = 'grid';
         if (materialFilter) materialFilter.style.display = 'flex';
         if (anodeSearchField) anodeSearchField.style.display = 'block';
 
@@ -1088,7 +1100,19 @@ export class AdminApp {
     displayAnodesWithShaftType(shaftType, searchTerm = '') {
         if (!this.anodeCatalog) return;
 
-        const grid = document.getElementById('anodeGrid');
+        // Get the visible anode grid (there may be multiple)
+        const grids = document.querySelectorAll('#anodeGrid');
+        let grid = null;
+        for (let g of grids) {
+            if (g.offsetParent !== null) { // Check if element is visible
+                grid = g;
+                break;
+            }
+        }
+        if (!grid && grids.length > 0) {
+            grid = grids[0]; // Fallback to first grid
+        }
+        if (!grid) return;
         let filtered = this.anodeCatalog;
 
         // Filter out polishing strips and free items
@@ -1156,7 +1180,7 @@ export class AdminApp {
                     <div class="anode-price">$${price.toFixed(2)}</div>
                     <div class="anode-controls">
                         <button data-anode="${dataAttr}" data-change="-1" onclick="adminApp.handleAnodeClick(this)">−</button>
-                        <span class="quantity" id="qty-${anode.id}">${quantity}</span>
+                        <span class="quantity" id="qty-${anodeId}">${quantity}</span>
                         <button data-anode="${dataAttr}" data-change="1" onclick="adminApp.handleAnodeClick(this)">+</button>
                     </div>
                 </div>
@@ -1213,8 +1237,9 @@ export class AdminApp {
         const countEl = document.getElementById('selectedCount');
         const subtotalEl = document.getElementById('anodeSubtotal');
 
-        // If elements don't exist, we're not in anode selection mode
-        if (!list || !countEl || !subtotalEl) {
+        // If essential elements don't exist, we're not in anode selection mode
+        // Note: subtotalEl is optional (doesn't exist in wizard)
+        if (!list || !countEl) {
             return;
         }
 
@@ -1239,7 +1264,9 @@ export class AdminApp {
         }
 
         countEl.textContent = totalCount;
-        subtotalEl.textContent = totalPrice.toFixed(2);
+        if (subtotalEl) {
+            subtotalEl.textContent = totalPrice.toFixed(2);
+        }
 
         // Update charge summary if in service mode
         if (this.currentServiceKey) {
