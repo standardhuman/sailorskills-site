@@ -880,7 +880,7 @@ window.updateWizardPricing = function() {
         if (window.selectedCustomer) {
             summaryHTML += `
                 <div class="charge-detail-row">
-                    <span>Customer:</span>
+                    <span><strong>Customer:</strong></span>
                     <span>${window.selectedCustomer.name || window.selectedCustomer.email}</span>
                 </div>`;
         }
@@ -888,12 +888,120 @@ window.updateWizardPricing = function() {
         // Add service info
         summaryHTML += `
             <div class="charge-detail-row">
-                <span>Service:</span>
+                <span><strong>Service:</strong></span>
                 <span>${service.name}</span>
             </div>`;
 
-        // Add detailed breakdown
+        // Add boat details section
         summaryHTML += '<div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #ddd;">';
+        summaryHTML += '<h4 style="margin: 0 0 10px 0; color: #2c3e50;">Boat Details</h4>';
+
+        // Add boat name if available
+        const boatName = document.getElementById('boatName')?.value || document.getElementById('wizardBoatName')?.value;
+        if (boatName) {
+            summaryHTML += `
+                <div class="charge-detail-row" style="font-size: 14px; margin: 5px 0;">
+                    <span>Boat Name:</span>
+                    <span>${boatName}</span>
+                </div>`;
+        }
+
+        // Add boat length
+        if (boatLength > 0) {
+            summaryHTML += `
+                <div class="charge-detail-row" style="font-size: 14px; margin: 5px 0;">
+                    <span>Boat Length:</span>
+                    <span>${boatLength} feet</span>
+                </div>`;
+        }
+
+        // Add boat type
+        const boatType = document.querySelector('input[name="wizard_boat_type"]:checked')?.value ||
+                        document.querySelector('input[name="boat_type"]:checked')?.value || 'sailboat';
+        summaryHTML += `
+            <div class="charge-detail-row" style="font-size: 14px; margin: 5px 0;">
+                <span>Boat Type:</span>
+                <span>${boatType === 'powerboat' ? 'Powerboat' : 'Sailboat'}</span>
+            </div>`;
+
+        // Add hull type
+        const hullType = document.querySelector('input[name="wizard_hull_type"]:checked')?.value ||
+                        document.querySelector('input[name="hull_type"]:checked')?.value || 'monohull';
+        const hullTypeDisplay = hullType === 'catamaran' ? 'Catamaran' :
+                                hullType === 'trimaran' ? 'Trimaran' : 'Monohull';
+        summaryHTML += `
+            <div class="charge-detail-row" style="font-size: 14px; margin: 5px 0;">
+                <span>Hull Type:</span>
+                <span>${hullTypeDisplay}</span>
+            </div>`;
+
+        // Add twin engines status
+        const twinEngines = document.getElementById('wizard_twin_engines')?.checked ||
+                           document.getElementById('has_twin_engines')?.checked;
+        if (twinEngines) {
+            summaryHTML += `
+                <div class="charge-detail-row" style="font-size: 14px; margin: 5px 0;">
+                    <span>Twin Engines:</span>
+                    <span>Yes</span>
+                </div>`;
+        }
+
+        // Add condition details for cleaning services
+        if (serviceKey === 'recurring_cleaning' || serviceKey === 'onetime_cleaning') {
+            // Add paint condition
+            const paintCondition = document.getElementById('wizardPaintCondition')?.value ||
+                                  document.getElementById('paint_condition')?.value || 'good';
+            summaryHTML += `
+                <div class="charge-detail-row" style="font-size: 14px; margin: 5px 0;">
+                    <span>Paint Condition:</span>
+                    <span>${paintCondition.charAt(0).toUpperCase() + paintCondition.slice(1)}</span>
+                </div>`;
+
+            // Add growth level
+            const growthLevel = document.getElementById('wizardGrowthLevel')?.value ||
+                               document.getElementById('growth_level')?.value || 'minimal';
+            const growthDisplay = growthLevel.split('-').map(word =>
+                word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+            summaryHTML += `
+                <div class="charge-detail-row" style="font-size: 14px; margin: 5px 0;">
+                    <span>Growth Level:</span>
+                    <span>${growthDisplay}</span>
+                </div>`;
+        }
+
+        // Add anode information if any are selected
+        if (window.adminApp && window.adminApp.selectedAnodes && window.adminApp.selectedAnodes.size > 0) {
+            summaryHTML += '<div style="margin-top: 10px;">';
+            summaryHTML += '<h5 style="margin: 10px 0 5px 0; color: #2c3e50;">Anodes Selected</h5>';
+            let totalAnodes = 0;
+            let anodeDetails = [];
+            window.adminApp.selectedAnodes.forEach((quantity, anodeId) => {
+                if (quantity > 0) {
+                    const anode = window.adminApp.anodes.find(a => a.id === anodeId);
+                    if (anode) {
+                        anodeDetails.push(`${quantity}x ${anode.name} (${anode.material})`);
+                        totalAnodes += quantity;
+                    }
+                }
+            });
+            if (anodeDetails.length > 0) {
+                summaryHTML += `
+                    <div class="charge-detail-row" style="font-size: 14px; margin: 5px 0;">
+                        <span>Total Anodes:</span>
+                        <span>${totalAnodes} anodes</span>
+                    </div>`;
+                summaryHTML += `
+                    <div class="charge-detail-row" style="font-size: 12px; margin: 5px 0; color: #666;">
+                        <span style="display: block;">${anodeDetails.join(', ')}</span>
+                    </div>`;
+            }
+            summaryHTML += '</div>';
+        }
+        summaryHTML += '</div>';
+
+        // Add pricing breakdown section
+        summaryHTML += '<div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #ddd;">';
+        summaryHTML += '<h4 style="margin: 0 0 10px 0; color: #2c3e50;">Pricing Breakdown</h4>';
         summaryHTML += breakdown.map(line => `<div class="charge-detail-row" style="font-size: 14px; margin: 5px 0;">${line}</div>`).join('');
         summaryHTML += '</div>';
 
