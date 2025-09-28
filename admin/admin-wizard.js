@@ -1052,10 +1052,10 @@ window.updateWizardPricing = function() {
         summaryHTML += '</div>';
         chargeSummaryContent.innerHTML = summaryHTML;
 
-        // Enable/disable charge button based on selections
+        // Keep charge button enabled - it will open customer dialog if needed
         const chargeButton = document.getElementById('chargeButton');
         if (chargeButton) {
-            chargeButton.disabled = !window.selectedCustomer || !window.selectedCustomer.payment_method || !serviceKey;
+            chargeButton.disabled = false;  // Always enabled, will prompt for customer if needed
         }
 
         // Disabled auto-scroll to prevent unwanted scrolling when interacting with wizard

@@ -1542,8 +1542,8 @@ export class AdminApp {
             summaryContent.innerHTML = '<div style="text-align: center; color: #7f8c8d;">Select a customer and configure service details</div>';
         }
 
-        // Enable button if service is selected (customer can be selected later)
-        chargeButton.disabled = !this.currentServiceKey || price === 0;
+        // Keep button enabled - it will open customer dialog if needed
+        chargeButton.disabled = false;
 
         // Update button text
         if (price > 0) {
@@ -1599,7 +1599,9 @@ export class AdminApp {
 
         // If customer has no payment method
         if (!this.selectedCustomer.payment_method) {
-            alert('Please add a payment method for this customer');
+            if (confirm('This customer needs a payment method. Would you like to add one now?')) {
+                this.showPaymentMethodForm(this.selectedCustomer.stripe_customer_id);
+            }
             return;
         }
 
@@ -1746,9 +1748,26 @@ export class AdminApp {
 
             if (customer) {
                 this.selectedCustomer = customer;
+
+                // Update wizard fields with customer data
+                if (document.getElementById('wizardCustomerName')) {
+                    document.getElementById('wizardCustomerName').value = customer.name || '';
+                    document.getElementById('wizardCustomerEmail').value = customer.email || '';
+                    document.getElementById('wizardCustomerPhone').value = customer.phone || '';
+                    window.selectedWizardCustomer = customer;
+                }
+
                 this.closeCustomerModal();
-                // Continue with charge
-                this.chargeCustomer();
+
+                // Check if customer needs payment method
+                if (!customer.payment_method) {
+                    if (confirm('This customer needs a payment method. Would you like to add one now?')) {
+                        this.showPaymentMethodForm(customer.stripe_customer_id);
+                    }
+                } else {
+                    // Continue with charge
+                    this.chargeCustomer();
+                }
             }
         } catch (error) {
             console.error('Error processing customer info:', error);

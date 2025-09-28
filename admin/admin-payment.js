@@ -8,6 +8,12 @@ let cardElement = null;
 
 // Charge the customer
 async function chargeCustomer() {
+    // Delegate to adminApp's chargeCustomer which has the new logic
+    if (window.adminApp && window.adminApp.chargeCustomer) {
+        return window.adminApp.chargeCustomer();
+    }
+
+    // Fallback to old logic if adminApp not available
     // Check if a service is configured
     const service = window.currentServiceKey;
     if (!service) {
@@ -15,9 +21,14 @@ async function chargeCustomer() {
         return;
     }
 
-    // If no customer selected, show the modal
+    // Always show the modal for customer selection/creation
+    // This allows searching existing customers or creating new ones
     if (!window.selectedCustomer) {
-        openCustomerSelectionModal();
+        if (window.adminApp && window.adminApp.openCustomerModal) {
+            window.adminApp.openCustomerModal();
+        } else {
+            openCustomerSelectionModal();
+        }
         return;
     }
 
