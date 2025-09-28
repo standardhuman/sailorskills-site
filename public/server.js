@@ -23,13 +23,16 @@ try {
 // Serve static files
 app.use(express.static(__dirname));
 
+// Serve admin directory files
+app.use('/admin', express.static(path.join(__dirname, '..', 'admin')));
+
 // URL rewriting - serve HTML files without extension
 app.get('/diving', (req, res) => {
     res.sendFile(path.join(__dirname, 'diving.html'));
 });
 
 app.get(['/admin', '/admin/'], (req, res) => {
-    res.sendFile(path.join(__dirname, 'admin-new.html'));
+    res.sendFile(path.join(__dirname, '..', 'admin', 'admin.html'));
 });
 
 app.get('/booking', (req, res) => {

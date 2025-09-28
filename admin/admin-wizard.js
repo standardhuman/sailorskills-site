@@ -283,7 +283,7 @@ const renderConsolidatedForm = function(isCleaningService, serviceKey) {
     if (isAnodesOnly) {
         formHTML += `
             <div class="form-section" style="text-align: center; margin-top: 20px;">
-                <button onclick="toggleAnodeSection()" class="customer-btn" style="background-color: #e67e22; font-size: 16px; padding: 12px 24px;">
+                <button type="button" onclick="toggleAnodeSection()" class="customer-btn" style="background-color: #e67e22; font-size: 16px; padding: 12px 24px;">
                     ⚓ Select Anodes
                 </button>
                 <p style="margin-top: 10px; color: #666; font-size: 14px;">
@@ -294,7 +294,7 @@ const renderConsolidatedForm = function(isCleaningService, serviceKey) {
     } else {
         formHTML += `
             <div class="form-section" style="text-align: center; margin-top: 20px;">
-                <button onclick="toggleAnodeSection()" class="customer-btn" style="background-color: #e67e22; font-size: 16px; padding: 12px 24px;">
+                <button type="button" onclick="toggleAnodeSection()" class="customer-btn" style="background-color: #e67e22; font-size: 16px; padding: 12px 24px;">
                     ⚓ Add Anodes to Service
                 </button>
                 <p style="margin-top: 10px; color: #666; font-size: 14px;">
@@ -303,6 +303,56 @@ const renderConsolidatedForm = function(isCleaningService, serviceKey) {
             </div>
         `;
     }
+
+    // Add the anode selection section (hidden by default except for anodes_only)
+    formHTML += `
+        <div id="anodeSection" class="form-section" style="display: ${isAnodesOnly ? 'block' : 'none'}; margin-top: 20px; background: #f8f9fa; border: 2px solid #e67e22;">
+            <h3 style="color: #e67e22;">⚓ Select Zinc Anodes</h3>
+
+            <div class="anode-selector">
+                <div class="wizard-field">
+                    <input type="text" id="anodeSearch" class="search-input"
+                           placeholder="Search by size or type..."
+                           oninput="if(window.adminApp) adminApp.filterAnodes(this.value)">
+                </div>
+
+                <div class="anode-categories" style="margin-top: 15px;">
+                    <button type="button" class="category-btn active" onclick="if(window.adminApp) adminApp.filterByCategory('all')">All</button>
+                    <button type="button" class="category-btn" onclick="if(window.adminApp) adminApp.filterByCategory('shaft')">Shaft</button>
+                    <button type="button" class="category-btn" onclick="if(window.adminApp) adminApp.filterByCategory('propeller')">Prop</button>
+                    <button type="button" class="category-btn" onclick="if(window.adminApp) adminApp.filterByCategory('hull')">Hull</button>
+                    <button type="button" class="category-btn" onclick="if(window.adminApp) adminApp.filterByCategory('engine')">Engine</button>
+                </div>
+
+                <div id="materialFilter" class="material-filter" style="margin-top: 10px;">
+                    <button type="button" class="material-btn active" onclick="if(window.adminApp) adminApp.filterByMaterial('all')">All</button>
+                    <button type="button" class="material-btn" onclick="if(window.adminApp) adminApp.filterByMaterial('zinc')">Zinc</button>
+                    <button type="button" class="material-btn" onclick="if(window.adminApp) adminApp.filterByMaterial('magnesium')">Mag</button>
+                    <button type="button" class="material-btn" onclick="if(window.adminApp) adminApp.filterByMaterial('aluminum')">Alum</button>
+                </div>
+
+                <div id="shaftSubfilter" class="shaft-subfilter" style="display: none; margin-top: 10px;">
+                    <button type="button" class="subfilter-btn active" onclick="if(window.adminApp) adminApp.filterShaftType('all')">All</button>
+                    <button type="button" class="subfilter-btn" onclick="if(window.adminApp) adminApp.filterShaftType('standard')">Standard</button>
+                    <button type="button" class="subfilter-btn" onclick="if(window.adminApp) adminApp.filterShaftType('metric')">Metric</button>
+                </div>
+
+                <div id="anodeGrid" class="anode-grid" style="max-height: 400px; overflow-y: auto; margin-top: 15px; border: 1px solid #ddd; border-radius: 8px; padding: 15px;">
+                    <!-- Anodes will be populated here -->
+                    <p style="color: #999;">Loading anodes...</p>
+                </div>
+            </div>
+
+            <div class="selected-anodes" style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #e0e0e0;">
+                <h4>Selected Anodes: <span id="selectedCount">0</span></h4>
+                <div id="selectedAnodesList"></div>
+                <div class="anode-total" style="margin-top: 15px; padding: 15px; background: #fff3cd; border-radius: 8px;">
+                    <strong>Anodes Subtotal: $<span id="anodeSubtotal">0.00</span></strong>
+                    <br><small>Labor: $15 per anode</small>
+                </div>
+            </div>
+        </div>
+    `;
 
     // Add pricing display section in the wizard
     formHTML += `
@@ -439,6 +489,20 @@ const renderConsolidatedForm = function(isCleaningService, serviceKey) {
         if (window.adminApp && serviceKey) {
             window.adminApp.currentServiceKey = serviceKey;
             console.log('Setting adminApp.currentServiceKey in renderConsolidatedForm to:', serviceKey);
+
+            // Load anode catalog if service needs it
+            if (serviceKey === 'recurring_cleaning' || serviceKey === 'onetime_cleaning' || serviceKey === 'anodes_only') {
+                console.log('Loading anode catalog for service:', serviceKey);
+                window.adminApp.loadAnodeCatalog();
+
+                // For anodes_only service, auto-open the anode section
+                if (serviceKey === 'anodes_only') {
+                    const anodeSection = document.getElementById('anodeSection');
+                    if (anodeSection) {
+                        anodeSection.style.display = 'block';
+                    }
+                }
+            }
         }
 
         console.log('Initial calculation on wizard load');
