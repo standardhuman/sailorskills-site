@@ -356,19 +356,7 @@ const renderConsolidatedForm = function(isCleaningService, serviceKey) {
         </div>
     `;
 
-    // Add pricing display section in the wizard
-    formHTML += `
-        <div class="form-section" id="wizardPricingSection" style="background: #e8f4f8; border: 2px solid #3498db;">
-            <h3 style="color: #2980b9;">💰 Price Estimate</h3>
-            <div id="wizardCostBreakdown" style="font-size: 16px; line-height: 1.6; color: #34495e;"></div>
-            <div style="margin-top: 15px; padding-top: 15px; border-top: 2px solid #3498db;">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span style="font-size: 20px; font-weight: bold; color: #2c3e50;">Total:</span>
-                    <span id="wizardTotalPrice" style="font-size: 24px; font-weight: bold; color: #27ae60;">$0.00</span>
-                </div>
-            </div>
-        </div>
-    `;
+    // Remove the Price Estimate section - it will be shown in the main Charge Summary instead
 
     formHTML += '</div>';
 
@@ -882,16 +870,60 @@ window.updateWizardPricing = function() {
         breakdown.push(`Minimum charge applied: $${minimumCharge}`);
     }
 
-    // Update wizard pricing display
-    const wizardCostBreakdown = document.getElementById('wizardCostBreakdown');
-    const wizardTotalPrice = document.getElementById('wizardTotalPrice');
+    // Update the main charge summary instead of wizard pricing section
+    const chargeSummaryContent = document.getElementById('chargeSummaryContent');
 
-    if (wizardCostBreakdown) {
-        wizardCostBreakdown.innerHTML = breakdown.join('<br>');
-    }
+    if (chargeSummaryContent) {
+        let summaryHTML = '<div class="charge-breakdown">';
 
-    if (wizardTotalPrice) {
-        wizardTotalPrice.textContent = `$${finalTotal.toFixed(2)}`;
+        // Add customer info if available
+        if (window.selectedCustomer) {
+            summaryHTML += `
+                <div class="charge-detail-row">
+                    <span>Customer:</span>
+                    <span>${window.selectedCustomer.name || window.selectedCustomer.email}</span>
+                </div>`;
+        }
+
+        // Add service info
+        summaryHTML += `
+            <div class="charge-detail-row">
+                <span>Service:</span>
+                <span>${service.name}</span>
+            </div>`;
+
+        // Add detailed breakdown
+        summaryHTML += '<div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #ddd;">';
+        summaryHTML += breakdown.map(line => `<div class="charge-detail-row" style="font-size: 14px; margin: 5px 0;">${line}</div>`).join('');
+        summaryHTML += '</div>';
+
+        // Add total with emphasis
+        summaryHTML += `
+            <div style="margin-top: 15px; padding-top: 15px; border-top: 2px solid #3498db;">
+                <div class="charge-detail-row" style="font-size: 20px; font-weight: bold;">
+                    <span>Total:</span>
+                    <span style="color: #27ae60;">$${finalTotal.toFixed(2)}</span>
+                </div>
+            </div>`;
+
+        summaryHTML += '</div>';
+        chargeSummaryContent.innerHTML = summaryHTML;
+
+        // Enable/disable charge button based on selections
+        const chargeButton = document.getElementById('chargeButton');
+        if (chargeButton) {
+            chargeButton.disabled = !window.selectedCustomer || !window.selectedCustomer.payment_method || !serviceKey;
+        }
+
+        // Scroll to charge summary if not visible
+        const chargeSummarySection = document.querySelector('.charge-summary');
+        if (chargeSummarySection) {
+            const rect = chargeSummarySection.getBoundingClientRect();
+            const isVisible = rect.top >= 0 && rect.bottom <= window.innerHeight;
+            if (!isVisible) {
+                chargeSummarySection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
     }
 
     // CRITICAL: Update the hidden totalCost input that charge summary reads from
