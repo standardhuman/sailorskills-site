@@ -563,6 +563,16 @@ async function chargeAnodes() {
 
 // Update charge summary
 window.updateChargeSummary = function() {
+    // Check if updateWizardPricing exists and should handle the update for wizard services
+    if (window.updateWizardPricing &&
+        (window.currentServiceKey === 'recurring_cleaning' ||
+         window.currentServiceKey === 'onetime_cleaning' ||
+         window.currentServiceKey === 'anodes_only')) {
+        // Let updateWizardPricing handle the detailed summary
+        window.updateWizardPricing();
+        return;
+    }
+
     const summaryContent = document.getElementById('chargeSummaryContent');
     if (!summaryContent) return;
 
@@ -579,7 +589,7 @@ window.updateChargeSummary = function() {
         return;
     }
 
-    // Basic summary display
+    // Basic summary display for other services
     summaryContent.innerHTML = `
         <div class="charge-detail-row">
             <span>Service:</span>
