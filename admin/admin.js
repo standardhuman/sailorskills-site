@@ -867,8 +867,18 @@ export class AdminApp {
 
             const data = await response.json();
             this.anodeCatalog = data.anodes || data;
-            this.selectedAnodes = {};
+
+            // Only reset selectedAnodes if it doesn't exist
+            if (!this.selectedAnodes) {
+                this.selectedAnodes = {};
+            }
+
             this.displayAnodes();
+
+            // Force update of the selection display after catalog loads
+            setTimeout(() => {
+                this.updateAnodeSelection();
+            }, 100);
         } catch (error) {
             console.error('Failed to load anode catalog:', error);
             document.getElementById('anodeGrid').innerHTML = '<p>Failed to load anode catalog</p>';
@@ -1189,8 +1199,10 @@ export class AdminApp {
             qtyElement.textContent = this.selectedAnodes[sku]?.quantity || 0;
         }
 
-        // Update display
-        this.updateAnodeSelection();
+        // Update display - force it with a small delay to ensure DOM is ready
+        setTimeout(() => {
+            this.updateAnodeSelection();
+        }, 0);
 
         // Don't refresh the entire view - it resets the quantity displays
         // The quantity is already updated above directly in the DOM
@@ -1202,7 +1214,9 @@ export class AdminApp {
         const subtotalEl = document.getElementById('anodeSubtotal');
 
         // If elements don't exist, we're not in anode selection mode
-        if (!list || !countEl || !subtotalEl) return;
+        if (!list || !countEl || !subtotalEl) {
+            return;
+        }
 
         let totalCount = 0;
         let totalPrice = 0;

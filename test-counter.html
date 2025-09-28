@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Anode Counter Test</title>
+</head>
+<body>
+    <h1>Test Instructions for Selected Anodes Counter</h1>
+
+    <h2>Steps to Test:</h2>
+    <ol>
+        <li>Go to http://localhost:3000/admin/admin.html</li>
+        <li>Click "Recurring Cleaning" service</li>
+        <li>Select "Bi-Weekly" frequency</li>
+        <li>Click "Add Anodes to Service" button</li>
+        <li>Wait for anodes to load</li>
+        <li>Click the + button on any anode</li>
+        <li><strong>Check: "Selected Anodes: X" should update from 0 to 1</strong></li>
+        <li>Click + on another anode</li>
+        <li><strong>Check: Counter should now show 2</strong></li>
+    </ol>
+
+    <h2>Changes Made:</h2>
+    <ul>
+        <li>Added setTimeout to ensure DOM is ready before updating</li>
+        <li>Force update of selection after catalog loads</li>
+        <li>Don't reset selectedAnodes when loading catalog</li>
+        <li>Update selection display with minimal delay to ensure DOM readiness</li>
+    </ul>
+
+    <h2>What Should Happen:</h2>
+    <ul>
+        <li>✅ When you click + on an anode, the quantity in the button area updates immediately</li>
+        <li>✅ The "Selected Anodes: X" counter should also update immediately</li>
+        <li>✅ The anodes subtotal should update</li>
+        <li>✅ The selected anodes list should show the items</li>
+        <li>✅ The charge summary should update to show the anodes</li>
+    </ul>
+</body>
+</html>
