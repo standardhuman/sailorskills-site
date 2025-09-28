@@ -306,24 +306,32 @@
     <!-- External Scripts -->
     <script src="https://js.stripe.com/v3/"></script>
 
-    <!-- Load modules first -->
-    <script type="module">
-        // Import modules
-        import { AdminApp } from './admin.js';
-        import './admin-wizard.js';
-        import './admin-payment.js';
-
-        // Initialize admin app
-        window.adminApp = new AdminApp();
-
-        // Define selectServiceDirect after modules load
+    <!-- Define selectServiceDirect immediately for button handlers -->
+    <script>
         window.selectServiceDirect = function(serviceKey) {
             console.log('Service selected:', serviceKey);
             window.currentServiceKey = serviceKey;
 
-            // Update the adminApp's currentServiceKey
-            if (window.adminApp) {
-                window.adminApp.currentServiceKey = serviceKey;
+            // Function to update adminApp when it's ready
+            const updateAdminApp = () => {
+                if (window.adminApp) {
+                    window.adminApp.currentServiceKey = serviceKey;
+                    console.log('Set adminApp.currentServiceKey to:', serviceKey);
+
+                    // Also call selectService on adminApp to ensure proper initialization
+                    if (typeof window.adminApp.selectService === 'function') {
+                        window.adminApp.selectService(serviceKey);
+                    }
+                    return true;
+                }
+                return false;
+            };
+
+            // Try to update adminApp immediately
+            if (!updateAdminApp()) {
+                // If not ready, retry after a short delay
+                setTimeout(updateAdminApp, 100);
+                setTimeout(updateAdminApp, 500);
             }
 
             // Determine if it's a cleaning service
@@ -352,6 +360,17 @@
                 window.updateChargeSummary();
             }
         };
+    </script>
+
+    <!-- Load modules -->
+    <script type="module">
+        // Import modules
+        import { AdminApp } from './admin.js';
+        import './admin-wizard.js';
+        import './admin-payment.js';
+
+        // Initialize admin app
+        window.adminApp = new AdminApp();
 
         // Make sure functions are globally available
         window.updatePricing = window.updatePricing || function() {
@@ -411,7 +430,7 @@
     <!-- Hidden inputs for form data -->
     <input type="hidden" id="selectedCustomerId" value="">
     <input type="hidden" id="boatName" value="">
-    <input type="hidden" id="boatLength" value="">
+    <input type="hidden" id="boatLength" value="35">
     <input type="hidden" id="paintCondition" value="good">
     <input type="hidden" id="paint_condition" value="good">
     <input type="hidden" id="growthLevel" value="minimal">

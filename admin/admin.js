@@ -1275,7 +1275,8 @@ export class AdminApp {
         const totalElement = document.getElementById('totalCostDisplay') || document.getElementById('totalCost');
         let price = 0;
         if (totalElement) {
-            const priceText = totalElement.textContent || totalElement.value || '0';
+            // For input elements, check value first, then textContent
+            const priceText = totalElement.value || totalElement.textContent || '0';
             price = parseFloat(priceText.replace('$', '').replace(',', '')) || 0;
         }
 
