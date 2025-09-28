@@ -18,12 +18,13 @@ export class AdminApp {
         this.setupEventListeners();
 
         // Initialize service buttons
-        if (window.serviceData) {
-            this.populateAdminServiceButtons();
-        } else {
-            // Retry if script.js hasn't loaded yet
-            setTimeout(() => this.init(), 100);
-        }
+        // DISABLED: Using HTML buttons with selectServiceDirect instead
+        // if (window.serviceData) {
+        //     this.populateAdminServiceButtons();
+        // } else {
+        //     // Retry if script.js hasn't loaded yet
+        //     setTimeout(() => this.init(), 100);
+        // }
     }
 
     setupEventListeners() {

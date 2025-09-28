@@ -339,13 +339,17 @@
 
             // Call renderConsolidatedForm
             if (window.renderConsolidatedForm) {
+                console.log('Calling renderConsolidatedForm for', serviceKey, 'isCleaningService:', isCleaningService);
                 window.renderConsolidatedForm(isCleaningService, serviceKey);
             } else {
                 console.error('renderConsolidatedForm not available');
                 // Try to load it
                 setTimeout(() => {
                     if (window.renderConsolidatedForm) {
+                        console.log('Calling renderConsolidatedForm (delayed) for', serviceKey);
                         window.renderConsolidatedForm(isCleaningService, serviceKey);
+                    } else {
+                        console.error('renderConsolidatedForm still not available after delay');
                     }
                 }, 100);
             }
