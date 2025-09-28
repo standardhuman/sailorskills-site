@@ -305,8 +305,18 @@
 
     <!-- External Scripts -->
     <script src="https://js.stripe.com/v3/"></script>
-    <script>
-        // Define selectServiceDirect immediately for button onclick handlers
+
+    <!-- Load modules first -->
+    <script type="module">
+        // Import modules
+        import { AdminApp } from './admin.js';
+        import './admin-wizard.js';
+        import './admin-payment.js';
+
+        // Initialize admin app
+        window.adminApp = new AdminApp();
+
+        // Define selectServiceDirect after modules load
         window.selectServiceDirect = function(serviceKey) {
             console.log('Service selected:', serviceKey);
             window.currentServiceKey = serviceKey;
@@ -318,7 +328,13 @@
             if (window.renderConsolidatedForm) {
                 window.renderConsolidatedForm(isCleaningService, serviceKey);
             } else {
-                console.error('renderConsolidatedForm not yet loaded');
+                console.error('renderConsolidatedForm not available');
+                // Try to load it
+                setTimeout(() => {
+                    if (window.renderConsolidatedForm) {
+                        window.renderConsolidatedForm(isCleaningService, serviceKey);
+                    }
+                }, 100);
             }
 
             // Update pricing
@@ -331,15 +347,6 @@
                 window.updateChargeSummary();
             }
         };
-    </script>
-    <script src="script.js" type="module"></script>
-    <script type="module">
-        import { AdminApp } from './admin.js';
-        import './admin-wizard.js';
-        import './admin-payment.js';
-
-        // Initialize admin app
-        window.adminApp = new AdminApp();
 
         // Make sure functions are globally available
         window.updatePricing = window.updatePricing || function() {
@@ -369,6 +376,13 @@
                     navToggle.classList.toggle('active');
                 });
             }
+
+            // Log loaded functions for debugging
+            console.log('Functions loaded:', {
+                renderConsolidatedForm: typeof window.renderConsolidatedForm,
+                adminApp: typeof window.adminApp,
+                updateWizardPricing: typeof window.updateWizardPricing
+            });
         });
     </script>
 </body>
