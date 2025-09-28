@@ -128,41 +128,89 @@
 
         <!-- Customer Selection Modal -->
         <div id="customerSelectionModal" class="modal" style="display: none;">
-            <div class="modal-content">
-                <span class="close" onclick="closeCustomerSelectionModal()">&times;</span>
-                <h2>Select Customer</h2>
-                <div id="modalCustomerList" style="max-height: 400px; overflow-y: auto;">
-                    <!-- Customer list will be populated here -->
+            <div class="modal-content" style="max-width: 600px;">
+                <span class="close" onclick="window.adminApp.closeCustomerModal()">&times;</span>
+                <h2>Customer Information</h2>
+
+                <div style="margin-bottom: 20px;">
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label for="modalCustomerName" style="display: block; margin-bottom: 5px;">Name *</label>
+                        <div style="position: relative;">
+                            <input type="text"
+                                   id="modalCustomerName"
+                                   placeholder="Start typing to search existing customers..."
+                                   style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"
+                                   oninput="window.searchModalCustomer(this.value)"
+                                   autocomplete="off"
+                                   required>
+                            <div id="modalCustomerSearchResults" style="position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ddd; border-radius: 5px; max-height: 200px; overflow-y: auto; display: none; z-index: 1001; box-shadow: 0 2px 5px rgba(0,0,0,0.1);"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label for="modalCustomerEmail" style="display: block; margin-bottom: 5px;">Email *</label>
+                        <input type="email"
+                               id="modalCustomerEmail"
+                               placeholder="customer@example.com"
+                               style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"
+                               required>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label for="modalCustomerPhone" style="display: block; margin-bottom: 5px;">Phone</label>
+                        <input type="tel"
+                               id="modalCustomerPhone"
+                               placeholder="(555) 123-4567"
+                               style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                    </div>
+
+                    <h3 style="margin-top: 20px; margin-bottom: 10px;">Boat Information</h3>
+
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label for="modalBoatName" style="display: block; margin-bottom: 5px;">Boat Name</label>
+                        <input type="text"
+                               id="modalBoatName"
+                               placeholder="Serenity"
+                               style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label for="modalBoatLength" style="display: block; margin-bottom: 5px;">Boat Length (ft)</label>
+                            <input type="number"
+                                   id="modalBoatLength"
+                                   placeholder="35"
+                                   min="20"
+                                   max="100"
+                                   style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="modalBoatMake" style="display: block; margin-bottom: 5px;">Make</label>
+                            <input type="text"
+                                   id="modalBoatMake"
+                                   placeholder="Catalina"
+                                   style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 15px;">
+                        <label for="modalBoatModel" style="display: block; margin-bottom: 5px;">Model</label>
+                        <input type="text"
+                               id="modalBoatModel"
+                               placeholder="Catalina 350"
+                               style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                    </div>
                 </div>
-                <div class="form-actions">
-                    <button type="button" onclick="closeCustomerSelectionModal()" class="cancel-btn">Cancel</button>
-                    <button type="button" onclick="confirmModalCustomerSelection()" class="submit-btn">Select Customer</button>
+
+                <div class="form-actions" style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px;">
+                    <button type="button" onclick="window.adminApp.closeCustomerModal()" class="cancel-btn">Cancel</button>
+                    <button type="button" onclick="window.adminApp.confirmCustomerInfo()" class="submit-btn">Continue</button>
                 </div>
             </div>
         </div>
 
         <div class="container">
-            <!-- Customer Selection -->
-            <div class="customer-section">
-                <h2>Select Customer</h2>
-                <div class="customer-controls">
-                    <input type="text"
-                           id="customerSearch"
-                           class="customer-search-input"
-                           placeholder="Search by name, email, or boat name...">
-                    <div class="customer-buttons">
-                        <button onclick="window.adminApp.searchCustomers()" class="customer-btn">Search</button>
-                        <button onclick="window.adminApp.loadRecentCustomers()" class="customer-btn">Show Recent</button>
-                        <button onclick="window.adminApp.showCreateCustomerForm()" class="customer-btn new-customer-btn">+ New Customer</button>
-                    </div>
-                </div>
-                <div id="customerList" class="customer-list" style="display: none;"></div>
-                <div id="selectedCustomer" class="selected-customer-display">
-                    <strong>Selected Customer:</strong>
-                    <span id="selectedCustomerInfo"></span>
-                </div>
-            </div>
-
             <!-- Service Selection -->
             <div class="service-selector">
                 <h2>Select Service Type</h2>

@@ -134,6 +134,41 @@ const renderConsolidatedForm = function(isCleaningService, serviceKey) {
         </div>
     `;
 
+    // Add Customer Information Section
+    formHTML += `
+        <div class="form-section customer-info-section" style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+            <h3 style="margin-top: 0; color: #495057;">Customer Information</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+                <div class="form-group">
+                    <label for="wizardCustomerName" style="display: block; margin-bottom: 5px; color: #495057;">Name</label>
+                    <div style="position: relative;">
+                        <input type="text"
+                               id="wizardCustomerName"
+                               placeholder="Start typing to search..."
+                               style="width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 5px; font-size: 14px;"
+                               oninput="window.searchCustomerByName(this.value)"
+                               autocomplete="off">
+                        <div id="customerSearchResults" style="position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ced4da; border-radius: 5px; max-height: 200px; overflow-y: auto; display: none; z-index: 1000; box-shadow: 0 2px 5px rgba(0,0,0,0.1);"></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="wizardCustomerEmail" style="display: block; margin-bottom: 5px; color: #495057;">Email</label>
+                    <input type="email"
+                           id="wizardCustomerEmail"
+                           placeholder="customer@example.com"
+                           style="width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 5px; font-size: 14px;">
+                </div>
+                <div class="form-group">
+                    <label for="wizardCustomerPhone" style="display: block; margin-bottom: 5px; color: #495057;">Phone</label>
+                    <input type="tel"
+                           id="wizardCustomerPhone"
+                           placeholder="(555) 123-4567"
+                           style="width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 5px; font-size: 14px;">
+                </div>
+            </div>
+        </div>
+    `;
+
     // Check if service needs boat length (per-foot services)
     const needsBoatLength = service && service.type === 'per_foot';
 
@@ -1181,6 +1216,114 @@ window.updatePricing = function() {
         window.updateChargeSummary();
     }
 };
+
+// Customer search functionality for wizard
+let searchTimeout = null;
+window.searchCustomerByName = async function(query) {
+    // Clear previous timeout
+    if (searchTimeout) {
+        clearTimeout(searchTimeout);
+    }
+
+    const resultsDiv = document.getElementById('customerSearchResults');
+
+    // Hide results if query is empty
+    if (!query || query.length < 2) {
+        resultsDiv.style.display = 'none';
+        return;
+    }
+
+    // Debounce the search
+    searchTimeout = setTimeout(async () => {
+        try {
+            const response = await fetch(`/api/customers/search?q=${encodeURIComponent(query)}`);
+            const customers = await response.json();
+
+            if (customers && customers.length > 0) {
+                resultsDiv.innerHTML = customers.map(customer => `
+                    <div onclick="window.selectWizardCustomer('${customer.id}')"
+                         style="padding: 10px; cursor: pointer; border-bottom: 1px solid #eee;"
+                         onmouseover="this.style.backgroundColor='#f0f0f0'"
+                         onmouseout="this.style.backgroundColor='white'">
+                        <div style="font-weight: 500;">${customer.name || 'Unnamed'}</div>
+                        <div style="font-size: 12px; color: #666;">${customer.email}</div>
+                        ${customer.boat_name ? `<div style="font-size: 12px; color: #666;">Boat: ${customer.boat_name}</div>` : ''}
+                    </div>
+                `).join('');
+                resultsDiv.style.display = 'block';
+            } else {
+                resultsDiv.innerHTML = '<div style="padding: 10px; color: #666;">No customers found</div>';
+                resultsDiv.style.display = 'block';
+            }
+        } catch (error) {
+            console.error('Error searching customers:', error);
+            resultsDiv.style.display = 'none';
+        }
+    }, 300);
+};
+
+// Select a customer from search results
+window.selectWizardCustomer = async function(customerId) {
+    try {
+        const response = await fetch(`/api/customers/${customerId}`);
+        const customer = await response.json();
+
+        if (customer) {
+            // Fill in customer fields
+            document.getElementById('wizardCustomerName').value = customer.name || '';
+            document.getElementById('wizardCustomerEmail').value = customer.email || '';
+            document.getElementById('wizardCustomerPhone').value = customer.phone || '';
+
+            // Hide search results
+            document.getElementById('customerSearchResults').style.display = 'none';
+
+            // Store customer data for later use
+            window.selectedWizardCustomer = customer;
+
+            // If customer has boat info, fill that in too
+            if (customer.boat_length) {
+                const boatLengthInput = document.getElementById('wizardBoatLength') || document.getElementById('boat_length');
+                if (boatLengthInput) {
+                    boatLengthInput.value = customer.boat_length;
+                }
+            }
+            if (customer.boat_name) {
+                const boatNameInput = document.getElementById('wizardBoatName') || document.getElementById('boat_name');
+                if (boatNameInput) {
+                    boatNameInput.value = customer.boat_name;
+                }
+            }
+            if (customer.boat_make) {
+                const boatMakeInput = document.getElementById('wizardBoatMake') || document.getElementById('boat_make');
+                if (boatMakeInput) {
+                    boatMakeInput.value = customer.boat_make;
+                }
+            }
+            if (customer.boat_model) {
+                const boatModelInput = document.getElementById('wizardBoatModel') || document.getElementById('boat_model');
+                if (boatModelInput) {
+                    boatModelInput.value = customer.boat_model;
+                }
+            }
+
+            // Update pricing
+            if (window.calculateCost) window.calculateCost();
+            if (window.updateChargeSummary) window.updateChargeSummary();
+        }
+    } catch (error) {
+        console.error('Error fetching customer details:', error);
+    }
+};
+
+// Hide search results when clicking outside
+document.addEventListener('click', function(e) {
+    const searchResults = document.getElementById('customerSearchResults');
+    const nameInput = document.getElementById('wizardCustomerName');
+
+    if (searchResults && nameInput && !nameInput.contains(e.target) && !searchResults.contains(e.target)) {
+        searchResults.style.display = 'none';
+    }
+});
 
 // All functions already assigned to window above
 

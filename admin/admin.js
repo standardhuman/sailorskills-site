@@ -1561,7 +1561,37 @@ export class AdminApp {
             return;
         }
 
-        // If no customer selected, show modal
+        // First, check if we have customer info from the wizard
+        const wizardName = document.getElementById('wizardCustomerName')?.value;
+        const wizardEmail = document.getElementById('wizardCustomerEmail')?.value;
+        const wizardPhone = document.getElementById('wizardCustomerPhone')?.value;
+
+        // If we have wizard customer data, use that
+        if (wizardName || wizardEmail) {
+            // Check if we have a selected customer from the autocomplete
+            if (window.selectedWizardCustomer) {
+                this.selectedCustomer = window.selectedWizardCustomer;
+            } else if (wizardName && wizardEmail) {
+                // We have manual customer info - we'll need to create or find this customer
+                // For now, show the modal with this info pre-filled
+                this.openCustomerModalWithData({
+                    name: wizardName,
+                    email: wizardEmail,
+                    phone: wizardPhone
+                });
+                return;
+            } else {
+                // Missing required info - show modal to complete it
+                this.openCustomerModalWithData({
+                    name: wizardName,
+                    email: wizardEmail,
+                    phone: wizardPhone
+                });
+                return;
+            }
+        }
+
+        // If no customer selected and no wizard data, show modal
         if (!this.selectedCustomer) {
             this.openCustomerModal();
             return;
@@ -1624,7 +1654,36 @@ export class AdminApp {
         const modal = document.getElementById('customerSelectionModal');
         if (modal) {
             modal.style.display = 'block';
-            this.populateModalCustomers();
+            // Clear fields when opening fresh
+            document.getElementById('modalCustomerName').value = '';
+            document.getElementById('modalCustomerEmail').value = '';
+            document.getElementById('modalCustomerPhone').value = '';
+            document.getElementById('modalBoatName').value = '';
+            document.getElementById('modalBoatLength').value = '';
+            document.getElementById('modalBoatMake').value = '';
+            document.getElementById('modalBoatModel').value = '';
+        }
+    }
+
+    openCustomerModalWithData(customerData) {
+        const modal = document.getElementById('customerSelectionModal');
+        if (modal) {
+            modal.style.display = 'block';
+            // Pre-fill with provided data
+            if (customerData.name) document.getElementById('modalCustomerName').value = customerData.name;
+            if (customerData.email) document.getElementById('modalCustomerEmail').value = customerData.email;
+            if (customerData.phone) document.getElementById('modalCustomerPhone').value = customerData.phone;
+
+            // Also try to get boat info from wizard if available
+            const boatLength = document.getElementById('wizardBoatLength')?.value || document.getElementById('boat_length')?.value;
+            const boatName = document.getElementById('wizardBoatName')?.value || document.getElementById('boat_name')?.value;
+            const boatMake = document.getElementById('wizardBoatMake')?.value || document.getElementById('boat_make')?.value;
+            const boatModel = document.getElementById('wizardBoatModel')?.value || document.getElementById('boat_model')?.value;
+
+            if (boatLength) document.getElementById('modalBoatLength').value = boatLength;
+            if (boatName) document.getElementById('modalBoatName').value = boatName;
+            if (boatMake) document.getElementById('modalBoatMake').value = boatMake;
+            if (boatModel) document.getElementById('modalBoatModel').value = boatModel;
         }
     }
 
@@ -1635,15 +1694,65 @@ export class AdminApp {
         }
     }
 
-    populateModalCustomers() {
-        const listEl = document.getElementById('modalCustomerList');
-        if (listEl && this.customers) {
-            listEl.innerHTML = this.customers.map(customer => `
-                <div class="customer-item" onclick="adminApp.selectModalCustomer('${customer.id}')">
-                    <div>${customer.name || 'Unnamed'} - ${customer.email}</div>
-                    <div>${customer.payment_method ? '✓ Card on file' : '⚠ No card'}</div>
-                </div>
-            `).join('');
+    async confirmCustomerInfo() {
+        const name = document.getElementById('modalCustomerName').value;
+        const email = document.getElementById('modalCustomerEmail').value;
+        const phone = document.getElementById('modalCustomerPhone').value;
+        const boatName = document.getElementById('modalBoatName').value;
+        const boatLength = document.getElementById('modalBoatLength').value;
+        const boatMake = document.getElementById('modalBoatMake').value;
+        const boatModel = document.getElementById('modalBoatModel').value;
+
+        if (!name || !email) {
+            alert('Please provide at least name and email');
+            return;
+        }
+
+        // Check if this is an existing customer selected from search
+        if (window.modalSelectedCustomer) {
+            this.selectedCustomer = window.modalSelectedCustomer;
+            this.closeCustomerModal();
+            // Continue with charge
+            this.chargeCustomer();
+            return;
+        }
+
+        // Otherwise, we need to create or find this customer
+        try {
+            // First, try to find customer by email
+            const searchResponse = await fetch(`/api/customers/search?q=${encodeURIComponent(email)}`);
+            const customers = await searchResponse.json();
+
+            let customer = customers.find(c => c.email === email);
+
+            if (!customer) {
+                // Create new customer
+                const createResponse = await fetch('/api/customers', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name,
+                        email,
+                        phone,
+                        boat_name: boatName,
+                        boat_length: boatLength ? parseInt(boatLength) : null,
+                        boat_make: boatMake,
+                        boat_model: boatModel
+                    })
+                });
+
+                customer = await createResponse.json();
+            }
+
+            if (customer) {
+                this.selectedCustomer = customer;
+                this.closeCustomerModal();
+                // Continue with charge
+                this.chargeCustomer();
+            }
+        } catch (error) {
+            console.error('Error processing customer info:', error);
+            alert('Error processing customer information');
         }
     }
 
@@ -2249,3 +2358,87 @@ if (window.updateChargeSummary) {
     console.log('Replacing updateChargeSummary stub with real implementation');
     window.updateChargeSummary = () => adminApp.updateChargeSummary();
 }
+
+// Modal customer search functionality
+let modalSearchTimeout = null;
+window.searchModalCustomer = async function(query) {
+    // Clear previous timeout
+    if (modalSearchTimeout) {
+        clearTimeout(modalSearchTimeout);
+    }
+
+    const resultsDiv = document.getElementById('modalCustomerSearchResults');
+
+    // Hide results if query is empty
+    if (!query || query.length < 2) {
+        resultsDiv.style.display = 'none';
+        window.modalSelectedCustomer = null;
+        return;
+    }
+
+    // Debounce the search
+    modalSearchTimeout = setTimeout(async () => {
+        try {
+            const response = await fetch(`/api/customers/search?q=${encodeURIComponent(query)}`);
+            const customers = await response.json();
+
+            if (customers && customers.length > 0) {
+                resultsDiv.innerHTML = customers.map(customer => `
+                    <div onclick="window.selectModalCustomer('${customer.id}')"
+                         style="padding: 10px; cursor: pointer; border-bottom: 1px solid #eee;"
+                         onmouseover="this.style.backgroundColor='#f0f0f0'"
+                         onmouseout="this.style.backgroundColor='white'">
+                        <div style="font-weight: 500;">${customer.name || 'Unnamed'}</div>
+                        <div style="font-size: 12px; color: #666;">${customer.email}</div>
+                        ${customer.boat_name ? `<div style="font-size: 12px; color: #666;">Boat: ${customer.boat_name}</div>` : ''}
+                    </div>
+                `).join('');
+                resultsDiv.style.display = 'block';
+            } else {
+                resultsDiv.innerHTML = '<div style="padding: 10px; color: #666;">No customers found - new customer will be created</div>';
+                resultsDiv.style.display = 'block';
+                window.modalSelectedCustomer = null;
+            }
+        } catch (error) {
+            console.error('Error searching customers:', error);
+            resultsDiv.style.display = 'none';
+        }
+    }, 300);
+};
+
+// Select a customer from modal search results
+window.selectModalCustomer = async function(customerId) {
+    try {
+        const response = await fetch(`/api/customers/${customerId}`);
+        const customer = await response.json();
+
+        if (customer) {
+            // Fill in customer fields
+            document.getElementById('modalCustomerName').value = customer.name || '';
+            document.getElementById('modalCustomerEmail').value = customer.email || '';
+            document.getElementById('modalCustomerPhone').value = customer.phone || '';
+            document.getElementById('modalBoatName').value = customer.boat_name || '';
+            document.getElementById('modalBoatLength').value = customer.boat_length || '';
+            document.getElementById('modalBoatMake').value = customer.boat_make || '';
+            document.getElementById('modalBoatModel').value = customer.boat_model || '';
+
+            // Hide search results
+            document.getElementById('modalCustomerSearchResults').style.display = 'none';
+
+            // Store customer data for later use
+            window.modalSelectedCustomer = customer;
+        }
+    } catch (error) {
+        console.error('Error fetching customer details:', error);
+    }
+};
+
+// Hide modal search results when clicking outside
+document.addEventListener('click', function(e) {
+    const searchResults = document.getElementById('modalCustomerSearchResults');
+    const nameInput = document.getElementById('modalCustomerName');
+
+    if (searchResults && nameInput && !nameInput.contains(e.target) && !searchResults.contains(e.target)) {
+        searchResults.style.display = 'none';
+    }
+});
