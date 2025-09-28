@@ -424,6 +424,42 @@
                 adminApp: typeof window.adminApp,
                 updateWizardPricing: typeof window.updateWizardPricing
             });
+
+            // CRITICAL FIX: Sync adminApp.currentServiceKey with window.currentServiceKey
+            // This ensures the charge summary updates properly
+            setInterval(() => {
+                if (window.adminApp && window.currentServiceKey) {
+                    // Sync service key if different
+                    if (window.adminApp.currentServiceKey !== window.currentServiceKey) {
+                        console.log('Syncing adminApp.currentServiceKey to:', window.currentServiceKey);
+                        window.adminApp.currentServiceKey = window.currentServiceKey;
+                    }
+
+                    // Always sync the price if wizard is visible
+                    const wizardContainer = document.getElementById('wizardContainer');
+                    if (wizardContainer && wizardContainer.style.display === 'block') {
+                        const wizardPrice = document.getElementById('wizardTotalPrice');
+                        if (wizardPrice) {
+                            const priceText = wizardPrice.textContent.replace('$', '').replace(',', '');
+                            const price = parseFloat(priceText) || 0;
+
+                            const totalCost = document.getElementById('totalCost');
+                            if (totalCost) {
+                                const currentValue = parseFloat(totalCost.value) || 0;
+                                if (Math.abs(currentValue - price) > 0.01) { // Only update if different
+                                    totalCost.value = price.toFixed(2);
+                                    console.log('Synced price to:', price.toFixed(2));
+
+                                    // Update charge summary when price changes
+                                    if (typeof window.adminApp.updateChargeSummary === 'function') {
+                                        window.adminApp.updateChargeSummary();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }, 500); // Check every 500ms
         });
     </script>
 

@@ -777,6 +777,25 @@ window.updateWizardPricing = function() {
         wizardTotalPrice.textContent = `$${finalTotal.toFixed(2)}`;
     }
 
+    // CRITICAL: Update the hidden totalCost input that charge summary reads from
+    const totalCostInput = document.getElementById('totalCost');
+    if (totalCostInput) {
+        totalCostInput.value = finalTotal.toFixed(2);
+        console.log('Updated totalCost hidden input to:', finalTotal.toFixed(2));
+    }
+
+    // Also update the totalCostDisplay input
+    const totalCostDisplayInput = document.getElementById('totalCostDisplay');
+    if (totalCostDisplayInput) {
+        totalCostDisplayInput.value = finalTotal.toFixed(2);
+    }
+
+    // Trigger charge summary update after setting the price
+    if (window.adminApp && typeof window.adminApp.updateChargeSummary === 'function') {
+        window.adminApp.updateChargeSummary();
+        console.log('Called adminApp.updateChargeSummary after setting price');
+    }
+
     // Also update the main pricing display
     const priceBreakdown = document.getElementById('priceBreakdown');
     if (priceBreakdown) {

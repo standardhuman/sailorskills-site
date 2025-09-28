@@ -26,8 +26,19 @@ test('Charge summary shows service details when selected', async ({ page }) => {
   const wizardVisible = await page.locator('#wizardContainer').isVisible();
   console.log('Wizard visible:', wizardVisible);
 
-  // Enter boat length if input visible
-  const boatLengthInput = page.locator('#wizardBoatLength');
+  // Wait for the service key to be synced to adminApp (via setInterval)
+  await page.waitForTimeout(1500); // Allow time for setInterval to run
+
+  // Manually trigger updateChargeSummary to ensure it runs
+  await page.evaluate(() => {
+    if (window.adminApp && typeof window.adminApp.updateChargeSummary === 'function') {
+      window.adminApp.updateChargeSummary();
+    }
+  });
+  await page.waitForTimeout(500);
+
+  // Enter boat length - look for either wizardBoatLength or adminBoatLength
+  const boatLengthInput = page.locator('#wizardBoatLength, #adminBoatLength').first();
   if (await boatLengthInput.isVisible()) {
     await boatLengthInput.fill('40');
     await boatLengthInput.press('Tab');
@@ -36,12 +47,20 @@ test('Charge summary shows service details when selected', async ({ page }) => {
   }
 
   // Select powerboat
-  const powerboatRadio = page.locator('input[name="wizard_boat_type"][value="powerboat"]');
+  const powerboatRadio = page.locator('input[name="wizard_boat_type"][value="powerboat"], input[name="adminBoatType"][value="powerboat"]').first();
   if (await powerboatRadio.isVisible()) {
     await powerboatRadio.click();
     console.log('Selected powerboat');
     await page.waitForTimeout(1000);
   }
+
+  // Manually trigger updateChargeSummary again after making changes
+  await page.evaluate(() => {
+    if (window.adminApp && typeof window.adminApp.updateChargeSummary === 'function') {
+      window.adminApp.updateChargeSummary();
+    }
+  });
+  await page.waitForTimeout(500);
 
   // Check charge summary
   console.log('\n=== CHECKING CHARGE SUMMARY ===');

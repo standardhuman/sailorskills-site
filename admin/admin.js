@@ -164,6 +164,11 @@ export class AdminApp {
         });
     }
 
+    selectService(serviceKey) {
+        // Alias for selectAdminService for compatibility
+        return this.selectAdminService(serviceKey);
+    }
+
     selectAdminService(serviceKey) {
         console.log('Selecting service:', serviceKey);
 
@@ -201,8 +206,13 @@ export class AdminApp {
             const wizardContainer = document.getElementById('wizardContainer');
             wizardContainer.style.display = 'block';
 
-            // Initialize the wizard for admin
-            this.initializeWizard(serviceKey);
+            // Only initialize wizard if it hasn't been rendered already
+            // (renderConsolidatedForm may have already rendered it)
+            const wizardContent = document.getElementById('wizardContent');
+            if (!wizardContent || !wizardContent.innerHTML.trim()) {
+                // Initialize the wizard for admin
+                this.initializeWizard(serviceKey);
+            }
         } else {
             // For flat rate services, set the price directly
             // Set the price in the hidden display element
@@ -558,10 +568,17 @@ export class AdminApp {
             this.surchargeDetails.engines = 10;
         }
 
-        // Update the display
+        // Update the display - set both value and textContent
         const displayEl = document.getElementById('totalCostDisplay');
         if (displayEl) {
-            displayEl.textContent = `$${cost.toFixed(2)}`;
+            displayEl.value = cost.toFixed(2); // For input elements
+            displayEl.textContent = `$${cost.toFixed(2)}`; // For display elements
+        }
+
+        // Also update the totalCost hidden input
+        const totalCostEl = document.getElementById('totalCost');
+        if (totalCostEl) {
+            totalCostEl.value = cost.toFixed(2);
         }
     }
 
