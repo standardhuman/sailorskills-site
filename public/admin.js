@@ -1060,13 +1060,24 @@ export class AdminApp {
     handleAnodeClick(button) {
         const anodeData = JSON.parse(atob(button.dataset.anode));
         const change = parseInt(button.dataset.change);
+
+        // Calculate the new quantity before updating
+        if (!this.selectedAnodes) {
+            this.selectedAnodes = {};
+        }
+        if (!this.selectedAnodes[anodeData.id]) {
+            this.selectedAnodes[anodeData.id] = { quantity: 0, price: anodeData.price, name: anodeData.name };
+        }
+        const currentQty = this.selectedAnodes[anodeData.id].quantity;
+        const newQuantity = Math.max(0, currentQty + change);
+
+        // Update the quantity
         this.updateAnodeQuantity(anodeData.id, change, anodeData.price, anodeData.name);
 
-        // Update the quantity display immediately
+        // Update the quantity display immediately with the new value
         const quantitySpan = button.parentElement.querySelector('.quantity');
         if (quantitySpan) {
-            const currentQuantity = this.selectedAnodes[anodeData.id]?.quantity || 0;
-            quantitySpan.textContent = currentQuantity;
+            quantitySpan.textContent = newQuantity;
         }
     }
 
@@ -1443,11 +1454,57 @@ export class AdminApp {
                 </div>`;
             }
 
+            // Add customization if any discount/adjustment is applied
+            let finalPrice = price;
+            if (this.priceAdjustment) {
+                if (this.priceAdjustment.type === 'percent') {
+                    finalPrice = price * (1 - this.priceAdjustment.value / 100);
+                    detailsHTML += `
+                    <div class="charge-detail-row" style="font-size: 12px; color: #e67e22;">
+                        <span>Discount (${this.priceAdjustment.value}%):</span>
+                        <span>-$${(price - finalPrice).toFixed(2)}</span>
+                    </div>`;
+                } else if (this.priceAdjustment.type === 'dollar') {
+                    finalPrice = Math.max(0, price - this.priceAdjustment.value);
+                    detailsHTML += `
+                    <div class="charge-detail-row" style="font-size: 12px; color: #e67e22;">
+                        <span>Discount:</span>
+                        <span>-$${this.priceAdjustment.value.toFixed(2)}</span>
+                    </div>`;
+                } else if (this.priceAdjustment.type === 'custom') {
+                    finalPrice = this.priceAdjustment.value;
+                    const diff = price - finalPrice;
+                    if (diff > 0) {
+                        detailsHTML += `
+                        <div class="charge-detail-row" style="font-size: 12px; color: #e67e22;">
+                            <span>Adjustment:</span>
+                            <span>-$${diff.toFixed(2)}</span>
+                        </div>`;
+                    } else if (diff < 0) {
+                        detailsHTML += `
+                        <div class="charge-detail-row" style="font-size: 12px; color: #27ae60;">
+                            <span>Adjustment:</span>
+                            <span>+$${Math.abs(diff).toFixed(2)}</span>
+                        </div>`;
+                    }
+                }
+            }
+
             detailsHTML += `
                 <div class="charge-detail-row" style="border-top: 2px solid #345475; padding-top: 10px; margin-top: 10px;">
                     <span><strong>Amount to Charge:</strong></span>
-                    <span><strong>$${price.toFixed(2)}</strong></span>
+                    <span style="display: flex; align-items: center; gap: 10px;">
+                        <strong>$${finalPrice.toFixed(2)}</strong>
+                        <button onclick="adminApp.openPriceCustomization(${price})"
+                            style="padding: 2px 8px; font-size: 11px; background: #7f8c8d; color: white; border: none; border-radius: 3px; cursor: pointer;"
+                            title="Customize price">
+                            ✏️
+                        </button>
+                    </span>
                 </div>`;
+
+            // Store the final price for charging
+            this.finalPrice = finalPrice;
 
             chargeDetails.innerHTML = detailsHTML;
         } else {
@@ -1455,11 +1512,12 @@ export class AdminApp {
         }
 
         // Enable button if service is selected (customer can be selected later)
-        chargeButton.disabled = !this.currentServiceKey || price === 0;
+        const chargeAmount = this.finalPrice || price;
+        chargeButton.disabled = !this.currentServiceKey || chargeAmount === 0;
 
         // Update button text
-        if (price > 0) {
-            chargeButton.textContent = `💳 Charge $${price.toFixed(2)}`;
+        if (chargeAmount > 0) {
+            chargeButton.textContent = `💳 Charge $${chargeAmount.toFixed(2)}`;
         } else {
             chargeButton.textContent = `💳 Charge Customer`;
         }
@@ -1491,10 +1549,15 @@ export class AdminApp {
         button.textContent = 'Processing...';
 
         try {
-            // Get price
-            const totalElement = document.getElementById('totalCostDisplay');
-            const price = totalElement ?
-                parseFloat(totalElement.textContent.replace('$', '').replace(',', '')) : 0;
+            // Get price - use finalPrice if customization was applied, otherwise use calculated price
+            let price;
+            if (this.finalPrice !== undefined && this.finalPrice !== null) {
+                price = this.finalPrice;
+            } else {
+                const totalElement = document.getElementById('totalCostDisplay');
+                price = totalElement ?
+                    parseFloat(totalElement.textContent.replace('$', '').replace(',', '')) : 0;
+            }
 
             const response = await fetch('http://localhost:3001/api/charge', {
                 method: 'POST',
@@ -1649,6 +1712,187 @@ export class AdminApp {
         this.customers.push(tempCustomer);
         this.selectedCustomer = tempCustomer;
         this.closeCustomerModal();
+        this.updateChargeSummary();
+    }
+
+    // Price Customization Functions
+    openPriceCustomization(originalPrice) {
+        this.originalPrice = originalPrice;
+
+        // Create modal if it doesn't exist
+        let modal = document.getElementById('priceCustomizationModal');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'priceCustomizationModal';
+            modal.className = 'modal';
+            modal.style.cssText = `
+                display: none;
+                position: fixed;
+                z-index: 1000;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                overflow: auto;
+                background-color: rgba(0,0,0,0.4);
+            `;
+
+            modal.innerHTML = `
+                <div class="modal-content" style="
+                    background-color: #fefefe;
+                    margin: 10% auto;
+                    padding: 30px;
+                    border: 1px solid #888;
+                    width: 90%;
+                    max-width: 400px;
+                    border-radius: 10px;
+                    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+                ">
+                    <span onclick="adminApp.closePriceCustomization()" style="
+                        color: #aaa;
+                        float: right;
+                        font-size: 28px;
+                        font-weight: bold;
+                        cursor: pointer;
+                        line-height: 20px;
+                    ">&times;</span>
+
+                    <h2 style="color: #345475; margin-bottom: 20px;">Customize Price</h2>
+
+                    <div style="margin-bottom: 15px; padding: 10px; background: #f8f9fa; border-radius: 5px;">
+                        <strong>Original Price:</strong> $<span id="originalPriceDisplay">0.00</span>
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 10px;">
+                            <input type="radio" name="adjustmentType" value="percent" checked
+                                onchange="adminApp.updateCustomizationPreview()">
+                            Percentage Discount
+                        </label>
+                        <input type="number" id="percentValue" min="0" max="100" value="10"
+                            style="width: 80px; padding: 5px; margin-left: 20px;"
+                            oninput="adminApp.updateCustomizationPreview()">
+                        <span>%</span>
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 10px;">
+                            <input type="radio" name="adjustmentType" value="dollar"
+                                onchange="adminApp.updateCustomizationPreview()">
+                            Dollar Amount Discount
+                        </label>
+                        <span style="margin-left: 20px;">$</span>
+                        <input type="number" id="dollarValue" min="0" value="50" step="0.01"
+                            style="width: 100px; padding: 5px;"
+                            oninput="adminApp.updateCustomizationPreview()">
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 10px;">
+                            <input type="radio" name="adjustmentType" value="custom"
+                                onchange="adminApp.updateCustomizationPreview()">
+                            Custom Total Amount
+                        </label>
+                        <span style="margin-left: 20px;">$</span>
+                        <input type="number" id="customValue" min="0" value="${originalPrice}" step="0.01"
+                            style="width: 100px; padding: 5px;"
+                            oninput="adminApp.updateCustomizationPreview()">
+                    </div>
+
+                    <div style="margin-top: 20px; padding: 15px; background: #e8f5e9; border-radius: 5px;">
+                        <strong>Final Price:</strong>
+                        <span style="font-size: 1.2em; color: #2e7d32;">$<span id="finalPricePreview">0.00</span></span>
+                    </div>
+
+                    <div style="display: flex; gap: 10px; margin-top: 20px;">
+                        <button onclick="adminApp.applyPriceCustomization()"
+                            style="flex: 1; padding: 10px; background: #345475; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                            Apply
+                        </button>
+                        <button onclick="adminApp.clearPriceCustomization()"
+                            style="flex: 1; padding: 10px; background: #e74c3c; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                            Clear Discount
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+        }
+
+        // Update original price display
+        document.getElementById('originalPriceDisplay').textContent = originalPrice.toFixed(2);
+        document.getElementById('customValue').value = originalPrice.toFixed(2);
+
+        // Set initial values based on current adjustment
+        if (this.priceAdjustment) {
+            const radios = document.getElementsByName('adjustmentType');
+            for (let radio of radios) {
+                if (radio.value === this.priceAdjustment.type) {
+                    radio.checked = true;
+                    break;
+                }
+            }
+
+            if (this.priceAdjustment.type === 'percent') {
+                document.getElementById('percentValue').value = this.priceAdjustment.value;
+            } else if (this.priceAdjustment.type === 'dollar') {
+                document.getElementById('dollarValue').value = this.priceAdjustment.value;
+            } else if (this.priceAdjustment.type === 'custom') {
+                document.getElementById('customValue').value = this.priceAdjustment.value;
+            }
+        }
+
+        this.updateCustomizationPreview();
+        modal.style.display = 'block';
+    }
+
+    closePriceCustomization() {
+        const modal = document.getElementById('priceCustomizationModal');
+        if (modal) {
+            modal.style.display = 'none';
+        }
+    }
+
+    updateCustomizationPreview() {
+        const selectedType = document.querySelector('input[name="adjustmentType"]:checked')?.value;
+        let finalPrice = this.originalPrice;
+
+        if (selectedType === 'percent') {
+            const percent = parseFloat(document.getElementById('percentValue').value) || 0;
+            finalPrice = this.originalPrice * (1 - percent / 100);
+        } else if (selectedType === 'dollar') {
+            const discount = parseFloat(document.getElementById('dollarValue').value) || 0;
+            finalPrice = Math.max(0, this.originalPrice - discount);
+        } else if (selectedType === 'custom') {
+            finalPrice = parseFloat(document.getElementById('customValue').value) || 0;
+        }
+
+        document.getElementById('finalPricePreview').textContent = finalPrice.toFixed(2);
+    }
+
+    applyPriceCustomization() {
+        const selectedType = document.querySelector('input[name="adjustmentType"]:checked')?.value;
+
+        if (selectedType === 'percent') {
+            const percent = parseFloat(document.getElementById('percentValue').value) || 0;
+            this.priceAdjustment = { type: 'percent', value: percent };
+        } else if (selectedType === 'dollar') {
+            const discount = parseFloat(document.getElementById('dollarValue').value) || 0;
+            this.priceAdjustment = { type: 'dollar', value: discount };
+        } else if (selectedType === 'custom') {
+            const custom = parseFloat(document.getElementById('customValue').value) || 0;
+            this.priceAdjustment = { type: 'custom', value: custom };
+        }
+
+        this.closePriceCustomization();
+        this.updateChargeSummary();
+    }
+
+    clearPriceCustomization() {
+        this.priceAdjustment = null;
+        this.finalPrice = null;
+        this.closePriceCustomization();
         this.updateChargeSummary();
     }
 
