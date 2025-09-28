@@ -369,11 +369,6 @@ export class AdminApp {
                     </label>
                 </div>
 
-                <div class="wizard-field">
-                    <button class="btn-primary anode-button" onclick="adminApp.openAnodeWizard()">
-                        ⚓ Add Anodes to Service
-                    </button>
-                </div>
 
                 <div class="wizard-actions">
                     <button onclick="adminApp.closeWizard()" class="btn-secondary">← Back to Services</button>
@@ -1009,20 +1004,40 @@ export class AdminApp {
             btn.classList.remove('active');
             if (btn.textContent.toLowerCase().includes(category.toLowerCase()) ||
                 (category === 'all' && btn.textContent === 'All') ||
+                (category === 'none' && btn.textContent === 'None') ||
                 (category === 'engine' && btn.textContent.includes('Engine'))) {
                 btn.classList.add('active');
             }
         });
 
-        // Show/hide shaft subfilter
+        // Handle "none" category - hide everything
+        const anodeGrid = document.getElementById('anodeGrid');
+        const materialFilter = document.getElementById('materialFilter');
+        const anodeSearchField = document.getElementById('anodeSearchField');
         const shaftSubfilter = document.getElementById('shaftSubfilter');
+
+        if (category === 'none') {
+            // Hide all anode-related elements
+            if (anodeGrid) anodeGrid.style.display = 'none';
+            if (materialFilter) materialFilter.style.display = 'none';
+            if (anodeSearchField) anodeSearchField.style.display = 'none';
+            if (shaftSubfilter) shaftSubfilter.style.display = 'none';
+            return; // Exit early, nothing else to do
+        }
+
+        // Show elements for other categories
+        if (anodeGrid) anodeGrid.style.display = 'block';
+        if (materialFilter) materialFilter.style.display = 'flex';
+        if (anodeSearchField) anodeSearchField.style.display = 'block';
+
+        // Show/hide shaft subfilter
         if (shaftSubfilter) {
             if (category === 'shaft') {
                 shaftSubfilter.style.display = 'flex';
                 // Reset shaft subfilter to "All Shaft"
                 document.querySelectorAll('.subfilter-btn').forEach(btn => {
                     btn.classList.remove('active');
-                    if (btn.textContent.includes('All Shaft')) {
+                    if (btn.textContent.includes('All')) {
                         btn.classList.add('active');
                     }
                 });

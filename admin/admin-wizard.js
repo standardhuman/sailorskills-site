@@ -332,53 +332,30 @@ const renderConsolidatedForm = function(isCleaningService, serviceKey) {
         `;
     }
 
-    // Add the "Add Anodes" button after Current Condition
-    // For "Anodes Only" service, show different message and auto-open
-    if (isAnodesOnly) {
+    // Add the anode selection section directly in the wizard for cleaning services and anodes_only
+    // Only show for services that support anodes
+    if (isCleaningService || isAnodesOnly) {
         formHTML += `
-            <div class="form-section" style="text-align: center; margin-top: 20px;">
-                <button type="button" onclick="toggleAnodeSection()" class="customer-btn" style="background-color: #e67e22; font-size: 16px; padding: 12px 24px;">
-                    ⚓ Select Anodes
-                </button>
-                <p style="margin-top: 10px; color: #666; font-size: 14px;">
-                    Select zinc anodes for replacement ($150 minimum service fee)
-                </p>
-            </div>
-        `;
-    } else {
-        formHTML += `
-            <div class="form-section" style="text-align: center; margin-top: 20px;">
-                <button type="button" onclick="toggleAnodeSection()" class="customer-btn" style="background-color: #e67e22; font-size: 16px; padding: 12px 24px;">
-                    ⚓ Add Anodes to Service
-                </button>
-                <p style="margin-top: 10px; color: #666; font-size: 14px;">
-                    Optional: Add zinc anode replacement to this service
-                </p>
-            </div>
-        `;
-    }
-
-    // Add the anode selection section (hidden by default except for anodes_only)
-    formHTML += `
-        <div id="anodeSection" class="form-section" style="display: ${isAnodesOnly ? 'block' : 'none'}; margin-top: 20px; background: #f8f9fa; border: 2px solid #e67e22;">
-            <h3 style="color: #e67e22;">⚓ Select Zinc Anodes</h3>
+            <div id="anodeSection" class="form-section" style="margin-top: 20px; background: #f8f9fa; border: 1px solid #dee2e6;">
+                <h3 style="color: #2c3e50;">⚓ Select Zinc Anodes</h3>
 
             <div class="anode-selector">
-                <div class="wizard-field">
-                    <input type="text" id="anodeSearch" class="search-input"
-                           placeholder="Search by size or type..."
-                           oninput="if(window.adminApp) adminApp.filterAnodes(this.value)">
-                </div>
-
                 <div class="anode-categories" style="margin-top: 15px;">
-                    <button type="button" class="category-btn active" onclick="if(window.adminApp) adminApp.filterByCategory('all')">All</button>
+                    <button type="button" class="category-btn active" onclick="if(window.adminApp) adminApp.filterByCategory('none')">None</button>
+                    <button type="button" class="category-btn" onclick="if(window.adminApp) adminApp.filterByCategory('all')">All</button>
                     <button type="button" class="category-btn" onclick="if(window.adminApp) adminApp.filterByCategory('shaft')">Shaft</button>
                     <button type="button" class="category-btn" onclick="if(window.adminApp) adminApp.filterByCategory('propeller')">Prop</button>
                     <button type="button" class="category-btn" onclick="if(window.adminApp) adminApp.filterByCategory('hull')">Hull</button>
                     <button type="button" class="category-btn" onclick="if(window.adminApp) adminApp.filterByCategory('engine')">Engine</button>
                 </div>
 
-                <div id="materialFilter" class="material-filter" style="margin-top: 10px;">
+                <div class="wizard-field" id="anodeSearchField" style="display: none; margin-top: 15px;">
+                    <input type="text" id="anodeSearch" class="search-input"
+                           placeholder="Search by size or type..."
+                           oninput="if(window.adminApp) adminApp.filterAnodes(this.value)">
+                </div>
+
+                <div id="materialFilter" class="material-filter" style="display: none; margin-top: 10px;">
                     <button type="button" class="material-btn active" onclick="if(window.adminApp) adminApp.filterByMaterial('all')">All</button>
                     <button type="button" class="material-btn" onclick="if(window.adminApp) adminApp.filterByMaterial('zinc')">Zinc</button>
                     <button type="button" class="material-btn" onclick="if(window.adminApp) adminApp.filterByMaterial('magnesium')">Mag</button>
@@ -391,9 +368,9 @@ const renderConsolidatedForm = function(isCleaningService, serviceKey) {
                     <button type="button" class="subfilter-btn" onclick="if(window.adminApp) adminApp.filterShaftType('metric')">Metric</button>
                 </div>
 
-                <div id="anodeGrid" class="anode-grid" style="max-height: 400px; overflow-y: auto; margin-top: 15px; border: 1px solid #ddd; border-radius: 8px; padding: 15px;">
+                <div id="anodeGrid" class="anode-grid" style="display: none; max-height: 400px; overflow-y: auto; margin-top: 15px; border: 1px solid #ddd; border-radius: 8px; padding: 15px;">
                     <!-- Anodes will be populated here -->
-                    <p style="color: #999;">Loading anodes...</p>
+                    <p style="color: #999;">Select a category above to view anodes</p>
                 </div>
             </div>
 
@@ -407,6 +384,7 @@ const renderConsolidatedForm = function(isCleaningService, serviceKey) {
             </div>
         </div>
     `;
+    } // End if (isCleaningService || isAnodesOnly)
 
     // Remove the Price Estimate section - it will be shown in the main Charge Summary instead
 
