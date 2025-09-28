@@ -78,7 +78,48 @@ app.post('/api/create-customer', async (req, res) => {
 // Fetch Stripe customers with improved search
 app.get('/api/stripe-customers', async (req, res) => {
   try {
-    const { search, limit = 10 } = req.query;
+    const { search, limit = 10, customerId } = req.query;
+
+    // If requesting a specific customer by ID
+    if (customerId) {
+      try {
+        const customer = await stripe.customers.retrieve(customerId);
+        const paymentMethods = await stripe.paymentMethods.list({
+          customer: customer.id,
+          type: 'card',
+          limit: 1
+        });
+
+        const billingName = paymentMethods.data[0]?.billing_details?.name || '';
+        const customerName = customer.name || '';
+
+        // Use billing name if it has more words
+        let displayName = customerName;
+        if (billingName && billingName.split(' ').length > (customerName.split(' ').length || 0)) {
+          displayName = billingName;
+        } else if (!customerName && billingName) {
+          displayName = billingName;
+        }
+
+        const customerData = {
+          id: customer.id,
+          stripe_customer_id: customer.id,
+          name: displayName || 'Unknown',
+          email: customer.email,
+          phone: customer.phone || customer.metadata?.phone || null,
+          boat_name: customer.metadata?.boat_name || null,
+          boat_length: customer.metadata?.boat_length ? parseInt(customer.metadata.boat_length) : null,
+          boat_make: customer.metadata?.boat_make || null,
+          boat_model: customer.metadata?.boat_model || null,
+          payment_method: paymentMethods.data[0] || null
+        };
+
+        return res.json(customerData);
+      } catch (error) {
+        console.error('Error fetching specific customer:', error);
+        return res.status(404).json({ error: 'Customer not found' });
+      }
+    }
     
     let customers;
     if (search) {
@@ -177,10 +218,59 @@ app.get('/api/stripe-customers', async (req, res) => {
       }
     }
 
-    res.json({ customers: customersWithPaymentMethods });
+    res.json(customersWithPaymentMethods);
   } catch (error) {
     console.error('Error fetching customers:', error);
     res.status(500).json({ error: 'Failed to fetch customers' });
+  }
+});
+
+// Create or update Stripe customer
+app.post('/api/stripe-customers', async (req, res) => {
+  try {
+    const { name, email, phone, boat_name, boat_length, boat_make, boat_model } = req.body;
+
+    if (!name || !email) {
+      return res.status(400).json({ error: 'Name and email are required' });
+    }
+
+    // Create customer in Stripe with metadata
+    const customer = await stripe.customers.create({
+      name,
+      email,
+      phone,
+      metadata: {
+        boat_name: boat_name || '',
+        boat_length: boat_length || '',
+        boat_make: boat_make || '',
+        boat_model: boat_model || ''
+      }
+    });
+
+    // Return customer data in the same format as GET
+    const customerData = {
+      id: customer.id,
+      stripe_customer_id: customer.id,
+      name: customer.name || 'Unknown',
+      email: customer.email,
+      phone: customer.phone || null,
+      boat_name: boat_name || null,
+      boat_length: boat_length ? parseInt(boat_length) : null,
+      boat_make: boat_make || null,
+      boat_model: boat_model || null,
+      payment_method: null  // New customers don't have payment method yet
+    };
+
+    res.json(customerData);
+  } catch (error) {
+    console.error('Error creating customer:', error);
+
+    // Check if customer already exists
+    if (error.code === 'resource_already_exists' || error.message?.includes('already exists')) {
+      return res.status(409).json({ error: 'Customer with this email already exists' });
+    }
+
+    res.status(500).json({ error: 'Failed to create customer' });
   }
 });
 

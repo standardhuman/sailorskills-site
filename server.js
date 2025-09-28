@@ -20,6 +20,14 @@ try {
     console.warn('Quote routes not available:', error.message);
 }
 
+// Load main API routes (Stripe customers, etc.)
+try {
+    const apiRoutes = await import('./api/index.js');
+    app.use(apiRoutes.default);
+} catch (error) {
+    console.warn('API routes not available:', error.message);
+}
+
 // HTML routes (serve HTML without extensions in URL) - BEFORE static files
 app.get('/diving', (req, res) => {
     res.sendFile(path.join(__dirname, 'diving', 'diving.html'));

@@ -1722,14 +1722,14 @@ export class AdminApp {
         // Otherwise, we need to create or find this customer
         try {
             // First, try to find customer by email
-            const searchResponse = await fetch(`/api/customers/search?q=${encodeURIComponent(email)}`);
+            const searchResponse = await fetch(`http://localhost:3001/api/stripe-customers?search=${encodeURIComponent(email)}`);
             const customers = await searchResponse.json();
 
             let customer = customers.find(c => c.email === email);
 
             if (!customer) {
                 // Create new customer
-                const createResponse = await fetch('/api/customers', {
+                const createResponse = await fetch('http://localhost:3001/api/stripe-customers', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -2398,7 +2398,7 @@ window.searchModalCustomer = async function(query) {
     // Debounce the search
     modalSearchTimeout = setTimeout(async () => {
         try {
-            const response = await fetch(`/api/customers/search?q=${encodeURIComponent(query)}`);
+            const response = await fetch(`http://localhost:3001/api/stripe-customers?search=${encodeURIComponent(query)}`);
             const customers = await response.json();
 
             if (customers && customers.length > 0) {
@@ -2428,7 +2428,7 @@ window.searchModalCustomer = async function(query) {
 // Select a customer from modal search results
 window.selectModalCustomer = async function(customerId) {
     try {
-        const response = await fetch(`/api/customers/${customerId}`);
+        const response = await fetch(`http://localhost:3001/api/stripe-customers?customerId=${customerId}`);
         const customer = await response.json();
 
         if (customer) {

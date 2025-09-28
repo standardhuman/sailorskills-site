@@ -1236,7 +1236,7 @@ window.searchCustomerByName = async function(query) {
     // Debounce the search
     searchTimeout = setTimeout(async () => {
         try {
-            const response = await fetch(`/api/customers/search?q=${encodeURIComponent(query)}`);
+            const response = await fetch(`http://localhost:3001/api/stripe-customers?search=${encodeURIComponent(query)}`);
             const customers = await response.json();
 
             if (customers && customers.length > 0) {
@@ -1265,7 +1265,7 @@ window.searchCustomerByName = async function(query) {
 // Select a customer from search results
 window.selectWizardCustomer = async function(customerId) {
     try {
-        const response = await fetch(`/api/customers/${customerId}`);
+        const response = await fetch(`http://localhost:3001/api/stripe-customers?customerId=${customerId}`);
         const customer = await response.json();
 
         if (customer) {
