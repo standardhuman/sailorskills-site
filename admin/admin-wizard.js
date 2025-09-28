@@ -226,7 +226,7 @@ const renderConsolidatedForm = function(isCleaningService, serviceKey) {
                         </label>
                         <label class="radio-option">
                             <input type="radio" name="wizard_hull_type" value="trimaran">
-                            <span>Trimaran (+25% surcharge)</span>
+                            <span>Trimaran (+50% surcharge)</span>
                         </label>
                     </div>
                 </div>
@@ -266,8 +266,8 @@ const renderConsolidatedForm = function(isCleaningService, serviceKey) {
                         <input type="range" class="growth-slider" id="wizardGrowthLevelSlider" min="0" max="100" value="0" step="5">
                         <div class="growth-slider-labels">
                             <span>Minimal<br>0%</span>
-                            <span>Moderate<br>25%</span>
-                            <span>Heavy<br>50%</span>
+                            <span>Moderate<br>0%</span>
+                            <span>Heavy<br>35%</span>
                             <span>Severe<br>200%</span>
                         </div>
                         <div class="growth-slider-value" id="wizardGrowthSliderValue">Minimal (0%)</div>
@@ -535,10 +535,10 @@ function setupGrowthSlider() {
             surcharge = '0%';
         } else if (value <= 50) {
             level = 'moderate';
-            surcharge = '25%';
+            surcharge = '0%';
         } else if (value <= 75) {
             level = 'heavy';
-            surcharge = '50%';
+            surcharge = '35%';
         } else {
             level = 'severe';
             surcharge = '200%';
@@ -769,10 +769,14 @@ window.updateWizardPricing = function() {
         // Hull type surcharge
         const hullType = document.querySelector('input[name="wizard_hull_type"]:checked')?.value ||
                         document.querySelector('input[name="hull_type"]:checked')?.value || 'monohull';
-        if (hullType === 'catamaran' || hullType === 'trimaran') {
+        if (hullType === 'catamaran') {
             const surcharge = basePrice * 0.25;
             totalSurcharge += surcharge;
-            breakdown.push(`${hullType.charAt(0).toUpperCase() + hullType.slice(1)} surcharge (25%): +$${surcharge.toFixed(2)}`);
+            breakdown.push(`Catamaran surcharge (25%): +$${surcharge.toFixed(2)}`);
+        } else if (hullType === 'trimaran') {
+            const surcharge = basePrice * 0.50;
+            totalSurcharge += surcharge;
+            breakdown.push(`Trimaran surcharge (50%): +$${surcharge.toFixed(2)}`);
         }
 
         // Twin engines surcharge
@@ -789,10 +793,10 @@ window.updateWizardPricing = function() {
                               document.getElementById('paint_condition')?.value || 'good';
         const paintSurcharges = {
             'excellent': 0,
-            'good': 0.0375,
-            'fair': 0.075,
-            'poor': 0.10,
-            'missing': 0.15
+            'good': 0,      // No surcharge for good paint
+            'fair': 0,      // No surcharge for fair paint
+            'poor': 0.10,   // 10% surcharge for poor paint
+            'missing': 0.15 // 15% surcharge for missing paint
         };
         const paintSurchargeRate = paintSurcharges[paintCondition] || 0;
         if (paintSurchargeRate > 0) {
@@ -805,10 +809,10 @@ window.updateWizardPricing = function() {
         const growthLevel = document.getElementById('wizardGrowthLevel')?.value ||
                            document.getElementById('growth_level')?.value || 'minimal';
         const growthSurcharges = {
-            'minimal': 0,
-            'moderate': 0.25,
-            'heavy': 0.50,
-            'severe': 2.00
+            'minimal': 0,     // No surcharge for minimal growth
+            'moderate': 0,    // No surcharge for moderate growth
+            'heavy': 0.35,    // 35% surcharge for heavy growth (average of 25-50%)
+            'severe': 2.00    // 200% surcharge for severe growth
         };
         const growthSurchargeRate = growthSurcharges[growthLevel] || 0;
         if (growthSurchargeRate > 0) {
