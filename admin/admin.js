@@ -186,6 +186,17 @@ export class AdminApp {
             this.scrollToServiceForm();
         }, 100);
 
+        // Check if renderConsolidatedForm should handle this service
+        // (for services with anode picker functionality)
+        if (window.renderConsolidatedForm &&
+            (serviceKey === 'recurring_cleaning' ||
+             serviceKey === 'onetime_cleaning' ||
+             serviceKey === 'anodes_only')) {
+            console.log('Service will be handled by renderConsolidatedForm');
+            // Don't show our own wizard - let renderConsolidatedForm handle it
+            return;
+        }
+
         // Special handling for Anodes Only service - open anode selector directly
         if (serviceKey === 'anodes_only') {
             // Hide service buttons
