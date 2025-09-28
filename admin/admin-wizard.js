@@ -435,6 +435,12 @@ const renderConsolidatedForm = function(isCleaningService, serviceKey) {
         syncWizardValues();
         setupGrowthSlider();
 
+        // IMPORTANT: Ensure adminApp has the current service key
+        if (window.adminApp && serviceKey) {
+            window.adminApp.currentServiceKey = serviceKey;
+            console.log('Setting adminApp.currentServiceKey in renderConsolidatedForm to:', serviceKey);
+        }
+
         console.log('Initial calculation on wizard load');
         if (window.calculateCost) {
             window.calculateCost();
@@ -800,6 +806,17 @@ window.updateWizardPricing = function() {
     if (totalCost) {
         totalCost.textContent = `$${finalTotal.toFixed(2)}`;
         totalCost.value = finalTotal.toFixed(2);
+    }
+
+    // CRITICAL: Ensure adminApp has the current service key
+    if (window.adminApp && serviceKey) {
+        window.adminApp.currentServiceKey = serviceKey;
+        console.log('Setting adminApp.currentServiceKey to:', serviceKey);
+
+        // Trigger charge summary update
+        if (typeof window.adminApp.updateChargeSummary === 'function') {
+            window.adminApp.updateChargeSummary();
+        }
     }
 
     // Enable charge button
