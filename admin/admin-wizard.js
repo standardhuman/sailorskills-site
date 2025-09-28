@@ -104,15 +104,20 @@ const renderConsolidatedForm = function(isCleaningService, serviceKey) {
 
     // Scroll to the wizard after a brief delay
     setTimeout(() => {
+        // Try to find the first input field in the wizard
+        const firstInput = wizardContainer.querySelector('input, select, textarea');
+        const targetElement = firstInput || wizardContainer;
+
+        // Scroll to position the first input at the top of the viewport
         const headerHeight = 60;
-        const elementPosition = wizardContainer.getBoundingClientRect().top + window.pageYOffset;
-        const offsetPosition = elementPosition - headerHeight - 20; // 20px extra padding
+        const elementPosition = targetElement.getBoundingClientRect().top + window.pageYOffset;
+        const offsetPosition = elementPosition - headerHeight - 10; // Small padding from header
 
         window.scrollTo({
             top: Math.max(0, offsetPosition),
             behavior: 'smooth'
         });
-    }, 150);
+    }, 200);
 
     const service = window.serviceData ? window.serviceData[serviceKey] : null;
     const serviceName = service ? service.name : 'Service';

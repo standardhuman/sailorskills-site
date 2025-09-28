@@ -186,17 +186,21 @@ export class AdminApp {
         setTimeout(() => {
             const wizardContainer = document.getElementById('wizardContainer');
             if (wizardContainer && wizardContainer.style.display !== 'none') {
-                // Scroll to the wizard container (top of the form)
+                // Try to find the first input field in the wizard
+                const firstInput = wizardContainer.querySelector('input, select, textarea');
+                const targetElement = firstInput || wizardContainer;
+
+                // Scroll to position the first input at the top of the viewport
                 const headerHeight = 60;
-                const elementPosition = wizardContainer.getBoundingClientRect().top + window.pageYOffset;
-                const offsetPosition = elementPosition - headerHeight - 20; // 20px extra padding
+                const elementPosition = targetElement.getBoundingClientRect().top + window.pageYOffset;
+                const offsetPosition = elementPosition - headerHeight - 10; // Small padding from header
 
                 window.scrollTo({
                     top: Math.max(0, offsetPosition),
                     behavior: 'smooth'
                 });
             }
-        }, 150);
+        }, 200);
 
         // Check if renderConsolidatedForm should handle this service
         // (for services with anode picker functionality)
