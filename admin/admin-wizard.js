@@ -912,11 +912,11 @@ window.updateWizardPricing = function() {
     }
 
     // Calculate total
-    const total = basePrice + totalSurcharge;
+    let total = basePrice + totalSurcharge;
 
     // Apply minimum charge
     const minimumCharge = 150;
-    const finalTotal = Math.max(total, minimumCharge);
+    let finalTotal = Math.max(total, minimumCharge);
 
     if (finalTotal === minimumCharge && total < minimumCharge) {
         breakdown.push(`Minimum charge applied: $${minimumCharge}`);
@@ -1022,32 +1022,48 @@ window.updateWizardPricing = function() {
         }
 
         // Add anode information if any are selected
-        if (window.adminApp && window.adminApp.selectedAnodes && window.adminApp.selectedAnodes.size > 0) {
-            summaryHTML += '<div style="margin-top: 10px;">';
-            summaryHTML += '<h5 style="margin: 10px 0 5px 0; color: #2c3e50;">Anodes Selected</h5>';
-            let totalAnodes = 0;
-            let anodeDetails = [];
-            window.adminApp.selectedAnodes.forEach((quantity, anodeId) => {
-                if (quantity > 0) {
-                    const anode = window.adminApp.anodes.find(a => a.id === anodeId);
-                    if (anode) {
-                        anodeDetails.push(`${quantity}x ${anode.name} (${anode.material})`);
-                        totalAnodes += quantity;
-                    }
-                }
-            });
-            if (anodeDetails.length > 0) {
+        let anodeCost = 0;
+        let anodeLaborCost = 0;
+        if (window.adminApp && window.adminApp.selectedAnodes && Object.keys(window.adminApp.selectedAnodes).length > 0) {
+            const selectedAnodesData = window.adminApp.getSelectedAnodes();
+            if (selectedAnodesData && selectedAnodesData.count > 0) {
+                summaryHTML += '<div style="margin-top: 10px;">';
+                summaryHTML += '<h5 style="margin: 10px 0 5px 0; color: #2c3e50;">Anodes Selected</h5>';
+
+                // Display anode items
+                selectedAnodesData.items.forEach(item => {
+                    summaryHTML += `
+                        <div class="charge-detail-row" style="font-size: 14px; margin: 5px 0;">
+                            <span>${item.quantity}x ${item.name}</span>
+                            <span>$${item.subtotal.toFixed(2)}</span>
+                        </div>`;
+                });
+
+                // Calculate anode costs
+                anodeCost = selectedAnodesData.totalPrice;
+                anodeLaborCost = selectedAnodesData.count * 15; // $15 per anode labor
+
                 summaryHTML += `
-                    <div class="charge-detail-row" style="font-size: 14px; margin: 5px 0;">
-                        <span>Total Anodes:</span>
-                        <span>${totalAnodes} anodes</span>
+                    <div class="charge-detail-row" style="font-size: 14px; margin: 5px 0; padding-top: 5px; border-top: 1px solid #eee;">
+                        <span>Anode Installation Labor (${selectedAnodesData.count} × $15)</span>
+                        <span>$${anodeLaborCost.toFixed(2)}</span>
                     </div>`;
+
                 summaryHTML += `
-                    <div class="charge-detail-row" style="font-size: 12px; margin: 5px 0; color: #666;">
-                        <span style="display: block;">${anodeDetails.join(', ')}</span>
+                    <div class="charge-detail-row" style="font-size: 14px; margin: 5px 0; font-weight: 600;">
+                        <span>Anodes Subtotal</span>
+                        <span>$${(anodeCost + anodeLaborCost).toFixed(2)}</span>
                     </div>`;
+
+                summaryHTML += '</div>';
+
+                // Add anode costs to the breakdown for the final total
+                breakdown.push(`Anodes: $${anodeCost.toFixed(2)}`);
+                breakdown.push(`Anode Installation Labor: $${anodeLaborCost.toFixed(2)}`);
+
+                // Add anode costs to the total
+                finalTotal += anodeCost + anodeLaborCost;
             }
-            summaryHTML += '</div>';
         }
         summaryHTML += '</div>';
 
