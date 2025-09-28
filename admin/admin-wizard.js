@@ -265,10 +265,12 @@ const renderConsolidatedForm = function(isCleaningService, serviceKey) {
                     <div class="growth-slider-container">
                         <input type="range" class="growth-slider" id="wizardGrowthLevelSlider" min="0" max="100" value="0" step="5">
                         <div class="growth-slider-labels">
-                            <span>Minimal<br>0%</span>
-                            <span>Moderate<br>0%</span>
-                            <span>Heavy<br>35%</span>
-                            <span>Severe<br>200%</span>
+                            <span style="font-size: 11px;">Min<br>0%</span>
+                            <span style="font-size: 11px;">Light<br>10%</span>
+                            <span style="font-size: 11px;">Mod<br>35%</span>
+                            <span style="font-size: 11px;">Heavy<br>75%</span>
+                            <span style="font-size: 11px;">Severe<br>150%</span>
+                            <span style="font-size: 11px;">Extreme<br>200%</span>
                         </div>
                         <div class="growth-slider-value" id="wizardGrowthSliderValue">Minimal (0%)</div>
                     </div>
@@ -528,24 +530,49 @@ function setupGrowthSlider() {
 
     slider.addEventListener('input', function() {
         const value = parseInt(this.value);
-        let level, surcharge;
+        let level, surcharge, surchargePercent;
 
-        if (value <= 25) {
+        // More granular growth levels with smooth progression from 0% to 200%
+        if (value <= 10) {
             level = 'minimal';
-            surcharge = '0%';
+            surchargePercent = 0;
+        } else if (value <= 20) {
+            level = 'very-light';
+            surchargePercent = 5;
+        } else if (value <= 30) {
+            level = 'light';
+            surchargePercent = 10;
+        } else if (value <= 40) {
+            level = 'light-moderate';
+            surchargePercent = 20;
         } else if (value <= 50) {
             level = 'moderate';
-            surcharge = '0%';
-        } else if (value <= 75) {
+            surchargePercent = 35;
+        } else if (value <= 60) {
+            level = 'moderate-heavy';
+            surchargePercent = 50;
+        } else if (value <= 70) {
             level = 'heavy';
-            surcharge = '35%';
-        } else {
+            surchargePercent = 75;
+        } else if (value <= 80) {
+            level = 'very-heavy';
+            surchargePercent = 100;
+        } else if (value <= 90) {
             level = 'severe';
-            surcharge = '200%';
+            surchargePercent = 150;
+        } else {
+            level = 'extreme';
+            surchargePercent = 200;
         }
 
-        valueDisplay.textContent = `${level.charAt(0).toUpperCase() + level.slice(1)} (${surcharge})`;
+        surcharge = surchargePercent + '%';
+        // Format the display text nicely
+        const displayLevel = level.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+        valueDisplay.textContent = `${displayLevel} (${surcharge})`;
         hiddenInput.value = level;
+
+        // Store the actual percentage for calculations
+        hiddenInput.setAttribute('data-surcharge', surchargePercent / 100);
 
         // Sync with hidden form input
         const growthLevelHidden = document.getElementById('growth_level');
@@ -807,15 +834,29 @@ window.updateWizardPricing = function() {
         }
 
         // Growth level surcharge
-        const growthLevel = document.getElementById('wizardGrowthLevel')?.value ||
-                           document.getElementById('growth_level')?.value || 'minimal';
-        const growthSurcharges = {
-            'minimal': 0,     // No surcharge for minimal growth
-            'moderate': 0,    // No surcharge for moderate growth
-            'heavy': 0.35,    // 35% surcharge for heavy growth (average of 25-50%)
-            'severe': 2.00    // 200% surcharge for severe growth
-        };
-        const growthSurchargeRate = growthSurcharges[growthLevel] || 0;
+        const growthLevelElement = document.getElementById('wizardGrowthLevel') || document.getElementById('growth_level');
+        const growthLevel = growthLevelElement?.value || 'minimal';
+
+        // Check if we have a data-surcharge attribute (new system) or use legacy mapping
+        let growthSurchargeRate;
+        if (growthLevelElement && growthLevelElement.hasAttribute('data-surcharge')) {
+            growthSurchargeRate = parseFloat(growthLevelElement.getAttribute('data-surcharge')) || 0;
+        } else {
+            // Expanded surcharges for all levels
+            const growthSurcharges = {
+                'minimal': 0,           // 0% surcharge
+                'very-light': 0.05,     // 5% surcharge
+                'light': 0.10,          // 10% surcharge
+                'light-moderate': 0.20, // 20% surcharge
+                'moderate': 0.35,       // 35% surcharge
+                'moderate-heavy': 0.50, // 50% surcharge
+                'heavy': 0.75,          // 75% surcharge
+                'very-heavy': 1.00,     // 100% surcharge
+                'severe': 1.50,         // 150% surcharge
+                'extreme': 2.00         // 200% surcharge
+            };
+            growthSurchargeRate = growthSurcharges[growthLevel] || 0;
+        }
         if (growthSurchargeRate > 0) {
             const surcharge = basePrice * growthSurchargeRate;
             totalSurcharge += surcharge;
