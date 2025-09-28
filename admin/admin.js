@@ -941,7 +941,7 @@ export class AdminApp {
                     <div class="anode-price">$${price.toFixed(2)}</div>
                     <div class="anode-controls">
                         <button data-anode="${dataAttr}" data-change="-1" onclick="adminApp.handleAnodeClick(this)">−</button>
-                        <span class="quantity">${quantity}</span>
+                        <span class="quantity" id="qty-${anode.id}">${quantity}</span>
                         <button data-anode="${dataAttr}" data-change="1" onclick="adminApp.handleAnodeClick(this)">+</button>
                     </div>
                 </div>
@@ -1146,7 +1146,7 @@ export class AdminApp {
                     <div class="anode-price">$${price.toFixed(2)}</div>
                     <div class="anode-controls">
                         <button data-anode="${dataAttr}" data-change="-1" onclick="adminApp.handleAnodeClick(this)">−</button>
-                        <span class="quantity">${quantity}</span>
+                        <span class="quantity" id="qty-${anode.id}">${quantity}</span>
                         <button data-anode="${dataAttr}" data-change="1" onclick="adminApp.handleAnodeClick(this)">+</button>
                     </div>
                 </div>
@@ -1175,32 +1175,17 @@ export class AdminApp {
             delete this.selectedAnodes[sku];
         }
 
+        // Update the quantity display immediately
+        const qtyElement = document.getElementById(`qty-${sku}`);
+        if (qtyElement) {
+            qtyElement.textContent = this.selectedAnodes[sku]?.quantity || 0;
+        }
+
         // Update display
         this.updateAnodeSelection();
 
-        // Refresh the current view
-        const searchTerm = document.getElementById('anodeSearch')?.value || '';
-        const activeCategory = document.querySelector('.category-btn.active')?.textContent.toLowerCase() || 'all';
-
-        // Check if we're in shaft subfilter mode
-        const shaftSubfilter = document.getElementById('shaftSubfilter');
-        if (shaftSubfilter && shaftSubfilter.style.display !== 'none') {
-            const activeSubfilter = document.querySelector('.subfilter-btn.active');
-            if (activeSubfilter) {
-                const subfilterText = activeSubfilter.textContent.toLowerCase();
-                if (subfilterText.includes('standard')) {
-                    this.displayAnodesWithShaftType('standard', searchTerm);
-                } else if (subfilterText.includes('metric')) {
-                    this.displayAnodesWithShaftType('metric', searchTerm);
-                } else {
-                    this.displayAnodes('shaft', searchTerm);
-                }
-            } else {
-                this.displayAnodes(activeCategory, searchTerm);
-            }
-        } else {
-            this.displayAnodes(activeCategory, searchTerm);
-        }
+        // Don't refresh the entire view - it resets the quantity displays
+        // The quantity is already updated above directly in the DOM
     }
 
     updateAnodeSelection() {

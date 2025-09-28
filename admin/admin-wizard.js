@@ -377,10 +377,6 @@ const renderConsolidatedForm = function(isCleaningService, serviceKey) {
             <div class="selected-anodes" style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #e0e0e0;">
                 <h4>Selected Anodes: <span id="selectedCount">0</span></h4>
                 <div id="selectedAnodesList"></div>
-                <div class="anode-total" style="margin-top: 15px; padding: 15px; background: #fff3cd; border-radius: 8px;">
-                    <strong>Anodes Subtotal: $<span id="anodeSubtotal">0.00</span></strong>
-                    <br><small>Labor: $15 per anode</small>
-                </div>
             </div>
         </div>
     `;
