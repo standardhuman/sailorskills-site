@@ -182,10 +182,21 @@ export class AdminApp {
         const service = window.serviceData[serviceKey];
         if (!service) return;
 
-        // Disabled auto-scroll to prevent unwanted scrolling behavior
-        // setTimeout(() => {
-        //     this.scrollToServiceForm();
-        // }, 100);
+        // Scroll to wizard after a brief delay to ensure it's rendered
+        setTimeout(() => {
+            const wizardContainer = document.getElementById('wizardContainer');
+            if (wizardContainer && wizardContainer.style.display !== 'none') {
+                // Scroll to the wizard container (top of the form)
+                const headerHeight = 60;
+                const elementPosition = wizardContainer.getBoundingClientRect().top + window.pageYOffset;
+                const offsetPosition = elementPosition - headerHeight - 20; // 20px extra padding
+
+                window.scrollTo({
+                    top: Math.max(0, offsetPosition),
+                    behavior: 'smooth'
+                });
+            }
+        }, 150);
 
         // Check if renderConsolidatedForm should handle this service
         // (for services with anode picker functionality)

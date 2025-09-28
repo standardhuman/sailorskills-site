@@ -102,6 +102,18 @@ const renderConsolidatedForm = function(isCleaningService, serviceKey) {
         simpleServiceButtons.style.display = 'none';
     }
 
+    // Scroll to the wizard after a brief delay
+    setTimeout(() => {
+        const headerHeight = 60;
+        const elementPosition = wizardContainer.getBoundingClientRect().top + window.pageYOffset;
+        const offsetPosition = elementPosition - headerHeight - 20; // 20px extra padding
+
+        window.scrollTo({
+            top: Math.max(0, offsetPosition),
+            behavior: 'smooth'
+        });
+    }, 150);
+
     const service = window.serviceData ? window.serviceData[serviceKey] : null;
     const serviceName = service ? service.name : 'Service';
 
