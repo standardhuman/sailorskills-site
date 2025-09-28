@@ -316,14 +316,14 @@ export class AdminApp {
                 </div>
 
                 <div class="wizard-field">
-                    <label>Growth Level: <span id="growthPercent">0%</span> - <span id="growthLabel">Minimal</span></label>
-                    <input type="range" id="adminGrowthLevel" min="0" max="200" value="0"
+                    <label>Growth Level: <span id="growthLabel">Minimal</span> - <span id="growthPercent">0%</span> surcharge</label>
+                    <input type="range" id="adminGrowthLevel" min="0" max="100" value="0"
                            oninput="adminApp.updateGrowthDisplay(this.value); adminApp.updateFromWizard()">
                     <div class="slider-labels">
                         <span class="slider-label" style="left: 5%">Minimal<br><small>0%</small></span>
-                        <span class="slider-label" style="left: 35%">Moderate<br><small>50%</small></span>
-                        <span class="slider-label" style="left: 65%">Heavy<br><small>100%</small></span>
-                        <span class="slider-label" style="left: 95%">Severe<br><small>200%</small></span>
+                        <span class="slider-label" style="left: 30%">Moderate<br><small>25%</small></span>
+                        <span class="slider-label" style="left: 55%">Heavy<br><small>50%</small></span>
+                        <span class="slider-label" style="left: 85%">Severe<br><small>200%</small></span>
                     </div>
                 </div>
                 ` : ''}
@@ -356,8 +356,12 @@ export class AdminApp {
 
         // Set initial values
         document.getElementById('boatLength').value = '30';
-        document.getElementById('actualPaintCondition').value = 'excellent';
-        document.getElementById('actualGrowthLevel').value = '0';
+        if (document.getElementById('actualPaintCondition')) {
+            document.getElementById('actualPaintCondition').value = 'excellent';
+        }
+        if (document.getElementById('actualGrowthLevel')) {
+            document.getElementById('actualGrowthLevel').value = '0';
+        }
         document.getElementById('additionalHulls').value = '0';
 
         // Calculate initial price
@@ -377,23 +381,44 @@ export class AdminApp {
     }
 
     updateGrowthDisplay(value) {
-        const percent = parseInt(value);
-        document.getElementById('growthPercent').textContent = percent + '%';
-        document.getElementById('actualGrowthLevel').value = value;
+        const sliderValue = parseInt(value);
 
-        // Update the growth label based on percentage
+        // Calculate surcharge percentage and label based on slider position
+        let surchargePercent = 0;
+        let label = 'Minimal';
+
+        if (sliderValue <= 20) {
+            surchargePercent = 0;
+            label = 'Minimal';
+        } else if (sliderValue <= 35) {
+            surchargePercent = Math.round((sliderValue - 20) * 25 / 15);
+            label = 'Moderate';
+        } else if (sliderValue <= 60) {
+            surchargePercent = 25 + Math.round((sliderValue - 35) * 25 / 25);
+            label = 'Heavy';
+        } else {
+            surchargePercent = 50 + Math.round((sliderValue - 60) * 150 / 40);
+            label = 'Severe';
+        }
+
+        // Update display
+        document.getElementById('growthPercent').textContent = surchargePercent + '%';
         const labelEl = document.getElementById('growthLabel');
         if (labelEl) {
-            let label = 'Minimal';
-            if (percent >= 150) {
-                label = 'Severe';
-            } else if (percent >= 75) {
-                label = 'Heavy';
-            } else if (percent >= 25) {
-                label = 'Moderate';
-            }
             labelEl.textContent = label;
         }
+
+        // Store the slider value for surcharge calculation
+        let actualGrowthEl = document.getElementById('actualGrowthLevel');
+        if (!actualGrowthEl) {
+            // Create it if it doesn't exist
+            actualGrowthEl = document.createElement('input');
+            actualGrowthEl.type = 'hidden';
+            actualGrowthEl.id = 'actualGrowthLevel';
+            document.body.appendChild(actualGrowthEl);
+        }
+        actualGrowthEl.value = value;
+
         // updateFromWizard is called from the oninput handler
     }
 
@@ -538,19 +563,32 @@ export class AdminApp {
             // Paint condition is recorded but doesn't affect price
             this.surchargeDetails.paint = 0;
 
-            // Apply growth level surcharge
-            // 0-50% = 0% surcharge (Minimal to Moderate)
-            // 50-200% = 0% to 200% surcharge (scales linearly)
-            const growthLevel = parseInt(document.getElementById('actualGrowthLevel')?.value) || 0;
+            // Apply growth level surcharge based on slider value (0-100 scale)
+            // The slider value represents visual growth, not a direct percentage
+            const sliderValue = parseInt(document.getElementById('actualGrowthLevel')?.value) || 0;
             let growthSurcharge = 0;
+            let growthLabel = 'Minimal';
 
-            if (growthLevel > 50) {
-                // Scale from 0% to 200% surcharge for 50-200% growth
-                // Formula: (growthLevel - 50) * (200/150) / 100
-                growthSurcharge = ((growthLevel - 50) * 1.333) / 100;
+            if (sliderValue <= 20) {
+                // Minimal: 0% surcharge
+                growthSurcharge = 0;
+                growthLabel = 'Minimal';
+            } else if (sliderValue <= 35) {
+                // Moderate: 0-25% surcharge (scaled)
+                growthSurcharge = ((sliderValue - 20) * 25 / 15) / 100;
+                growthLabel = 'Moderate';
+            } else if (sliderValue <= 60) {
+                // Heavy: 25-50% surcharge (scaled)
+                growthSurcharge = (25 + ((sliderValue - 35) * 25 / 25)) / 100;
+                growthLabel = 'Heavy';
+            } else {
+                // Severe: 50-200% surcharge (scaled)
+                growthSurcharge = (50 + ((sliderValue - 60) * 150 / 40)) / 100;
+                growthLabel = 'Severe';
             }
 
             this.surchargeDetails.growth = growthSurcharge * 100;
+            this.surchargeDetails.growthLabel = growthLabel;
             cost *= (1 + growthSurcharge);
         }
 
