@@ -6,7 +6,7 @@ window.wizardCurrentStep = 0;
 window.wizardSteps = [];
 
 // Paint condition selection for wizard
-window.selectWizardPaintCondition = function(value) {
+const selectWizardPaintCondition = function(value) {
     // Remove selected class from all paint condition buttons
     document.querySelectorAll('.option-button[class*="paint-"]').forEach(btn => {
         btn.classList.remove('selected');
@@ -31,9 +31,10 @@ window.selectWizardPaintCondition = function(value) {
         }
     });
 };
+window.selectWizardPaintCondition = selectWizardPaintCondition;
 
 // Main function to render consolidated service form
-window.renderConsolidatedForm = function(isCleaningService, serviceKey) {
+const renderConsolidatedForm = function(isCleaningService, serviceKey) {
     console.log('renderConsolidatedForm called for', serviceKey);
 
     const wizardContainer = document.getElementById('wizardContainer');
@@ -287,18 +288,20 @@ window.renderConsolidatedForm = function(isCleaningService, serviceKey) {
     // Update pricing display
     updatePricing();
 };
+window.renderConsolidatedForm = renderConsolidatedForm;
 
 // Growth level display update
-window.updateGrowthDisplay = function(value) {
+const updateGrowthDisplay = function(value) {
     const labels = ['Minimal Growth', 'Moderate Growth', 'Heavy Growth', 'Severe Growth'];
     const display = document.getElementById('growthDisplay');
     if (display) {
         display.textContent = labels[parseInt(value)];
     }
 };
+window.updateGrowthDisplay = updateGrowthDisplay;
 
 // Navigate wizard steps (if multi-step wizard is used)
-window.navigateWizard = function(direction) {
+const navigateWizard = function(direction) {
     if (direction === 'next') {
         if (window.wizardCurrentStep < window.wizardSteps.length - 1) {
             window.wizardCurrentStep++;
@@ -311,9 +314,10 @@ window.navigateWizard = function(direction) {
         }
     }
 };
+window.navigateWizard = navigateWizard;
 
 // Update wizard display for multi-step forms
-window.updateWizardDisplay = function() {
+const updateWizardDisplay = function() {
     const steps = document.querySelectorAll('.wizard-step');
     steps.forEach((step, index) => {
         if (index === window.wizardCurrentStep) {
@@ -335,6 +339,7 @@ window.updateWizardDisplay = function() {
         nextBtn.textContent = window.wizardCurrentStep === window.wizardSteps.length - 1 ? 'Finish' : 'Next';
     }
 };
+window.updateWizardDisplay = updateWizardDisplay;
 
 // Update pricing function
 window.updatePricing = function() {
@@ -347,12 +352,7 @@ window.updatePricing = function() {
     }
 };
 
-// Make functions globally available immediately
-window.selectWizardPaintCondition = selectWizardPaintCondition;
-window.renderConsolidatedForm = renderConsolidatedForm;
-window.updateGrowthDisplay = updateGrowthDisplay;
-window.navigateWizard = navigateWizard;
-window.updateWizardDisplay = updateWizardDisplay;
+// All functions already assigned to window above
 
 // Export for use in other modules
 export {
