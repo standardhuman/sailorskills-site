@@ -1047,12 +1047,61 @@ window.updateWizardPricing = function() {
         summaryHTML += breakdown.map(line => `<div class="charge-detail-row" style="font-size: 14px; margin: 5px 0;">${line}</div>`).join('');
         summaryHTML += '</div>';
 
-        // Add total with emphasis
+        // Check for any price adjustments
+        let adjustedTotal = finalTotal;
+        if (window.adminApp && window.adminApp.priceAdjustment) {
+            const adjustment = window.adminApp.priceAdjustment;
+            if (adjustment.type === 'percent') {
+                adjustedTotal = finalTotal * (1 - adjustment.value / 100);
+                summaryHTML += `
+                    <div class="charge-detail-row" style="font-size: 14px; color: #e67e22; margin: 10px 0;">
+                        <span>Discount (${adjustment.value}%):</span>
+                        <span>-$${(finalTotal - adjustedTotal).toFixed(2)}</span>
+                    </div>`;
+            } else if (adjustment.type === 'dollar') {
+                adjustedTotal = Math.max(0, finalTotal - adjustment.value);
+                summaryHTML += `
+                    <div class="charge-detail-row" style="font-size: 14px; color: #e67e22; margin: 10px 0;">
+                        <span>Discount:</span>
+                        <span>-$${adjustment.value.toFixed(2)}</span>
+                    </div>`;
+            } else if (adjustment.type === 'custom') {
+                adjustedTotal = adjustment.value;
+                const diff = finalTotal - adjustedTotal;
+                if (diff > 0) {
+                    summaryHTML += `
+                        <div class="charge-detail-row" style="font-size: 14px; color: #e67e22; margin: 10px 0;">
+                            <span>Adjustment:</span>
+                            <span>-$${diff.toFixed(2)}</span>
+                        </div>`;
+                } else if (diff < 0) {
+                    summaryHTML += `
+                        <div class="charge-detail-row" style="font-size: 14px; color: #27ae60; margin: 10px 0;">
+                            <span>Adjustment:</span>
+                            <span>+$${Math.abs(diff).toFixed(2)}</span>
+                        </div>`;
+                }
+            }
+        }
+
+        // Store final price for charging
+        if (window.adminApp) {
+            window.adminApp.finalPrice = adjustedTotal;
+        }
+
+        // Add total with emphasis and edit button
         summaryHTML += `
             <div style="margin-top: 15px; padding-top: 15px; border-top: 2px solid #3498db;">
                 <div class="charge-detail-row" style="font-size: 20px; font-weight: bold;">
                     <span>Total:</span>
-                    <span style="color: #27ae60;">$${finalTotal.toFixed(2)}</span>
+                    <span style="color: #27ae60; display: flex; align-items: center; gap: 10px;">
+                        $${adjustedTotal.toFixed(2)}
+                        <button onclick="window.adminApp.openPriceCustomization(${finalTotal})"
+                            style="padding: 2px 8px; font-size: 11px; background: #7f8c8d; color: white; border: none; border-radius: 3px; cursor: pointer;"
+                            title="Customize price">
+                            ✏️
+                        </button>
+                    </span>
                 </div>
             </div>`;
 
