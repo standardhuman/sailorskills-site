@@ -802,7 +802,8 @@ window.updateWizardPricing = function() {
         if (paintSurchargeRate > 0) {
             const surcharge = basePrice * paintSurchargeRate;
             totalSurcharge += surcharge;
-            breakdown.push(`Paint condition (${paintCondition}) surcharge: +$${surcharge.toFixed(2)}`);
+            const percentage = (paintSurchargeRate * 100).toFixed(0);
+            breakdown.push(`Paint condition (${paintCondition}) surcharge (${percentage}%): +$${surcharge.toFixed(2)}`);
         }
 
         // Growth level surcharge
@@ -818,8 +819,15 @@ window.updateWizardPricing = function() {
         if (growthSurchargeRate > 0) {
             const surcharge = basePrice * growthSurchargeRate;
             totalSurcharge += surcharge;
-            breakdown.push(`Growth level (${growthLevel}) surcharge: +$${surcharge.toFixed(2)}`);
+            const percentage = (growthSurchargeRate * 100).toFixed(0);
+            breakdown.push(`Growth level (${growthLevel}) surcharge (${percentage}%): +$${surcharge.toFixed(2)}`);
         }
+    }
+
+    // Add total surcharge summary if there are surcharges
+    if (totalSurcharge > 0 && basePrice > 0) {
+        const totalSurchargePercent = ((totalSurcharge / basePrice) * 100).toFixed(0);
+        breakdown.push(`<strong>Total surcharges (${totalSurchargePercent}%): +$${totalSurcharge.toFixed(2)}</strong>`);
     }
 
     // Calculate total
