@@ -790,10 +790,28 @@ window.updateWizardPricing = function() {
         editableAmount.value = finalTotal.toFixed(2);
     }
 
+    // Update total cost display for charge summary
+    const totalCostDisplay = document.getElementById('totalCostDisplay');
+    if (totalCostDisplay) {
+        totalCostDisplay.textContent = `$${finalTotal.toFixed(2)}`;
+    }
+
+    const totalCost = document.getElementById('totalCost');
+    if (totalCost) {
+        totalCost.textContent = `$${finalTotal.toFixed(2)}`;
+        totalCost.value = finalTotal.toFixed(2);
+    }
+
     // Enable charge button
     const chargeButton = document.getElementById('pricingChargeButton');
     if (chargeButton) {
         chargeButton.disabled = false;
+    }
+
+    // Also enable the main charge button
+    const mainChargeButton = document.getElementById('chargeButton');
+    if (mainChargeButton) {
+        mainChargeButton.disabled = false;
     }
 };
 

@@ -321,6 +321,11 @@
             console.log('Service selected:', serviceKey);
             window.currentServiceKey = serviceKey;
 
+            // Update the adminApp's currentServiceKey
+            if (window.adminApp) {
+                window.adminApp.currentServiceKey = serviceKey;
+            }
+
             // Determine if it's a cleaning service
             const isCleaningService = serviceKey === 'recurring_cleaning' || serviceKey === 'onetime_cleaning';
 
@@ -353,8 +358,25 @@
             console.log('updatePricing called');
         };
 
-        window.updateChargeSummary = window.updateChargeSummary || function() {
+        // Connect updateChargeSummary to the AdminApp instance
+        window.updateChargeSummary = function() {
             console.log('updateChargeSummary called');
+            if (window.adminApp && typeof window.adminApp.updateChargeSummary === 'function') {
+                window.adminApp.updateChargeSummary();
+            }
+        };
+
+        // Define calculateCost function that triggers pricing updates
+        window.calculateCost = function() {
+            console.log('calculateCost called');
+            // Update wizard pricing display
+            if (window.updateWizardPricing) {
+                window.updateWizardPricing();
+            }
+            // Update the main charge summary
+            if (window.updateChargeSummary) {
+                window.updateChargeSummary();
+            }
         };
 
         // Initialize on page load
@@ -385,5 +407,29 @@
             });
         });
     </script>
+
+    <!-- Hidden inputs for form data -->
+    <input type="hidden" id="selectedCustomerId" value="">
+    <input type="hidden" id="boatName" value="">
+    <input type="hidden" id="boatLength" value="">
+    <input type="hidden" id="paintCondition" value="good">
+    <input type="hidden" id="paint_condition" value="good">
+    <input type="hidden" id="growthLevel" value="minimal">
+    <input type="hidden" id="growth_level" value="minimal">
+    <input type="hidden" id="serviceKey" value="">
+    <input type="hidden" id="servicePrice" value="0">
+    <input type="hidden" id="anodesToInstall" value="0">
+    <input type="hidden" id="totalCost" value="0">
+    <input type="hidden" id="totalCostDisplay" value="0">
+    <input type="hidden" id="has_twin_engines" value="">
+
+    <!-- Hidden radio groups for boat/hull configuration -->
+    <div style="display:none;">
+        <input type="radio" name="boat_type" value="sailboat" checked>
+        <input type="radio" name="boat_type" value="powerboat">
+        <input type="radio" name="hull_type" value="monohull" checked>
+        <input type="radio" name="hull_type" value="catamaran">
+        <input type="radio" name="hull_type" value="trimaran">
+    </div>
 </body>
 </html>
