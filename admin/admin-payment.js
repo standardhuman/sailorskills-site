@@ -615,7 +615,8 @@ window.updateChargeSummary = function() {
 // Make functions globally available immediately
 window.chargeCustomer = chargeCustomer;
 window.updateChargeButton = updateChargeButton;
-window.updateChargeSummary = updateChargeSummary;
+// Don't overwrite the delegation function we defined above - it's already set on line 565
+// window.updateChargeSummary = updateChargeSummary;
 window.showPaymentMethodForm = showPaymentMethodForm;
 window.closePaymentMethodForm = closePaymentMethodForm;
 window.openCustomerSelectionModal = openCustomerSelectionModal;

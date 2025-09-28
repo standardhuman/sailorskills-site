@@ -1330,6 +1330,15 @@ export class AdminApp {
 
     // Charge Summary
     updateChargeSummary() {
+        // For wizard services, delegate to updateWizardPricing for detailed summary
+        if (window.updateWizardPricing &&
+            (this.currentServiceKey === 'recurring_cleaning' ||
+             this.currentServiceKey === 'onetime_cleaning' ||
+             this.currentServiceKey === 'anodes_only')) {
+            window.updateWizardPricing();
+            return;
+        }
+
         const chargeDetails = document.getElementById('chargeDetails');
         const chargeButton = document.getElementById('chargeButton');
 
@@ -1354,8 +1363,17 @@ export class AdminApp {
             }
         }
 
-        // Update charge details
+        // Update charge details - preserve chargeSummaryContent div
         if (this.currentServiceKey) {
+            // Find or create chargeSummaryContent
+            let summaryContent = document.getElementById('chargeSummaryContent');
+            if (!summaryContent) {
+                summaryContent = document.createElement('div');
+                summaryContent.id = 'chargeSummaryContent';
+                chargeDetails.innerHTML = '';
+                chargeDetails.appendChild(summaryContent);
+            }
+
             let detailsHTML = `
                 <div class="charge-detail-row">
                     <span>Service:</span>
@@ -1510,9 +1528,18 @@ export class AdminApp {
                     <span><strong>$${price.toFixed(2)}</strong></span>
                 </div>`;
 
-            chargeDetails.innerHTML = detailsHTML;
+            // Don't overwrite the chargeSummaryContent div - write to it instead
+            summaryContent.innerHTML = detailsHTML;
         } else {
-            chargeDetails.innerHTML = '<div style="text-align: center; color: #7f8c8d;">Select a customer and configure service details</div>';
+            // Clear charge details when no service
+            let summaryContent = document.getElementById('chargeSummaryContent');
+            if (!summaryContent) {
+                summaryContent = document.createElement('div');
+                summaryContent.id = 'chargeSummaryContent';
+                chargeDetails.innerHTML = '';
+                chargeDetails.appendChild(summaryContent);
+            }
+            summaryContent.innerHTML = '<div style="text-align: center; color: #7f8c8d;">Select a customer and configure service details</div>';
         }
 
         // Enable button if service is selected (customer can be selected later)
