@@ -1058,15 +1058,15 @@ window.updateWizardPricing = function() {
             chargeButton.disabled = !window.selectedCustomer || !window.selectedCustomer.payment_method || !serviceKey;
         }
 
-        // Scroll to charge summary if not visible
-        const chargeSummarySection = document.querySelector('.charge-summary');
-        if (chargeSummarySection) {
-            const rect = chargeSummarySection.getBoundingClientRect();
-            const isVisible = rect.top >= 0 && rect.bottom <= window.innerHeight;
-            if (!isVisible) {
-                chargeSummarySection.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-        }
+        // Disabled auto-scroll to prevent unwanted scrolling when interacting with wizard
+        // const chargeSummarySection = document.querySelector('.charge-summary');
+        // if (chargeSummarySection) {
+        //     const rect = chargeSummarySection.getBoundingClientRect();
+        //     const isVisible = rect.top >= 0 && rect.bottom <= window.innerHeight;
+        //     if (!isVisible) {
+        //         chargeSummarySection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        //     }
+        // }
     }
 
     // CRITICAL: Update the hidden totalCost input that charge summary reads from

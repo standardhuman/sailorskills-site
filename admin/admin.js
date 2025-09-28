@@ -182,10 +182,10 @@ export class AdminApp {
         const service = window.serviceData[serviceKey];
         if (!service) return;
 
-        // Smooth scroll to the service form after a brief delay to ensure it's rendered
-        setTimeout(() => {
-            this.scrollToServiceForm();
-        }, 100);
+        // Disabled auto-scroll to prevent unwanted scrolling behavior
+        // setTimeout(() => {
+        //     this.scrollToServiceForm();
+        // }, 100);
 
         // Check if renderConsolidatedForm should handle this service
         // (for services with anode picker functionality)
