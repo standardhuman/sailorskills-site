@@ -1061,24 +1061,23 @@ export class AdminApp {
         const anodeData = JSON.parse(atob(button.dataset.anode));
         const change = parseInt(button.dataset.change);
 
-        // Calculate the new quantity before updating
-        if (!this.selectedAnodes) {
-            this.selectedAnodes = {};
-        }
-        if (!this.selectedAnodes[anodeData.id]) {
-            this.selectedAnodes[anodeData.id] = { quantity: 0, price: anodeData.price, name: anodeData.name };
-        }
-        const currentQty = this.selectedAnodes[anodeData.id].quantity;
-        const newQuantity = Math.max(0, currentQty + change);
-
-        // Update the quantity
+        // Update the quantity in the data
         this.updateAnodeQuantity(anodeData.id, change, anodeData.price, anodeData.name);
 
-        // Update the quantity display immediately with the new value
+        // Get the new quantity after update
+        const newQuantity = this.selectedAnodes[anodeData.id]?.quantity || 0;
+
+        // Update the quantity display immediately
         const quantitySpan = button.parentElement.querySelector('.quantity');
         if (quantitySpan) {
             quantitySpan.textContent = newQuantity;
         }
+
+        // Update anode details for charge summary immediately
+        this.anodeDetails = this.getSelectedAnodes();
+
+        // Force update of charge summary
+        this.updateChargeSummary();
     }
 
     updateAnodeQuantity(sku, change, price, name) {
@@ -1099,29 +1098,8 @@ export class AdminApp {
         // Update display
         this.updateAnodeSelection();
 
-        // Refresh the current view
-        const searchTerm = document.getElementById('anodeSearch')?.value || '';
-        const activeCategory = document.querySelector('.category-btn.active')?.textContent.toLowerCase() || 'all';
-
-        // Check if we're in shaft subfilter mode
-        const shaftSubfilter = document.getElementById('shaftSubfilter');
-        if (shaftSubfilter && shaftSubfilter.style.display !== 'none') {
-            const activeSubfilter = document.querySelector('.subfilter-btn.active');
-            if (activeSubfilter) {
-                const subfilterText = activeSubfilter.textContent.toLowerCase();
-                if (subfilterText.includes('standard')) {
-                    this.displayAnodesWithShaftType('standard', searchTerm);
-                } else if (subfilterText.includes('metric')) {
-                    this.displayAnodesWithShaftType('metric', searchTerm);
-                } else {
-                    this.displayAnodes('shaft', searchTerm);
-                }
-            } else {
-                this.displayAnodes(activeCategory, searchTerm);
-            }
-        } else {
-            this.displayAnodes(activeCategory, searchTerm);
-        }
+        // Don't refresh the entire grid - it will reset the display
+        // The quantity is already updated in handleAnodeClick
     }
 
     updateAnodeSelection() {

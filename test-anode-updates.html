@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Anode Updates</title>
+</head>
+<body>
+    <h1>Manual Test Instructions for Anode Updates</h1>
+
+    <h2>Test 1: Anode Quantity Display Update</h2>
+    <ol>
+        <li>Go to http://localhost:3000/admin</li>
+        <li>Click "Recurring Cleaning" service</li>
+        <li>Select "Bi-Weekly" frequency</li>
+        <li>Click "Add Anodes to Service" button</li>
+        <li>Find any anode (e.g., "Azimut 35mm Propeller")</li>
+        <li>Click the + button next to it</li>
+        <li><strong>✓ The number should immediately change from 0 to 1</strong></li>
+        <li>Click + again</li>
+        <li><strong>✓ The number should immediately change to 2</strong></li>
+        <li>Click the - button</li>
+        <li><strong>✓ The number should immediately change to 1</strong></li>
+    </ol>
+
+    <h2>Test 2: Selected Anodes Counter</h2>
+    <ol>
+        <li>While in the anode picker:</li>
+        <li>Look at "Selected Anodes: X" at the bottom of the anode card</li>
+        <li>When you click + on an anode:</li>
+        <li><strong>✓ The "Selected Anodes: X" count should increase immediately</strong></li>
+        <li>When you click - on an anode:</li>
+        <li><strong>✓ The "Selected Anodes: X" count should decrease immediately</strong></li>
+    </ol>
+
+    <h2>Test 3: Charge Summary Update</h2>
+    <ol>
+        <li>While selecting anodes, look at the Charge Summary section below</li>
+        <li>When you add an anode (click +):</li>
+        <li><strong>✓ The anode should appear in the Charge Summary immediately</strong></li>
+        <li><strong>✓ The total price should update to include the anode cost</strong></li>
+        <li>When you remove an anode (click -):</li>
+        <li><strong>✓ The charge summary should update immediately</strong></li>
+        <li>You should NOT need to change other settings for anodes to appear</li>
+    </ol>
+
+    <h2>Test 4: Price Customization</h2>
+    <ol>
+        <li>After selecting some anodes and seeing the charge summary</li>
+        <li>Look for the edit button (✏️) next to the final charge amount</li>
+        <li>Click it to open the customization modal</li>
+        <li>Try applying a percentage discount</li>
+        <li><strong>✓ The charge summary should show the discount</strong></li>
+        <li><strong>✓ The charge button should show the discounted amount</strong></li>
+    </ol>
+
+    <h2>Summary of Fixes Applied:</h2>
+    <ul>
+        <li>✅ Anode quantity updates immediately in the UI when clicking +/-</li>
+        <li>✅ Selected Anodes counter updates immediately</li>
+        <li>✅ Charge summary updates immediately when anodes are selected</li>
+        <li>✅ No need to re-render entire grid on quantity change</li>
+        <li>✅ anodeDetails is set immediately, not just on confirmation</li>
+        <li>✅ Price customization feature added with three options</li>
+    </ul>
+</body>
+</html>
