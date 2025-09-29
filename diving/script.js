@@ -157,11 +157,19 @@ document.addEventListener('DOMContentLoaded', function() {
         lastCleanedDropdown.addEventListener('change', updateGrowthSurchargeDisplay);
     }
     
-    // Initialize Stripe
-    initializeStripe();
-    
+    // Initialize Stripe with error handling
+    try {
+        initializeStripe();
+    } catch (error) {
+        console.error('Failed to initialize Stripe:', error);
+    }
+
     // Setup checkout event listeners
-    setupCheckoutListeners();
+    try {
+        setupCheckoutListeners();
+    } catch (error) {
+        console.error('Failed to setup checkout listeners:', error);
+    }
 
     renderCurrentStep(); // Initial render
 });
@@ -1175,10 +1183,16 @@ function getSpecificGrowthSurchargePercent(paintCondition, lastCleanedValue) {
 
 // Initialize Stripe
 function initializeStripe() {
+    // Check if Stripe is available
+    if (typeof Stripe === 'undefined') {
+        console.error('Stripe library not loaded');
+        return;
+    }
+
     // Stripe publishable key for Sailor Skills
     stripe = Stripe('pk_live_pri1IepedMvGQmLCFrV4kVzF');
     elements = stripe.elements();
-    
+
     // Create card element
     const style = {
         base: {
@@ -1192,7 +1206,11 @@ function initializeStripe() {
     };
     
     cardElement = elements.create('card', { style: style });
-    cardElement.mount('#card-element');
+    // Only mount if the element exists
+    const cardElementContainer = document.getElementById('card-element');
+    if (cardElementContainer) {
+        cardElement.mount('#card-element');
+    }
     
     // Handle errors
     cardElement.on('change', function(event) {
@@ -1455,11 +1473,18 @@ function showOrderConfirmation(orderNumber) {
 
 // Show checkout section
 function showCheckout() {
+    console.log('showCheckout called with selectedServiceKey:', selectedServiceKey);
     // Hide calculator, show checkout
     stepElements.forEach(el => el.style.display = 'none');
     document.querySelector('.navigation-buttons').style.display = 'none';
     document.querySelector('.service-info-section').style.display = 'none';
     checkoutSection.style.display = 'block';
+
+    // Mount Stripe card element if not already mounted
+    const cardElementContainer = document.getElementById('card-element');
+    if (cardElementContainer && cardElement && !cardElementContainer.hasChildNodes()) {
+        cardElement.mount('#card-element');
+    }
     
     // Show/hide appropriate form sections based on service type
     const boatInfoSection = document.getElementById('boat-info-section');
@@ -1467,6 +1492,14 @@ function showCheckout() {
     const anodeDetailsSection = document.getElementById('anode-details-section');
     const intervalSection = document.getElementById('service-interval-section');
     const oneTimeOption = document.querySelector('[data-interval="one-time"]');
+
+    console.log('showCheckout - Elements found:', {
+        boatInfo: boatInfoSection !== null,
+        itemRecovery: itemRecoverySection !== null,
+        anodeDetails: anodeDetailsSection !== null,
+        serviceInterval: intervalSection !== null,
+        selectedService: selectedServiceKey
+    });
 
     // Handle form sections based on service type
     if (selectedServiceKey === 'item_recovery') {
@@ -1489,7 +1522,13 @@ function showCheckout() {
 
         // Show anode details section only for anodes_only service
         if (anodeDetailsSection) {
-            anodeDetailsSection.style.display = (selectedServiceKey === 'anodes_only') ? 'block' : 'none';
+            const shouldShowAnodeDetails = (selectedServiceKey === 'anodes_only');
+            console.log('Checking anode details visibility:', {
+                selectedServiceKey: selectedServiceKey,
+                shouldShow: shouldShowAnodeDetails,
+                settingTo: shouldShowAnodeDetails ? 'block' : 'none'
+            });
+            anodeDetailsSection.style.display = shouldShowAnodeDetails ? 'block' : 'none';
         }
         
         // Update required fields
