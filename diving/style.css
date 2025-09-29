@@ -899,6 +899,23 @@ input[type="tel"]:focus {
     outline: none;
 }
 
+/* Anode Details Textarea Styles */
+#anode-details-section textarea {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    resize: vertical;
+    min-height: 100px;
+}
+
+#anode-details-section textarea:focus {
+    border-color: #56B4EF;
+    outline: none;
+}
+
 /* Larger date picker for item recovery */
 #drop-date {
     padding: 14px 16px;
