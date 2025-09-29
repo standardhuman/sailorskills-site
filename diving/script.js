@@ -1326,6 +1326,11 @@ async function handleOrderSubmission() {
             formData.marinaName = document.getElementById('marina-name')?.value || '';
             formData.dock = document.getElementById('dock')?.value || '';
             formData.slipNumber = document.getElementById('slip-number')?.value || '';
+
+            // Add anode details if it's anodes_only service
+            if (selectedServiceKey === 'anodes_only') {
+                formData.anodeDetails = document.getElementById('anode-details')?.value || '';
+            }
         }
 
         console.log('Submitting order with data:', formData);
@@ -1459,14 +1464,16 @@ function showCheckout() {
     // Show/hide appropriate form sections based on service type
     const boatInfoSection = document.getElementById('boat-info-section');
     const itemRecoverySection = document.getElementById('item-recovery-section');
+    const anodeDetailsSection = document.getElementById('anode-details-section');
     const intervalSection = document.getElementById('service-interval-section');
     const oneTimeOption = document.querySelector('[data-interval="one-time"]');
-    
+
     // Handle form sections based on service type
     if (selectedServiceKey === 'item_recovery') {
         // For item recovery, show special location form
         if (boatInfoSection) boatInfoSection.style.display = 'none';
         if (itemRecoverySection) itemRecoverySection.style.display = 'block';
+        if (anodeDetailsSection) anodeDetailsSection.style.display = 'none';
 
         // Hide interval section and set to one-time
         intervalSection.style.display = 'none';
@@ -1479,6 +1486,11 @@ function showCheckout() {
         // For all other services, show boat info
         if (boatInfoSection) boatInfoSection.style.display = 'block';
         if (itemRecoverySection) itemRecoverySection.style.display = 'none';
+
+        // Show anode details section only for anodes_only service
+        if (anodeDetailsSection) {
+            anodeDetailsSection.style.display = (selectedServiceKey === 'anodes_only') ? 'block' : 'none';
+        }
         
         // Update required fields
         toggleRequiredFields(true, false);
