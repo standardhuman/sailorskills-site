@@ -94,6 +94,7 @@ let selectedServiceInterval = null;
 let stripe = null;
 let elements = null;
 let cardElement = null;
+let stripeInitialized = false; // Track if Stripe has been initialized
 
 // Store order data
 let orderData = {
@@ -157,14 +158,10 @@ document.addEventListener('DOMContentLoaded', function() {
         lastCleanedDropdown.addEventListener('change', updateGrowthSurchargeDisplay);
     }
     
-    // Initialize Stripe with error handling
-    try {
-        initializeStripe();
-    } catch (error) {
-        console.error('Failed to initialize Stripe:', error);
-    }
+    // Stripe will be initialized when checkout is shown
+    // This prevents errors from trying to mount to non-existent elements
 
-    // Setup checkout event listeners
+    // Setup checkout event listeners (these elements exist on page load)
     try {
         setupCheckoutListeners();
     } catch (error) {
@@ -984,6 +981,7 @@ function calculateCost() {
     // Store order data
     orderData.estimate = finalCost;
     orderData.service = currentServiceData.name;
+    orderData.serviceKey = selectedServiceKey; // Store the service key for later use
     orderData.boatLength = boatLength;
     orderData.serviceDetails = {
         baseRate: currentServiceData.rate,
@@ -1183,45 +1181,62 @@ function getSpecificGrowthSurchargePercent(paintCondition, lastCleanedValue) {
 
 // Initialize Stripe
 function initializeStripe() {
+    // Prevent re-initialization
+    if (stripeInitialized) {
+        return true;
+    }
+
     // Check if Stripe is available
     if (typeof Stripe === 'undefined') {
         console.error('Stripe library not loaded');
-        return;
+        return false;
     }
 
-    // Stripe publishable key for Sailor Skills
-    stripe = Stripe('pk_live_pri1IepedMvGQmLCFrV4kVzF');
-    elements = stripe.elements();
+    try {
+        // Stripe publishable key for Sailor Skills
+        stripe = Stripe('pk_live_pri1IepedMvGQmLCFrV4kVzF');
+        elements = stripe.elements();
 
-    // Create card element
-    const style = {
-        base: {
-            fontSize: '16px',
-            color: '#000',
-            fontFamily: 'Arial, sans-serif',
-            '::placeholder': {
-                color: '#999'
+        // Create card element
+        const style = {
+            base: {
+                fontSize: '16px',
+                color: '#000',
+                fontFamily: 'Arial, sans-serif',
+                '::placeholder': {
+                    color: '#999'
+                }
             }
+        };
+
+        cardElement = elements.create('card', { style: style });
+
+        // Only mount and add handlers if the element exists
+        const cardElementContainer = document.getElementById('card-element');
+        if (cardElementContainer) {
+            cardElement.mount('#card-element');
+
+            // Only add event handler after successful mount
+            cardElement.on('change', function(event) {
+                const displayError = document.getElementById('card-errors');
+                if (event.error) {
+                    displayError.textContent = event.error.message;
+                } else {
+                    displayError.textContent = '';
+                }
+                validateCheckoutForm();
+            });
+
+            stripeInitialized = true;
+            return true;
         }
-    };
-    
-    cardElement = elements.create('card', { style: style });
-    // Only mount if the element exists
-    const cardElementContainer = document.getElementById('card-element');
-    if (cardElementContainer) {
-        cardElement.mount('#card-element');
+
+        // Element not found - will initialize later
+        return false;
+    } catch (error) {
+        console.error('Error initializing Stripe:', error);
+        return false;
     }
-    
-    // Handle errors
-    cardElement.on('change', function(event) {
-        const displayError = document.getElementById('card-errors');
-        if (event.error) {
-            displayError.textContent = event.error.message;
-        } else {
-            displayError.textContent = '';
-        }
-        validateCheckoutForm();
-    });
 }
 
 // Setup checkout event listeners
@@ -1473,19 +1488,18 @@ function showOrderConfirmation(orderNumber) {
 
 // Show checkout section
 function showCheckout() {
-    console.log('showCheckout called with selectedServiceKey:', selectedServiceKey);
+
     // Hide calculator, show checkout
     stepElements.forEach(el => el.style.display = 'none');
     document.querySelector('.navigation-buttons').style.display = 'none';
     document.querySelector('.service-info-section').style.display = 'none';
     checkoutSection.style.display = 'block';
 
-    // Mount Stripe card element if not already mounted
-    const cardElementContainer = document.getElementById('card-element');
-    if (cardElementContainer && cardElement && !cardElementContainer.hasChildNodes()) {
-        cardElement.mount('#card-element');
+    // Initialize Stripe if not already done
+    if (!stripeInitialized) {
+        initializeStripe();
     }
-    
+
     // Show/hide appropriate form sections based on service type
     const boatInfoSection = document.getElementById('boat-info-section');
     const itemRecoverySection = document.getElementById('item-recovery-section');
@@ -1493,13 +1507,6 @@ function showCheckout() {
     const intervalSection = document.getElementById('service-interval-section');
     const oneTimeOption = document.querySelector('[data-interval="one-time"]');
 
-    console.log('showCheckout - Elements found:', {
-        boatInfo: boatInfoSection !== null,
-        itemRecovery: itemRecoverySection !== null,
-        anodeDetails: anodeDetailsSection !== null,
-        serviceInterval: intervalSection !== null,
-        selectedService: selectedServiceKey
-    });
 
     // Handle form sections based on service type
     if (selectedServiceKey === 'item_recovery') {
@@ -1522,12 +1529,10 @@ function showCheckout() {
 
         // Show anode details section only for anodes_only service
         if (anodeDetailsSection) {
-            const shouldShowAnodeDetails = (selectedServiceKey === 'anodes_only');
-            console.log('Checking anode details visibility:', {
-                selectedServiceKey: selectedServiceKey,
-                shouldShow: shouldShowAnodeDetails,
-                settingTo: shouldShowAnodeDetails ? 'block' : 'none'
-            });
+            // Check selectedServiceKey or orderData.serviceKey or orderData.service name
+            const shouldShowAnodeDetails = (selectedServiceKey === 'anodes_only') ||
+                                          (orderData && orderData.serviceKey === 'anodes_only') ||
+                                          (orderData && orderData.service === 'Anodes Only');
             anodeDetailsSection.style.display = shouldShowAnodeDetails ? 'block' : 'none';
         }
         
