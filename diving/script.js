@@ -1007,7 +1007,7 @@ function calculateCost() {
         checkoutButton.textContent = 'Proceed to Checkout';
         checkoutButton.style.marginTop = '20px';
         checkoutButton.style.marginBottom = '10px';
-        checkoutButton.addEventListener('click', showCheckout);
+        checkoutButton.addEventListener('click', () => window.showCheckout());
 
         // Insert button right before the navigation buttons (which contains Start Over)
         const navButtons = document.querySelector('.navigation-buttons');
@@ -1488,7 +1488,7 @@ function showOrderConfirmation(orderNumber) {
 
 // Show checkout section
 function showCheckout() {
-
+    console.log('[DEBUG] showCheckout called, selectedServiceKey =', selectedServiceKey);
     // Hide calculator, show checkout
     stepElements.forEach(el => el.style.display = 'none');
     document.querySelector('.navigation-buttons').style.display = 'none';
@@ -1529,10 +1529,8 @@ function showCheckout() {
 
         // Show anode details section only for anodes_only service
         if (anodeDetailsSection) {
-            // Check selectedServiceKey or orderData.serviceKey or orderData.service name
-            const shouldShowAnodeDetails = (selectedServiceKey === 'anodes_only') ||
-                                          (orderData && orderData.serviceKey === 'anodes_only') ||
-                                          (orderData && orderData.service === 'Anodes Only');
+            // Simply check if selectedServiceKey is anodes_only
+            const shouldShowAnodeDetails = (selectedServiceKey === 'anodes_only');
             anodeDetailsSection.style.display = shouldShowAnodeDetails ? 'block' : 'none';
         }
         
@@ -1593,6 +1591,9 @@ function showCheckout() {
         }
     }, 100);
 }
+
+// Export showCheckout immediately so it's available for event listeners
+window.showCheckout = showCheckout;
 
 // Toggle required fields based on service type
 function toggleRequiredFields(boatFields, itemRecoveryFields) {
@@ -1659,10 +1660,11 @@ function updateGrowthSurchargeDisplay() {
     growthExplainerEl.innerHTML = growthExplainerMsg;
 }
 
-// Export functions for use in admin.html
+// Export functions for use in admin.html and event handlers
 window.populateServiceButtons = populateServiceButtons;
 window.calculateCost = calculateCost;
 window.selectService = selectService;
+// showCheckout is already exported right after its definition
 window.serviceData = serviceData;
 // Expose selectedServiceKey as a getter so it's always current
 Object.defineProperty(window, 'selectedServiceKey', {
