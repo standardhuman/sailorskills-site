@@ -40,5 +40,16 @@
     { "source": "/admin", "destination": "/admin/admin.html" },
     { "source": "/inventory", "destination": "/inventory/inventory.html" },
     { "source": "/booking", "destination": "/booking.html" }
+  ],
+  "headers": [
+    {
+      "source": "/diving/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=3600"
+        }
+      ]
+    }
   ]
 }
