@@ -37,6 +37,7 @@
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/server.js" },
     { "source": "/diving", "destination": "/diving/diving.html" },
+    { "source": "/diving/(.*)", "destination": "/diving/$1" },
     { "source": "/admin", "destination": "/admin/admin.html" },
     { "source": "/inventory", "destination": "/inventory/inventory.html" },
     { "source": "/booking", "destination": "/booking.html" }
