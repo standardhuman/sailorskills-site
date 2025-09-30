@@ -22,6 +22,18 @@
       "use": "@vercel/static"
     },
     {
+      "src": "diving/**",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "admin/**",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "inventory/**",
+      "use": "@vercel/static"
+    },
+    {
       "src": "public/**",
       "use": "@vercel/static"
     },
@@ -34,13 +46,12 @@
       "use": "@vercel/node"
     }
   ],
-  "routes": [
-    { "src": "/api/(.*)", "dest": "/server.js" },
-    { "src": "/diving/([^/]+\\.(css|js|mjs))", "dest": "/diving/$1" },
-    { "src": "/diving", "dest": "/diving/diving.html" },
-    { "src": "/admin", "dest": "/admin/admin.html" },
-    { "src": "/inventory", "dest": "/inventory/inventory.html" },
-    { "src": "/booking", "dest": "/booking.html" }
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/server.js" },
+    { "source": "/diving", "destination": "/diving/diving.html" },
+    { "source": "/admin", "destination": "/admin/admin.html" },
+    { "source": "/inventory", "destination": "/inventory/inventory.html" },
+    { "source": "/booking", "destination": "/booking.html" }
   ],
   "headers": [
     {
