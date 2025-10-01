@@ -1,1 +1,0 @@
-# BOATY utils package initialization
