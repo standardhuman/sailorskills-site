@@ -28,9 +28,29 @@ try {
     console.warn('API routes not available:', error.message);
 }
 
+// Load calendar API routes
+try {
+    const calendarRoutes = await import('./api/calendar.js');
+    app.use(calendarRoutes.default);
+} catch (error) {
+    console.warn('Calendar routes not available:', error.message);
+}
+
 // HTML routes (serve HTML without extensions in URL) - BEFORE static files
 app.get('/diving', (req, res) => {
     res.sendFile(path.join(__dirname, 'diving', 'diving.html'));
+});
+
+app.get('/training', (req, res) => {
+    res.sendFile(path.join(__dirname, 'training', 'training.html'));
+});
+
+app.get('/detailing', (req, res) => {
+    res.sendFile(path.join(__dirname, 'detailing', 'detailing.html'));
+});
+
+app.get('/deliveries', (req, res) => {
+    res.sendFile(path.join(__dirname, 'deliveries', 'deliveries.html'));
 });
 
 app.get(['/admin', '/admin/'], (req, res) => {
@@ -45,6 +65,9 @@ app.get(['/inventory', '/inventory/'], (req, res) => {
 app.use('/admin', express.static(path.join(__dirname, 'admin')));
 app.use('/inventory', express.static(path.join(__dirname, 'inventory')));
 app.use('/diving', express.static(path.join(__dirname, 'diving')));
+app.use('/training', express.static(path.join(__dirname, 'training')));
+app.use('/detailing', express.static(path.join(__dirname, 'detailing')));
+app.use('/deliveries', express.static(path.join(__dirname, 'deliveries')));
 
 // Serve other static files from public directory
 app.use(express.static(path.join(__dirname, 'public')));
@@ -53,9 +76,9 @@ app.get('/booking', (req, res) => {
     res.sendFile(path.join(__dirname, 'booking.html'));
 });
 
-// Default route - serve index.html
+// Default route - serve home page
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'diving', 'index.html'));
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 // Handle 404
@@ -70,7 +93,10 @@ if (process.env.VERCEL !== '1') {
         console.log('📁 Auto-reload enabled with nodemon');
         console.log('Available routes:');
         console.log('  http://localhost:' + PORT + '/');
+        console.log('  http://localhost:' + PORT + '/training');
         console.log('  http://localhost:' + PORT + '/diving');
+        console.log('  http://localhost:' + PORT + '/detailing');
+        console.log('  http://localhost:' + PORT + '/deliveries');
         console.log('  http://localhost:' + PORT + '/admin');
         console.log('  http://localhost:' + PORT + '/inventory');
         console.log('  http://localhost:' + PORT + '/booking');
