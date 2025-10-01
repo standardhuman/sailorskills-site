@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Settings | Sailor Skills Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/admin/bookings.html">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: #345475;
+            color: white;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 { font-size: 24px; font-weight: 600; }
+
+        .nav-links { display: flex; gap: 20px; }
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        .nav-links a:hover { background: rgba(255,255,255,0.1); }
+        .nav-links a.active { background: rgba(255,255,255,0.2); }
+
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .section {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .section h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: #345475;
+        }
+
+        .service-grid {
+            display: grid;
+            gap: 20px;
+        }
+
+        .service-item {
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 20px;
+            align-items: start;
+        }
+
+        .service-info h3 { font-size: 18px; margin-bottom: 8px; }
+        .service-info p { color: #666; font-size: 14px; margin-bottom: 12px; }
+        .service-details { display: flex; gap: 20px; font-size: 14px; color: #666; }
+
+        .service-actions {
+            display: flex;
+            gap: 10px;
+            flex-direction: column;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary { background: #345475; color: white; }
+        .btn-primary:hover { background: #2a4460; }
+        .btn-secondary { background: #6c757d; color: white; }
+        .btn-secondary:hover { background: #5a6268; }
+
+        .hours-grid {
+            display: grid;
+            gap: 15px;
+        }
+
+        .hours-item {
+            display: grid;
+            grid-template-columns: 100px 1fr 1fr auto;
+            gap: 15px;
+            align-items: center;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+        }
+
+        .hours-day { font-weight: 600; }
+
+        input[type="time"] {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .blackout-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .blackout-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .blackout-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+        }
+
+        .loading { text-align: center; padding: 40px; color: #666; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <h1>⚙️ Booking Settings</h1>
+            <nav class="nav-links">
+                <a href="/admin/bookings.html">Bookings</a>
+                <a href="/admin/settings.html" class="active">Settings</a>
+                <a href="/admin/dashboard.html">Dashboard</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Service Types -->
+        <div class="section">
+            <h2>Service Types</h2>
+            <div class="service-grid" id="services-list">
+                <div class="loading">Loading services...</div>
+            </div>
+        </div>
+
+        <!-- Business Hours -->
+        <div class="section">
+            <h2>Business Hours</h2>
+            <div class="hours-grid" id="hours-list">
+                <div class="loading">Loading business hours...</div>
+            </div>
+        </div>
+
+        <!-- Blackout Dates -->
+        <div class="section">
+            <h2>Blackout Dates</h2>
+            <p style="color: #666; margin-bottom: 20px;">Add dates when bookings should not be available (vacations, holidays, etc.)</p>
+
+            <div class="blackout-form">
+                <div class="form-group">
+                    <label>Start Date</label>
+                    <input type="date" id="blackout-start">
+                </div>
+                <div class="form-group">
+                    <label>End Date</label>
+                    <input type="date" id="blackout-end">
+                </div>
+                <div class="form-group">
+                    <label>Reason</label>
+                    <input type="text" id="blackout-reason" placeholder="e.g., Vacation, Holiday">
+                </div>
+                <div class="form-group" style="display: flex; align-items: end;">
+                    <button class="btn btn-primary" onclick="addBlackoutDate()">Add Blackout Date</button>
+                </div>
+            </div>
+
+            <div class="blackout-list" id="blackout-list">
+                <div class="loading">Loading blackout dates...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = window.location.origin;
+
+        // Load service types
+        async function loadServices() {
+            try {
+                const response = await fetch(`${API_BASE}/api/admin/service-types`);
+                const data = await response.json();
+
+                const container = document.getElementById('services-list');
+
+                if (!data.success || data.serviceTypes.length === 0) {
+                    container.innerHTML = '<p>No services configured</p>';
+                    return;
+                }
+
+                container.innerHTML = data.serviceTypes.map(service => `
+                    <div class="service-item">
+                        <div class="service-info">
+                            <h3>${service.name}</h3>
+                            <p>${service.description || 'No description'}</p>
+                            <div class="service-details">
+                                <span>⏱️ ${service.duration_minutes} min</span>
+                                <span>🔄 ${service.buffer_minutes} min buffer</span>
+                                <span>${service.active ? '✅ Active' : '❌ Inactive'}</span>
+                            </div>
+                        </div>
+                        <div class="service-actions">
+                            <button class="btn btn-secondary" onclick="toggleService('${service.id}', ${!service.active})">
+                                ${service.active ? 'Deactivate' : 'Activate'}
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+
+            } catch (error) {
+                console.error('Failed to load services:', error);
+                document.getElementById('services-list').innerHTML = '<p style="color: #dc3545;">Failed to load services</p>';
+            }
+        }
+
+        async function toggleService(id, active) {
+            try {
+                const response = await fetch(`${API_BASE}/api/admin/service-types/${id}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ active })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    loadServices();
+                }
+            } catch (error) {
+                console.error('Failed to update service:', error);
+            }
+        }
+
+        // Load business hours
+        async function loadBusinessHours() {
+            try {
+                const response = await fetch(`${API_BASE}/api/admin/business-hours`);
+                const data = await response.json();
+
+                const container = document.getElementById('hours-list');
+                const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+                if (!data.success) {
+                    container.innerHTML = '<p style="color: #dc3545;">Failed to load business hours</p>';
+                    return;
+                }
+
+                container.innerHTML = days.map((day, index) => {
+                    const hours = data.businessHours.find(h => h.day_of_week === index);
+                    if (!hours) {
+                        return `<div class="hours-item"><div class="hours-day">${day}</div><div colspan="3">Closed</div></div>`;
+                    }
+
+                    return `
+                        <div class="hours-item">
+                            <div class="hours-day">${day}</div>
+                            <input type="time" value="${hours.start_time}" onchange="updateHours('${hours.id}', 'start_time', this.value)">
+                            <input type="time" value="${hours.end_time}" onchange="updateHours('${hours.id}', 'end_time', this.value)">
+                            <div class="toggle">
+                                <input type="checkbox" ${hours.active ? 'checked' : ''}
+                                    onchange="updateHours('${hours.id}', 'active', this.checked)">
+                                <label>Active</label>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+            } catch (error) {
+                console.error('Failed to load business hours:', error);
+                document.getElementById('hours-list').innerHTML = '<p style="color: #dc3545;">Failed to load business hours</p>';
+            }
+        }
+
+        async function updateHours(id, field, value) {
+            try {
+                await fetch(`${API_BASE}/api/admin/business-hours/${id}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ [field]: value })
+                });
+            } catch (error) {
+                console.error('Failed to update hours:', error);
+            }
+        }
+
+        // Load blackout dates
+        async function loadBlackoutDates() {
+            try {
+                const response = await fetch(`${API_BASE}/api/admin/blackout-dates`);
+                const data = await response.json();
+
+                const container = document.getElementById('blackout-list');
+
+                if (!data.success || data.blackoutDates.length === 0) {
+                    container.innerHTML = '<p>No blackout dates configured</p>';
+                    return;
+                }
+
+                container.innerHTML = data.blackoutDates.map(blackout => `
+                    <div class="blackout-item">
+                        <div>
+                            <strong>${blackout.start_date} to ${blackout.end_date}</strong>
+                            ${blackout.reason ? `<br><span style="color: #666; font-size: 14px;">${blackout.reason}</span>` : ''}
+                        </div>
+                        <button class="btn btn-secondary" onclick="deleteBlackout('${blackout.id}')">
+                            Delete
+                        </button>
+                    </div>
+                `).join('');
+
+            } catch (error) {
+                console.error('Failed to load blackout dates:', error);
+                document.getElementById('blackout-list').innerHTML = '<p style="color: #dc3545;">Failed to load blackout dates</p>';
+            }
+        }
+
+        async function addBlackoutDate() {
+            const start = document.getElementById('blackout-start').value;
+            const end = document.getElementById('blackout-end').value;
+            const reason = document.getElementById('blackout-reason').value;
+
+            if (!start || !end) {
+                alert('Please select start and end dates');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/api/admin/blackout-dates`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        start_date: start,
+                        end_date: end,
+                        reason: reason || null,
+                        all_day: true
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    document.getElementById('blackout-start').value = '';
+                    document.getElementById('blackout-end').value = '';
+                    document.getElementById('blackout-reason').value = '';
+                    loadBlackoutDates();
+                }
+            } catch (error) {
+                console.error('Failed to add blackout date:', error);
+                alert('Failed to add blackout date');
+            }
+        }
+
+        async function deleteBlackout(id) {
+            if (!confirm('Delete this blackout date?')) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/api/admin/blackout-dates/${id}`, {
+                    method: 'DELETE'
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    loadBlackoutDates();
+                }
+            } catch (error) {
+                console.error('Failed to delete blackout date:', error);
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadServices();
+            loadBusinessHours();
+            loadBlackoutDates();
+        });
+    </script>
+</body>
+</html>

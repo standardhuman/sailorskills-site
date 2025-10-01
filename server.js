@@ -36,6 +36,14 @@ try {
     console.warn('Calendar routes not available:', error.message);
 }
 
+// Load admin booking API routes
+try {
+    const adminBookingRoutes = await import('./api/admin-bookings.js');
+    app.use(adminBookingRoutes.default);
+} catch (error) {
+    console.warn('Admin booking routes not available:', error.message);
+}
+
 // HTML routes (serve HTML without extensions in URL) - BEFORE static files
 app.get('/diving', (req, res) => {
     res.sendFile(path.join(__dirname, 'diving', 'diving.html'));
