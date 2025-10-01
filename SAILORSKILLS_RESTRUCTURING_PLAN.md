@@ -37,11 +37,12 @@ app-development/
 ```
 
 ### Specific Actions
-1. Rename `cost-calculator/` → `sailorskills/`
-2. Rename `sailorskills/diving/` → `sailorskills/estimator/`
-3. Rename `sailorskills/admin/` → `sailorskills/billing/`
-4. Move `app-development/BOATY/` → `sailorskills/video/`
-5. Create `sailorskills/admin/` (NEW - master dashboard)
+1. Rename `cost-calculator/` → `sailorskills/` ✅
+2. Rename `sailorskills/diving/` → `sailorskills/estimator/` ✅
+3. Rename `sailorskills/admin/` → `sailorskills/billing/` ✅
+4. Move `app-development/BOATY/` → `sailorskills/video/` ✅
+5. Create `sailorskills/admin/` (NEW - master dashboard) ✅
+6. Move booking management from `/billing` to `/schedule` ✅
 
 ---
 
@@ -222,12 +223,22 @@ Claude Instance #6 → sailorskills-admin repo
 - Instant booking & payment processing
 - Automated email confirmations
 
+### Sailor Skills Schedule
+**Tagline:** "Booking made easy"
+- Customer self-service booking
+- Admin booking management
+- Service type configuration
+- Google Calendar integration
+- Availability checking
+- Business hours management
+
 ### Sailor Skills Billing
-**Tagline:** "Manage diving services from quote to payment"
-- Invoice generation & tracking
+**Tagline:** "Get paid for completed work"
+- Invoice generation for completed services
 - Stripe payment processing
-- Booking calendar integration
-- Customer communication tools
+- Revenue tracking
+- Payment history
+- Customer payment methods
 
 ### Sailor Skills Inventory
 **Tagline:** "Never run out of parts again"
@@ -263,15 +274,15 @@ Claude Instance #6 → sailorskills-admin repo
 
 ### Individual Products (À la carte)
 - Estimator: Free (customer acquisition tool)
-- Billing: $79/month
+- Schedule: $39/month (customer booking + admin management)
+- Billing: $49/month (invoicing + payment processing)
 - Inventory: $49/month
-- Schedule: $39/month
 - Video: $59/month
 
-**Total if purchased separately:** $226/month
+**Total if purchased separately:** $196/month
 
 ### Bundle Pricing
-- **Complete Suite:** $179/month (save $47/month)
+- **Complete Suite:** $149/month (save $47/month)
 - **Includes:** All 5 paid products + Admin dashboard
 - **Value prop:** Integrated workflow, unified dashboard
 
