@@ -11,6 +11,10 @@ import {
   deleteCalendarEvent,
   getBusyTimes
 } from '../src/calendar-utils.js';
+import {
+  sendBookingConfirmation,
+  sendCancellationEmail
+} from '../src/email-utils.js';
 
 const router = express.Router();
 
@@ -238,7 +242,21 @@ ${notes ? `\nNotes: ${notes}` : ''}
 
     const event = await createCalendarEvent(eventData);
 
-    // TODO: Save booking to Supabase database (Phase 3)
+    // TODO: Save booking to Supabase database (Phase 4)
+
+    // Send confirmation email
+    try {
+      await sendBookingConfirmation({
+        customerEmail,
+        customerName,
+        serviceName: serviceType,
+        startTime: start.toISOString(),
+        endTime: end.toISOString()
+      });
+    } catch (emailError) {
+      console.error('Failed to send confirmation email:', emailError);
+      // Don't fail the booking if email fails
+    }
 
     res.json({
       success: true,
@@ -275,7 +293,8 @@ router.delete('/api/calendar/cancel-booking/:eventId', async (req, res) => {
 
     await deleteCalendarEvent(eventId);
 
-    // TODO: Update booking status in Supabase (Phase 3)
+    // TODO: Update booking status in Supabase (Phase 4)
+    // TODO: Get customer email from booking record to send cancellation email
 
     res.json({
       success: true,
