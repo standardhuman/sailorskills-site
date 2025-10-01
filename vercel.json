@@ -26,6 +26,18 @@
       "use": "@vercel/static"
     },
     {
+      "src": "training/**",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "detailing/**",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "deliveries/**",
+      "use": "@vercel/static"
+    },
+    {
       "src": "admin/**",
       "use": "@vercel/static"
     },
@@ -49,6 +61,9 @@
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/server.js" },
     { "source": "/diving", "destination": "/diving/diving.html" },
+    { "source": "/training", "destination": "/training/training.html" },
+    { "source": "/detailing", "destination": "/detailing/detailing.html" },
+    { "source": "/deliveries", "destination": "/deliveries/deliveries.html" },
     { "source": "/admin", "destination": "/admin/admin.html" },
     { "source": "/inventory", "destination": "/inventory/inventory.html" },
     { "source": "/booking", "destination": "/booking.html" }

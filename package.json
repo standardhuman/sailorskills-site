@@ -33,6 +33,7 @@
     "test": "tests"
   },
   "dependencies": {
+    "@notionhq/client": "^5.1.0",
     "@sendgrid/mail": "^8.1.5",
     "@stripe/stripe-js": "^7.8.0",
     "@supabase/supabase-js": "^2.57.4",

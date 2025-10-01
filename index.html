@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Professional maritime services in San Francisco Bay - Diving, Training, Detailing, and Deliveries">
+    <title>Sailor Skills | Professional Maritime Services</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Global Reset & Base */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Montserrat', Arial, sans-serif;
+            background-color: #ffffff;
+            color: #181818;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        /* Navigation Header */
+        .navigation-header {
+            background-color: transparent;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            height: 69px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid rgba(224, 224, 224, 0.3);
+        }
+
+        .nav-container {
+            width: 100%;
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 50px;
+        }
+
+        .nav-logo {
+            display: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 40px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .nav-links a {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 20px;
+            color: #0000ee;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            font-weight: 400;
+        }
+
+        .nav-links a:hover {
+            color: #345475;
+        }
+
+        .nav-links a.active {
+            color: #345475;
+            font-weight: 400;
+        }
+
+        /* Hero Header */
+        .hero-header {
+            background-color: #ffffff;
+            padding-top: 69px;
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid #345475;
+        }
+
+        .hero-content {
+            text-align: center;
+            padding: 60px 20px;
+            max-width: 800px;
+        }
+
+        .hero-brand {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 20px;
+            font-weight: 400;
+            color: #181818;
+            letter-spacing: 0.2em;
+            margin-bottom: 20px;
+        }
+
+        .hero-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 48px;
+            font-weight: 600;
+            color: #181818;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .hero-tagline {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 22px;
+            color: #345475;
+            font-weight: 400;
+            letter-spacing: 0.05em;
+        }
+
+        /* Services Section */
+        .services-section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 80px 20px;
+        }
+
+        .section-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 36px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 60px;
+            color: #181818;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .service-card {
+            background: #ffffff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 40px 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .service-card:hover {
+            border-color: #345475;
+            box-shadow: 0 4px 12px rgba(52, 84, 117, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .service-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: #345475;
+        }
+
+        .service-name {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 24px;
+            font-weight: 600;
+            color: #181818;
+            margin-bottom: 15px;
+        }
+
+        .service-description {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .service-cta {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: #345475;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-size: 16px;
+        }
+
+        .service-cta:hover {
+            background-color: #2a4460;
+            transform: translateY(-1px);
+        }
+
+        /* Why Choose Section */
+        .why-choose-section {
+            background-color: #f8f9fa;
+            padding: 80px 20px;
+        }
+
+        .why-choose-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            margin-top: 40px;
+        }
+
+        .feature-item {
+            text-align: center;
+        }
+
+        .feature-item h3 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 20px;
+            font-weight: 600;
+            color: #181818;
+            margin-bottom: 10px;
+        }
+
+        .feature-item p {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 16px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        /* Contact Section */
+        .contact-section {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 80px 20px;
+            text-align: center;
+        }
+
+        .contact-cta {
+            display: inline-block;
+            padding: 16px 40px;
+            background-color: #345475;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            margin-top: 30px;
+        }
+
+        .contact-cta:hover {
+            background-color: #2a4460;
+            transform: translateY(-2px);
+        }
+
+        /* Footer */
+        .footer {
+            background-color: #181818;
+            color: #ffffff;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .footer p {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .footer a {
+            color: #ffffff;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                gap: 20px;
+                font-size: 16px;
+            }
+
+            .nav-links a {
+                font-size: 16px;
+            }
+
+            .hero-title {
+                font-size: 36px;
+            }
+
+            .hero-tagline {
+                font-size: 18px;
+            }
+
+            .section-title {
+                font-size: 28px;
+            }
+
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Header -->
+    <header class="navigation-header">
+        <div class="nav-container">
+            <nav class="nav-links">
+                <a href="/" class="active">HOME</a>
+                <a href="/training/training.html">TRAINING</a>
+                <a href="/diving/diving.html">DIVING</a>
+                <a href="/detailing/detailing.html">DETAILING</a>
+                <a href="/deliveries/deliveries.html">DELIVERIES</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Hero Header -->
+        <section class="hero-header">
+            <div class="hero-content">
+                <div class="hero-brand">SAILOR SKILLS</div>
+                <h1 class="hero-title">Professional Maritime Services</h1>
+                <div class="hero-tagline">San Francisco Bay's Trusted Marine Experts</div>
+            </div>
+        </section>
+
+        <!-- Services Section -->
+        <section class="services-section">
+            <h2 class="section-title">Our Services</h2>
+            <div class="services-grid">
+                <!-- Training -->
+                <div class="service-card" onclick="window.location.href='/training/training.html'">
+                    <div class="service-icon">⛵</div>
+                    <h3 class="service-name">Training</h3>
+                    <p class="service-description">Expert sailing instruction for all skill levels. From beginners to advanced mariners, we provide comprehensive training tailored to your needs.</p>
+                    <a href="/training/training.html" class="service-cta">Learn More</a>
+                </div>
+
+                <!-- Diving -->
+                <div class="service-card" onclick="window.location.href='/diving/diving.html'">
+                    <div class="service-icon">🤿</div>
+                    <h3 class="service-name">Diving</h3>
+                    <p class="service-description">Professional underwater vessel care including hull cleaning, anode replacement, and inspections. Keep your boat performing at its best.</p>
+                    <a href="/diving/diving.html" class="service-cta">Get Quote</a>
+                </div>
+
+                <!-- Detailing -->
+                <div class="service-card" onclick="window.location.href='/detailing/detailing.html'">
+                    <div class="service-icon">✨</div>
+                    <h3 class="service-name">Detailing</h3>
+                    <p class="service-description">Complete vessel detailing services to keep your boat looking pristine. Professional cleaning, polishing, and protection.</p>
+                    <a href="/detailing/detailing.html" class="service-cta">Learn More</a>
+                </div>
+
+                <!-- Deliveries -->
+                <div class="service-card" onclick="window.location.href='/deliveries/deliveries.html'">
+                    <div class="service-icon">🧭</div>
+                    <h3 class="service-name">Deliveries</h3>
+                    <p class="service-description">Safe and reliable boat delivery services. Professional captains with extensive experience navigating coastal and offshore waters.</p>
+                    <a href="/deliveries/deliveries.html" class="service-cta">Learn More</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Why Choose Section -->
+        <section class="why-choose-section">
+            <div class="why-choose-content">
+                <h2 class="section-title">Why Choose Sailor Skills?</h2>
+                <div class="features-grid">
+                    <div class="feature-item">
+                        <h3>Expert Team</h3>
+                        <p>Experienced maritime professionals with decades of combined expertise in all aspects of boat care and seamanship.</p>
+                    </div>
+                    <div class="feature-item">
+                        <h3>Professional Service</h3>
+                        <p>Reliable, on-time service with clear communication every step of the way. Your satisfaction is our priority.</p>
+                    </div>
+                    <div class="feature-item">
+                        <h3>Competitive Pricing</h3>
+                        <p>Fair, transparent pricing with no hidden fees. Get instant quotes and book services online.</p>
+                    </div>
+                    <div class="feature-item">
+                        <h3>Modern Technology</h3>
+                        <p>Online booking, service logs, and underwater video documentation keep you informed about your vessel.</p>
+                    </div>
+                    <div class="feature-item">
+                        <h3>Satisfaction Guarantee</h3>
+                        <p>We stand behind our work with a 100% satisfaction guarantee on all services.</p>
+                    </div>
+                    <div class="feature-item">
+                        <h3>Local Knowledge</h3>
+                        <p>San Francisco Bay experts who understand local conditions, marinas, and maritime community.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section class="contact-section">
+            <h2 class="section-title">Ready to Get Started?</h2>
+            <p style="font-size: 18px; color: #666; margin-bottom: 20px;">
+                Contact us today to schedule a service or learn more about how we can help with your maritime needs.
+            </p>
+            <a href="/schedule/schedule.html" class="contact-cta">Schedule a Service</a>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2025 Sailor Skills. All rights reserved.</p>
+        <p>San Francisco Bay | Professional Maritime Services</p>
+    </footer>
+</body>
+</html>

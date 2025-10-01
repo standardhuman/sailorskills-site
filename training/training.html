@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Professional sailing instruction in San Francisco Bay - All skill levels welcome">
+    <title>Training | Sailor Skills</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/diving/style.css">
+    <style>
+        .training-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 20px;
+        }
+
+        .intro-section {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .intro-section h2 {
+            font-size: 28px;
+            color: #181818;
+            margin-bottom: 20px;
+        }
+
+        .intro-section p {
+            font-size: 18px;
+            color: #666;
+            line-height: 1.8;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .service-box {
+            background: #ffffff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .service-box:hover {
+            border-color: #345475;
+            box-shadow: 0 4px 12px rgba(52, 84, 117, 0.1);
+        }
+
+        .service-box h3 {
+            font-size: 22px;
+            color: #345475;
+            margin-bottom: 15px;
+        }
+
+        .service-box .duration {
+            font-size: 16px;
+            color: #666;
+            font-style: italic;
+            margin-bottom: 15px;
+        }
+
+        .service-box p {
+            font-size: 16px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .service-box .price {
+            font-size: 20px;
+            color: #345475;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .what-to-expect {
+            background-color: #f8f9fa;
+            padding: 40px;
+            border-radius: 8px;
+            margin-bottom: 60px;
+        }
+
+        .what-to-expect h3 {
+            font-size: 24px;
+            color: #181818;
+            margin-bottom: 20px;
+        }
+
+        .what-to-expect ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .what-to-expect li {
+            font-size: 16px;
+            color: #666;
+            line-height: 1.8;
+            margin-bottom: 10px;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .what-to-expect li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #345475;
+            font-weight: bold;
+        }
+
+        .cta-section {
+            text-align: center;
+            padding: 40px 20px;
+            background-color: #ffffff;
+            border: 2px solid #345475;
+            border-radius: 8px;
+        }
+
+        .cta-section h3 {
+            font-size: 24px;
+            color: #181818;
+            margin-bottom: 20px;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 16px 40px;
+            background-color: #345475;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .cta-button:hover {
+            background-color: #2a4460;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Header -->
+    <header class="navigation-header">
+        <div class="nav-container">
+            <nav class="nav-links">
+                <a href="/">HOME</a>
+                <a href="/training/training.html" class="active">TRAINING</a>
+                <a href="/diving/diving.html">DIVING</a>
+                <a href="/detailing/detailing.html">DETAILING</a>
+                <a href="/deliveries/deliveries.html">DELIVERIES</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Hero Header -->
+        <div class="hero-header">
+            <div class="hero-content">
+                <div class="hero-brand">SAILOR SKILLS</div>
+                <h1 class="hero-service">TRAINING</h1>
+                <div class="hero-tagline">EXPERT SAILING INSTRUCTION</div>
+            </div>
+        </div>
+
+        <div class="training-content">
+            <!-- Intro Section -->
+            <section class="intro-section">
+                <h2>Learn to Sail with Confidence</h2>
+                <p>Whether you're taking your first steps in sailing or looking to refine advanced techniques, our experienced instructors provide personalized training tailored to your goals. Learn at your own pace in the beautiful San Francisco Bay.</p>
+            </section>
+
+            <!-- Services Grid -->
+            <div class="services-grid">
+                <!-- Free Consultation -->
+                <div class="service-box">
+                    <h3>Free Consultation</h3>
+                    <div class="duration">30 minutes</div>
+                    <p>Discuss your sailing goals, experience level, and create a personalized training plan. No obligation.</p>
+                    <div class="price">Free</div>
+                </div>
+
+                <!-- Half Day Training -->
+                <div class="service-box">
+                    <h3>Half Day Training</h3>
+                    <div class="duration">4 hours</div>
+                    <p>Perfect for focused skill development. Cover essential techniques including sail trim, tacking, jibing, and boat handling.</p>
+                    <div class="price">Contact for pricing</div>
+                </div>
+
+                <!-- Full Day Training -->
+                <div class="service-box">
+                    <h3>Full Day Training</h3>
+                    <div class="duration">8 hours</div>
+                    <p>Comprehensive instruction covering all aspects of sailing. Includes theory, hands-on practice, and real-world scenarios.</p>
+                    <div class="price">Contact for pricing</div>
+                </div>
+
+                <!-- Extended Session -->
+                <div class="service-box">
+                    <h3>Extended Session</h3>
+                    <div class="duration">Multiple days</div>
+                    <p>Intensive training programs for serious students. Multi-day sessions include overnight passages and advanced navigation.</p>
+                    <div class="price">Contact for pricing</div>
+                </div>
+            </div>
+
+            <!-- What to Expect -->
+            <section class="what-to-expect">
+                <h3>What to Expect</h3>
+                <ul>
+                    <li>Personalized instruction based on your skill level and goals</li>
+                    <li>Hands-on learning with experienced captain</li>
+                    <li>Safety procedures and emergency protocols</li>
+                    <li>Sail trim and boat handling techniques</li>
+                    <li>Navigation basics and chart reading</li>
+                    <li>Weather interpretation and passage planning</li>
+                    <li>Docking and anchoring practice</li>
+                    <li>All safety equipment provided</li>
+                    <li>Certificate of completion for multi-day programs</li>
+                </ul>
+            </section>
+
+            <!-- CTA Section -->
+            <section class="cta-section">
+                <h3>Ready to Start Your Sailing Journey?</h3>
+                <p style="margin-bottom: 30px; color: #666; font-size: 18px;">Book a free consultation or schedule your first training session today.</p>
+                <a href="/schedule/schedule.html" class="cta-button">Book Now</a>
+            </section>
+        </div>
+    </main>
+</body>
+</html>
