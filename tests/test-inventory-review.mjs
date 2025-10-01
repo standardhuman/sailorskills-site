@@ -63,6 +63,17 @@ async function testInventorySystem() {
             timeout: 10000
         });
 
+        // Handle authentication if auth modal appears
+        await page.waitForTimeout(1000);
+        const authModal = page.locator('.auth-modal');
+        if (await authModal.count() > 0) {
+            console.log('  🔑 Handling authentication...');
+            await page.fill('#auth-password', '123');
+            await page.click('.auth-btn');
+            await page.waitForTimeout(1000);
+            console.log('  ✅ Authenticated successfully');
+        }
+
         // Wait a bit for page to load
         await page.waitForTimeout(2000);
 

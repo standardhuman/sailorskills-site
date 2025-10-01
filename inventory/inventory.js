@@ -24,6 +24,9 @@ class AnodeManager {
     }
 
     async init() {
+        // Wait for configuration to load (from config.js module)
+        await this.waitForConfig();
+
         // Initialize Supabase
         this.initSupabase();
 
@@ -40,17 +43,32 @@ class AnodeManager {
         await this.checkSyncStatus();
     }
 
+    async waitForConfig() {
+        // Wait for config.js to set window.SUPABASE_URL
+        let attempts = 0;
+        while (!window.SUPABASE_URL && attempts < 50) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            attempts++;
+        }
+
+        if (!window.SUPABASE_URL) {
+            console.error('Configuration not loaded after 5 seconds');
+        }
+    }
+
     initSupabase() {
         // Get credentials from environment or config
-        const supabaseUrl = window.SUPABASE_URL || prompt('Enter Supabase URL:');
-        const supabaseKey = window.SUPABASE_ANON_KEY || prompt('Enter Supabase Anon Key:');
+        const supabaseUrl = window.SUPABASE_URL;
+        const supabaseKey = window.SUPABASE_ANON_KEY;
 
         if (!supabaseUrl || !supabaseKey) {
-            alert('Supabase credentials are required');
+            console.error('Supabase credentials not found');
+            alert('Configuration error: Supabase credentials not available');
             return;
         }
 
         this.supabase = supabase.createClient(supabaseUrl, supabaseKey);
+        console.log('✅ Supabase client initialized');
     }
 
     setupEventListeners() {

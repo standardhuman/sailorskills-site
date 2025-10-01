@@ -773,27 +773,167 @@ class InventoryManager extends AnodeManager {
 
     async generatePO() {
         const selected = [];
+        const selectedItems = new Map();
+
         document.querySelectorAll('.replenish-select:checked').forEach(cb => {
             const id = cb.dataset.id;
             const qtyInput = document.querySelector(`.qty-to-order[data-id="${id}"]`);
-            selected.push({
-                id: id,
-                quantity: parseInt(qtyInput.value)
-            });
+            const quantity = parseInt(qtyInput.value);
+
+            // Find the replenishment item details
+            const item = this.replenishmentList.find(r => r.id === id);
+            if (item) {
+                selectedItems.set(id, {
+                    replenishmentId: id,
+                    item: item,
+                    quantity: quantity
+                });
+            }
         });
 
-        if (selected.length === 0) {
+        if (selectedItems.size === 0) {
             alert('Please select items to include in the purchase order');
             return;
         }
 
-        // Here you would create a purchase order with the selected items
-        alert(`Creating PO with ${selected.length} items - Feature coming soon!`);
+        try {
+            // Generate PO number
+            const poNumber = `PO-${Date.now()}`;
+
+            // Calculate totals
+            let subtotal = 0;
+            const poItems = [];
+
+            for (const [id, data] of selectedItems) {
+                const isAnode = data.item.anode_id !== null;
+                const product = isAnode ? data.item.anodes_catalog : data.item.inventory_items;
+                const unitCost = isAnode ? product.list_price : product.unit_cost;
+                const lineTotal = data.quantity * unitCost;
+                subtotal += lineTotal;
+
+                poItems.push({
+                    [isAnode ? 'anode_id' : 'item_id']: data.item[isAnode ? 'anode_id' : 'item_id'],
+                    quantity_ordered: data.quantity,
+                    unit_cost: unitCost,
+                    line_total: lineTotal,
+                    replenishment_id: id
+                });
+            }
+
+            // Ask for supplier selection (for now, we'll create without supplier)
+            const supplierName = prompt('Enter supplier name (optional):') || 'Boatzincs';
+
+            // Create PO
+            const { data: po, error: poError } = await this.supabase
+                .from('purchase_orders')
+                .insert({
+                    po_number: poNumber,
+                    status: 'draft',
+                    order_date: new Date().toISOString().split('T')[0],
+                    subtotal: subtotal,
+                    total_amount: subtotal,
+                    internal_notes: `Generated from replenishment list. Supplier: ${supplierName}`,
+                    created_by: 'inventory_system'
+                })
+                .select()
+                .single();
+
+            if (poError) throw poError;
+
+            // Add items to PO
+            const { error: itemsError } = await this.supabase
+                .from('purchase_order_items')
+                .insert(poItems.map(item => ({
+                    ...item,
+                    po_id: po.id
+                })));
+
+            if (itemsError) throw itemsError;
+
+            // Update replenishment items
+            const replenishmentIds = Array.from(selectedItems.keys());
+            const { error: updateError } = await this.supabase
+                .from('replenishment_list')
+                .update({
+                    status: 'ordered',
+                    po_id: po.id
+                })
+                .in('id', replenishmentIds);
+
+            if (updateError) throw updateError;
+
+            alert(`✅ Purchase Order ${poNumber} created successfully!\n\nItems: ${selectedItems.size}\nTotal: $${subtotal.toFixed(2)}\n\nStatus: Draft`);
+
+            // Reload replenishment list
+            this.loadReplenishmentList();
+
+        } catch (error) {
+            console.error('Error creating purchase order:', error);
+            alert('Failed to create purchase order: ' + error.message);
+        }
     }
 
     exportReplenishment() {
-        // Export replenishment list to CSV
-        alert('Export feature coming soon!');
+        if (this.replenishmentList.length === 0) {
+            alert('No items in replenishment list to export');
+            return;
+        }
+
+        try {
+            // Prepare CSV data
+            const headers = ['Item Name', 'SKU', 'Current Stock', 'Reorder Point', 'Quantity Needed', 'Unit Cost', 'Total Cost', 'Priority', 'Status'];
+            const rows = [headers];
+
+            this.replenishmentList.forEach(item => {
+                const isAnode = item.anode_id !== null;
+                const product = isAnode ? item.anodes_catalog : item.inventory_items;
+                const inventory = isAnode ? item.anode_inventory : item.inventory_items;
+                const unitCost = isAnode ? product.list_price : product.unit_cost;
+                const quantity = item.quantity_to_order || item.quantity_needed;
+                const totalCost = quantity * unitCost;
+
+                rows.push([
+                    product.name,
+                    product.sku || '-',
+                    inventory.quantity_on_hand,
+                    inventory.reorder_point,
+                    quantity,
+                    `$${unitCost.toFixed(2)}`,
+                    `$${totalCost.toFixed(2)}`,
+                    item.priority,
+                    item.status
+                ]);
+            });
+
+            // Convert to CSV
+            const csvContent = rows.map(row =>
+                row.map(cell =>
+                    // Escape quotes and wrap in quotes if contains comma or quote
+                    typeof cell === 'string' && (cell.includes(',') || cell.includes('"'))
+                        ? `"${cell.replace(/"/g, '""')}"`
+                        : cell
+                ).join(',')
+            ).join('\n');
+
+            // Create blob and download
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            const timestamp = new Date().toISOString().split('T')[0];
+
+            link.setAttribute('href', url);
+            link.setAttribute('download', `replenishment-list-${timestamp}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            alert(`✅ Replenishment list exported to CSV\n\n${this.replenishmentList.length} items exported`);
+
+        } catch (error) {
+            console.error('Error exporting replenishment list:', error);
+            alert('Failed to export: ' + error.message);
+        }
     }
 
     async autoAddLowStock() {
