@@ -10,12 +10,45 @@ const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') ?? '', {
 const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+const allowedOrigins = [
+  'https://cost-calculator-sigma.vercel.app',
+  'http://localhost:3000',
+  'http://localhost:5173'
+]
+
+function getCorsHeaders(origin: string | null) {
+  const isAllowed = origin && allowedOrigins.includes(origin)
+  return {
+    'Access-Control-Allow-Origin': isAllowed ? origin : allowedOrigins[0],
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  }
+}
+
+// Rate limiting helper
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>()
+
+function checkRateLimit(identifier: string): boolean {
+  const now = Date.now()
+  const limit = rateLimitMap.get(identifier)
+
+  if (!limit || now > limit.resetTime) {
+    // Reset or create new limit (5 requests per 15 minutes)
+    rateLimitMap.set(identifier, { count: 1, resetTime: now + 15 * 60 * 1000 })
+    return true
+  }
+
+  if (limit.count >= 5) {
+    return false
+  }
+
+  limit.count++
+  return true
 }
 
 serve(async (req) => {
+  const origin = req.headers.get('origin')
+  const corsHeaders = getCorsHeaders(origin)
+
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
@@ -24,6 +57,70 @@ serve(async (req) => {
   try {
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
     const { formData } = await req.json()
+
+    // Rate limiting by email
+    const rateLimitKey = formData.customerEmail?.toLowerCase() || req.headers.get('x-forwarded-for') || 'unknown'
+    if (!checkRateLimit(rateLimitKey)) {
+      return new Response(
+        JSON.stringify({ error: 'Too many requests. Please try again later.' }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 429,
+        }
+      )
+    }
+
+    // Sanitize text inputs to prevent XSS
+    const sanitize = (text: string): string => {
+      if (!text) return text
+      return text
+        .replace(/[<>]/g, '') // Remove angle brackets
+        .trim()
+        .slice(0, 1000) // Limit length
+    }
+
+    formData.customerName = sanitize(formData.customerName)
+    formData.customerNotes = sanitize(formData.customerNotes || '')
+    formData.boatName = sanitize(formData.boatName || '')
+    formData.boatMake = sanitize(formData.boatMake || '')
+    formData.boatModel = sanitize(formData.boatModel || '')
+    if (formData.recoveryLocation) formData.recoveryLocation = sanitize(formData.recoveryLocation)
+    if (formData.itemDescription) formData.itemDescription = sanitize(formData.itemDescription)
+
+    // Server-side price validation
+    const validatePrice = (estimate: number, service: string, details: any): boolean => {
+      const MIN_CHARGE = 150
+      const serviceRates: Record<string, any> = {
+        'Recurring Cleaning & Anodes': { rate: 4.50, type: 'per_foot' },
+        'One-time Cleaning & Anodes': { rate: 6.00, type: 'per_foot' },
+        'Item Recovery': { rate: 199, type: 'flat' },
+        'Underwater Inspection': { rate: 4, type: 'per_foot' },
+        'Propeller Removal/Installation': { rate: 349, type: 'flat' },
+        'Anodes Only': { rate: 150, type: 'flat' }
+      }
+
+      const serviceConfig = serviceRates[service]
+      if (!serviceConfig) return false
+
+      if (serviceConfig.type === 'flat') {
+        // For flat rate services, allow some variance for anodes/options
+        return estimate >= serviceConfig.rate && estimate <= serviceConfig.rate * 5
+      } else {
+        // For per-foot services, validate against boat length with reasonable surcharges
+        const boatLength = parseInt(details?.boatLength || formData.boatLength || '0')
+        if (boatLength < 10 || boatLength > 300) return false
+
+        const basePrice = Math.max(boatLength * serviceConfig.rate, MIN_CHARGE)
+        const maxPrice = basePrice * 4 // Allow up to 4x for surcharges (catamaran, heavy growth, etc.)
+
+        return estimate >= MIN_CHARGE && estimate <= maxPrice
+      }
+    }
+
+    // Validate the estimate
+    if (!validatePrice(formData.estimate, formData.service, formData.serviceDetails)) {
+      throw new Error('Invalid price calculation')
+    }
 
     // Create or update customer in Supabase
     const { data: customer, error: customerError } = await supabase

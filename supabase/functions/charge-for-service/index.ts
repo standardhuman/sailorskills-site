@@ -10,19 +10,73 @@ const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') ?? '', {
 const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+const allowedOrigins = [
+  'https://cost-calculator-sigma.vercel.app',
+  'http://localhost:3000',
+  'http://localhost:5173'
+]
+
+function getCorsHeaders(origin: string | null) {
+  const isAllowed = origin && allowedOrigins.includes(origin)
+  return {
+    'Access-Control-Allow-Origin': isAllowed ? origin : allowedOrigins[0],
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  }
 }
 
 serve(async (req) => {
+  const origin = req.headers.get('origin')
+  const corsHeaders = getCorsHeaders(origin)
+
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
 
   try {
+    // Verify admin authentication
+    const authHeader = req.headers.get('authorization')
+    if (!authHeader) {
+      throw new Error('Missing authorization header')
+    }
+
+    // Create supabase client with the auth header to verify user
+    const supabaseAuth = createClient(supabaseUrl, supabaseServiceKey, {
+      global: {
+        headers: { Authorization: authHeader }
+      }
+    })
+
+    // Verify the user is authenticated and is an admin
+    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser()
+
+    if (authError || !user) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized - Invalid token' }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 401,
+        }
+      )
+    }
+
+    // Check if user has admin role (you'll need to add this metadata to user accounts)
+    // For now, we'll check if the email ends with a specific domain or is in a list
+    const adminEmails = (Deno.env.get('ADMIN_EMAILS') ?? '').split(',').map(e => e.trim())
+    if (!adminEmails.includes(user.email || '')) {
+      return new Response(
+        JSON.stringify({ error: 'Forbidden - Admin access required' }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 403,
+        }
+      )
+    }
+
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
     const { orderId, finalAmount, notes } = await req.json()
+
+    // Sanitize notes input
+    const sanitizedNotes = notes ? notes.replace(/[<>]/g, '').trim().slice(0, 2000) : ''
 
     // Get order details
     const { data: order, error: orderError } = await supabase
@@ -83,7 +137,7 @@ serve(async (req) => {
         status: 'completed',
         final_amount: chargeAmount,
         completed_at: new Date().toISOString(),
-        notes: notes || order.notes,
+        notes: sanitizedNotes || order.notes,
         stripe_payment_intent_id: paymentIntent.id
       })
       .eq('id', orderId)
@@ -96,7 +150,7 @@ serve(async (req) => {
         boat_id: order.boat_id,
         service_date: new Date().toISOString().split('T')[0],
         service_type: order.service_type,
-        notes: notes
+        notes: sanitizedNotes
       })
 
     // Update next service date for recurring customers
