@@ -22,7 +22,7 @@
       "use": "@vercel/static"
     },
     {
-      "src": "diving/**",
+      "src": "estimator/**",
       "use": "@vercel/static"
     },
     {
@@ -42,7 +42,15 @@
       "use": "@vercel/static"
     },
     {
+      "src": "billing/**",
+      "use": "@vercel/static"
+    },
+    {
       "src": "admin/**",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "video/**",
       "use": "@vercel/static"
     },
     {
@@ -64,18 +72,18 @@
   ],
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/server.js" },
-    { "source": "/diving", "destination": "/diving/diving.html" },
+    { "source": "/diving", "destination": "/estimator/diving.html" },
     { "source": "/training", "destination": "/training/training.html" },
     { "source": "/detailing", "destination": "/detailing/detailing.html" },
     { "source": "/deliveries", "destination": "/deliveries/deliveries.html" },
     { "source": "/schedule", "destination": "/schedule/schedule.html" },
-    { "source": "/admin", "destination": "/admin/admin.html" },
+    { "source": "/admin", "destination": "/billing/admin.html" },
     { "source": "/inventory", "destination": "/inventory/inventory.html" },
     { "source": "/booking", "destination": "/booking.html" }
   ],
   "headers": [
     {
-      "source": "/diving/(.*)",
+      "source": "/estimator/(.*)",
       "headers": [
         {
           "key": "Cache-Control",
