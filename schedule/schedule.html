@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Schedule a service with Sailor Skills - Book sailing lessons, diving services, detailing, and deliveries">
+    <title>Schedule a Service | Sailor Skills</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/diving/style.css">
+    <link rel="stylesheet" href="/schedule/schedule.css">
+</head>
+<body>
+    <!-- Navigation Header -->
+    <header class="navigation-header">
+        <div class="nav-container">
+            <nav class="nav-links">
+                <a href="/">HOME</a>
+                <a href="/training/training.html">TRAINING</a>
+                <a href="/diving/diving.html">DIVING</a>
+                <a href="/detailing/detailing.html">DETAILING</a>
+                <a href="/deliveries/deliveries.html">DELIVERIES</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Hero Header -->
+        <div class="hero-header">
+            <div class="hero-content">
+                <div class="hero-brand">SAILOR SKILLS</div>
+                <h1 class="hero-service">SCHEDULE A SERVICE</h1>
+                <div class="hero-tagline">BOOK YOUR APPOINTMENT</div>
+            </div>
+        </div>
+
+        <div class="booking-container">
+            <!-- Step 1: Select Service Type -->
+            <div id="step-service" class="booking-step active">
+                <h2>Select a Service</h2>
+                <div id="service-list" class="service-list">
+                    <!-- Services will be loaded dynamically -->
+                    <div class="loading">Loading services...</div>
+                </div>
+            </div>
+
+            <!-- Step 2: Select Date & Time -->
+            <div id="step-datetime" class="booking-step" style="display: none;">
+                <h2>Choose Date & Time</h2>
+                <div class="selected-service-info">
+                    <span id="selected-service-name"></span>
+                    <button type="button" id="change-service" class="link-button">Change Service</button>
+                </div>
+
+                <div class="datetime-picker">
+                    <div class="calendar-section">
+                        <h3>Select a Date</h3>
+                        <div id="calendar" class="calendar"></div>
+                    </div>
+
+                    <div class="time-slots-section">
+                        <h3>Available Times</h3>
+                        <div id="time-slots" class="time-slots">
+                            <p class="placeholder">Select a date to see available times</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3: Customer Information -->
+            <div id="step-info" class="booking-step" style="display: none;">
+                <h2>Your Information</h2>
+                <div class="booking-summary">
+                    <div class="summary-item">
+                        <strong>Service:</strong>
+                        <span id="summary-service"></span>
+                    </div>
+                    <div class="summary-item">
+                        <strong>Date & Time:</strong>
+                        <span id="summary-datetime"></span>
+                    </div>
+                </div>
+
+                <form id="customer-form" class="customer-form">
+                    <div class="form-group">
+                        <label for="customer-name">Full Name*</label>
+                        <input type="text" id="customer-name" name="customer-name" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="customer-email">Email*</label>
+                            <input type="email" id="customer-email" name="customer-email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="customer-phone">Phone*</label>
+                            <input type="tel" id="customer-phone" name="customer-phone" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="customer-notes">Additional Notes (Optional)</label>
+                        <textarea id="customer-notes" name="customer-notes" rows="4"
+                            placeholder="Any special requests or information we should know?"></textarea>
+                    </div>
+
+                    <div class="agreement-section">
+                        <div class="agreement-checkbox">
+                            <input type="checkbox" id="booking-agreement" required>
+                            <label for="booking-agreement">
+                                I understand the <a href="#" class="inline-link">cancellation policy</a>
+                                and agree to the <a href="#" class="inline-link">terms of service</a>.
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Navigation Buttons -->
+            <div class="booking-navigation">
+                <button type="button" id="back-button" class="nav-button secondary" style="display: none;">
+                    ← Back
+                </button>
+                <button type="button" id="next-button" class="nav-button primary">
+                    Next →
+                </button>
+                <button type="button" id="submit-button" class="nav-button primary" style="display: none;">
+                    Confirm Booking
+                </button>
+            </div>
+
+            <!-- Success Message -->
+            <div id="success-message" class="success-message" style="display: none;">
+                <div class="success-icon">✓</div>
+                <h2>Booking Confirmed!</h2>
+                <p>Thank you for your booking. We've sent a confirmation email to <strong id="confirmation-email"></strong>.</p>
+                <div class="confirmation-details">
+                    <p><strong>Service:</strong> <span id="confirmation-service"></span></p>
+                    <p><strong>Date & Time:</strong> <span id="confirmation-datetime"></span></p>
+                </div>
+                <button type="button" id="book-another" class="nav-button primary">Book Another Service</button>
+            </div>
+        </div>
+    </main>
+
+    <script type="module" src="/schedule/schedule.js"></script>
+</body>
+</html>

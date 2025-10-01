@@ -38,6 +38,10 @@
       "use": "@vercel/static"
     },
     {
+      "src": "schedule/**",
+      "use": "@vercel/static"
+    },
+    {
       "src": "admin/**",
       "use": "@vercel/static"
     },
@@ -64,6 +68,7 @@
     { "source": "/training", "destination": "/training/training.html" },
     { "source": "/detailing", "destination": "/detailing/detailing.html" },
     { "source": "/deliveries", "destination": "/deliveries/deliveries.html" },
+    { "source": "/schedule", "destination": "/schedule/schedule.html" },
     { "source": "/admin", "destination": "/admin/admin.html" },
     { "source": "/inventory", "destination": "/inventory/inventory.html" },
     { "source": "/booking", "destination": "/booking.html" }

@@ -53,6 +53,10 @@ app.get('/deliveries', (req, res) => {
     res.sendFile(path.join(__dirname, 'deliveries', 'deliveries.html'));
 });
 
+app.get('/schedule', (req, res) => {
+    res.sendFile(path.join(__dirname, 'schedule', 'schedule.html'));
+});
+
 app.get(['/admin', '/admin/'], (req, res) => {
     res.sendFile(path.join(__dirname, 'admin', 'admin.html'));
 });
@@ -68,6 +72,7 @@ app.use('/diving', express.static(path.join(__dirname, 'diving')));
 app.use('/training', express.static(path.join(__dirname, 'training')));
 app.use('/detailing', express.static(path.join(__dirname, 'detailing')));
 app.use('/deliveries', express.static(path.join(__dirname, 'deliveries')));
+app.use('/schedule', express.static(path.join(__dirname, 'schedule')));
 
 // Serve other static files from public directory
 app.use(express.static(path.join(__dirname, 'public')));
@@ -97,6 +102,7 @@ if (process.env.VERCEL !== '1') {
         console.log('  http://localhost:' + PORT + '/diving');
         console.log('  http://localhost:' + PORT + '/detailing');
         console.log('  http://localhost:' + PORT + '/deliveries');
+        console.log('  http://localhost:' + PORT + '/schedule');
         console.log('  http://localhost:' + PORT + '/admin');
         console.log('  http://localhost:' + PORT + '/inventory');
         console.log('  http://localhost:' + PORT + '/booking');
