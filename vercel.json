@@ -22,10 +22,6 @@
       "use": "@vercel/static"
     },
     {
-      "src": "estimator/**",
-      "use": "@vercel/static"
-    },
-    {
       "src": "training/**",
       "use": "@vercel/static"
     },
@@ -38,31 +34,7 @@
       "use": "@vercel/static"
     },
     {
-      "src": "schedule/**",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "billing/**",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "admin/**",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "video/**",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "inventory/**",
-      "use": "@vercel/static"
-    },
-    {
       "src": "public/**",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "images/**",
       "use": "@vercel/static"
     },
     {
@@ -72,24 +44,9 @@
   ],
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/server.js" },
-    { "source": "/diving", "destination": "/estimator/diving.html" },
     { "source": "/training", "destination": "/training/training.html" },
     { "source": "/detailing", "destination": "/detailing/detailing.html" },
     { "source": "/deliveries", "destination": "/deliveries/deliveries.html" },
-    { "source": "/schedule", "destination": "/schedule/schedule.html" },
-    { "source": "/admin", "destination": "/billing/admin.html" },
-    { "source": "/inventory", "destination": "/inventory/inventory.html" },
     { "source": "/booking", "destination": "/booking.html" }
-  ],
-  "headers": [
-    {
-      "source": "/estimator/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=3600"
-        }
-      ]
-    }
   ]
 }
