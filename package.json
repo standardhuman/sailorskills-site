@@ -26,6 +26,7 @@
   "license": "ISC",
   "devDependencies": {
     "@playwright/test": "^1.55.1",
+    "@supabase/supabase-js": "^2.58.0",
     "nodemon": "^3.1.10",
     "playwright": "^1.55.0"
   },
@@ -36,7 +37,6 @@
     "@notionhq/client": "^5.1.0",
     "@sendgrid/mail": "^8.1.5",
     "@stripe/stripe-js": "^7.8.0",
-    "@supabase/supabase-js": "^2.57.4",
     "@vitejs/plugin-react": "^4.7.0",
     "cors": "^2.8.5",
     "date-fns": "^4.1.0",
