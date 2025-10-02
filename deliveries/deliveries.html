@@ -3,221 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Professional boat delivery services - Safe, reliable captains for coastal and offshore passages">
+    <meta name="description" content="Professional vessel delivery services">
     <title>Deliveries | Sailor Skills</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/diving/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        .deliveries-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 60px 20px;
-        }
-
-        .intro-section {
-            text-align: center;
-            margin-bottom: 60px;
-        }
-
-        .intro-section h2 {
-            font-size: 28px;
-            color: #181818;
-            margin-bottom: 20px;
-        }
-
-        .intro-section p {
-            font-size: 18px;
-            color: #666;
-            line-height: 1.8;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .services-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 30px;
-            margin-bottom: 60px;
-        }
-
-        .service-box {
-            background: #ffffff;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            padding: 30px;
-            transition: all 0.3s ease;
-        }
-
-        .service-box:hover {
-            border-color: #345475;
-            box-shadow: 0 4px 12px rgba(52, 84, 117, 0.1);
-        }
-
-        .service-box h3 {
-            font-size: 22px;
-            color: #345475;
-            margin-bottom: 15px;
-        }
-
-        .service-box p {
-            font-size: 16px;
-            color: #666;
-            line-height: 1.6;
-            margin-bottom: 20px;
-        }
-
-        .service-box ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .service-box li {
-            font-size: 15px;
-            color: #666;
-            line-height: 1.8;
-            margin-bottom: 8px;
-            padding-left: 20px;
-            position: relative;
-        }
-
-        .service-box li:before {
-            content: "•";
-            position: absolute;
-            left: 0;
-            color: #345475;
-            font-weight: bold;
-        }
-
-        .experience-section {
-            background-color: #f8f9fa;
-            padding: 40px;
-            border-radius: 8px;
-            margin-bottom: 60px;
-        }
-
-        .experience-section h3 {
-            font-size: 24px;
-            color: #181818;
-            margin-bottom: 30px;
-            text-align: center;
-        }
-
-        .experience-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 30px;
-        }
-
-        .experience-item {
-            text-align: center;
-        }
-
-        .experience-item h4 {
-            font-size: 18px;
-            color: #345475;
-            margin-bottom: 10px;
-        }
-
-        .experience-item p {
-            font-size: 15px;
-            color: #666;
-            line-height: 1.6;
-        }
-
-        .routes-section {
-            margin-bottom: 60px;
-        }
-
-        .routes-section h3 {
-            font-size: 24px;
-            color: #181818;
-            margin-bottom: 30px;
-            text-align: center;
-        }
-
-        .routes-list {
-            max-width: 800px;
-            margin: 0 auto;
-            background: #ffffff;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            padding: 30px;
-        }
-
-        .routes-list h4 {
-            font-size: 18px;
-            color: #345475;
-            margin-bottom: 15px;
-        }
-
-        .routes-list ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .routes-list li {
-            font-size: 16px;
-            color: #666;
-            line-height: 1.8;
-            margin-bottom: 8px;
-            padding-left: 20px;
-            position: relative;
-        }
-
-        .routes-list li:before {
-            content: "→";
-            position: absolute;
-            left: 0;
-            color: #345475;
-            font-weight: bold;
-        }
-
-        .cta-section {
-            text-align: center;
-            padding: 40px 20px;
-            background-color: #ffffff;
-            border: 2px solid #345475;
-            border-radius: 8px;
-        }
-
-        .cta-section h3 {
-            font-size: 24px;
-            color: #181818;
-            margin-bottom: 20px;
-        }
-
-        .cta-button {
-            display: inline-block;
-            padding: 16px 40px;
-            background-color: #345475;
-            color: #ffffff;
-            text-decoration: none;
-            border-radius: 4px;
-            font-weight: 600;
-            font-size: 18px;
-            transition: all 0.3s ease;
-        }
-
-        .cta-button:hover {
-            background-color: #2a4460;
-            transform: translateY(-2px);
-        }
-
-        @media (max-width: 768px) {
-            .services-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .experience-grid {
-                grid-template-columns: 1fr;
-            }
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Montserrat', Arial, sans-serif; background-color: #ffffff; color: #3b5368; line-height: 1.6; }
+        .navigation-header { background-color: #ffffff; padding: 20px 0; border-bottom: 1px solid #e0e0e0; }
+        .nav-container { max-width: 1200px; margin: 0 auto; padding: 0 40px; display: flex; justify-content: center; gap: 40px; }
+        .nav-links { display: flex; gap: 40px; }
+        .nav-links a { font-size: 14px; color: #5a7fa6; text-decoration: none; letter-spacing: 0.05em; transition: color 0.2s; }
+        .nav-links a:hover, .nav-links a.active { color: #3b5368; }
+        .hero-section { text-align: center; padding: 60px 40px 40px; }
+        .brand-title { font-size: 16px; font-weight: 300; letter-spacing: 0.3em; color: #5a7fa6; margin-bottom: 10px; }
+        .page-title { font-size: 72px; font-weight: 300; letter-spacing: 0.15em; color: #5a7fa6; margin-bottom: 15px; line-height: 1; }
+        .page-subtitle { font-size: 14px; letter-spacing: 0.2em; color: #3b5368; margin-bottom: 60px; }
+        .main-content { display: grid; grid-template-columns: 1fr 1fr; max-width: 1200px; margin: 0 auto; gap: 80px; padding: 40px; }
+        .content-left { padding-top: 40px; }
+        .services-title { font-size: 16px; font-weight: 300; letter-spacing: 0.15em; color: #5a7fa6; margin-bottom: 40px; text-align: center; }
+        .pricing { text-align: center; margin-bottom: 40px; }
+        .price { font-size: 72px; font-weight: 300; color: #5a7fa6; line-height: 1; margin-bottom: 10px; }
+        .price-unit { font-size: 14px; color: #3b5368; letter-spacing: 0.1em; }
+        .divider { width: 200px; height: 1px; background-color: #e0e0e0; margin: 40px auto; }
+        .services-list { list-style: none; padding: 0; text-align: center; margin-bottom: 40px; }
+        .services-list li { font-size: 13px; letter-spacing: 0.15em; color: #3b5368; margin-bottom: 18px; text-transform: uppercase; }
+        .location { text-align: center; font-size: 12px; font-style: italic; color: #666; margin-bottom: 40px; }
+        .cta-button { display: block; width: 100%; max-width: 400px; margin: 50px auto 0; padding: 22px; background-color: #3b5368; color: #ffffff; text-align: center; text-decoration: none; font-size: 13px; letter-spacing: 0.2em; transition: background 0.3s; }
+        .cta-button:hover { background-color: #2a3e4f; }
+        .content-right img { width: 100%; height: auto; display: block; }
+        .footer { background-color: #ffffff; padding: 60px 40px; text-align: center; border-top: 1px solid #e0e0e0; }
+        .footer p { font-size: 12px; color: #3b5368; letter-spacing: 0.15em; }
+        @media (max-width: 968px) { .main-content { grid-template-columns: 1fr; gap: 40px; padding: 20px; } .page-title { font-size: 48px; } .price { font-size: 56px; } .nav-container { padding: 0 20px; gap: 20px; } .nav-links { gap: 20px; } .nav-links a { font-size: 12px; } }
     </style>
 </head>
 <body>
-    <!-- Navigation Header -->
     <header class="navigation-header">
         <div class="nav-container">
             <nav class="nav-links">
@@ -229,152 +50,35 @@
             </nav>
         </div>
     </header>
-
-    <!-- Main Content -->
-    <main class="main-content">
-        <!-- Hero Header -->
-        <div class="hero-header">
-            <div class="hero-content">
-                <div class="hero-brand">SAILOR SKILLS</div>
-                <h1 class="hero-service">DELIVERIES</h1>
-                <div class="hero-tagline">SAFE & RELIABLE BOAT TRANSPORT</div>
+    <section class="hero-section">
+        <p class="brand-title">SAILOR SKILLS</p>
+        <h1 class="page-title">DELIVERIES</h1>
+        <p class="page-subtitle">SAFE VESSEL TRANSPORT</p>
+    </section>
+    <section class="main-content">
+        <div class="content-left">
+            <h2 class="services-title">PROFESSIONAL DELIVERY<br>SERVICES FROM</h2>
+            <div class="pricing">
+                <div class="price">$ 300</div>
+                <p class="price-unit">per day</p>
             </div>
+            <div class="divider"></div>
+            <ul class="services-list">
+                <li>VESSEL READYING</li>
+                <li>ROUTE PLANNNING</li>
+                <li>CREW PROCUREMENT</li>
+                <li>AND MUCH MORE</li>
+            </ul>
+            <p class="location">SERVING THE WEST COAST</p>
+            <div class="divider"></div>
+            <a href="/booking.html" class="cta-button">LEARN MORE</a>
         </div>
-
-        <div class="deliveries-content">
-            <!-- Intro Section -->
-            <section class="intro-section">
-                <h2>Professional Boat Delivery Services</h2>
-                <p>Need to move your boat? Our experienced captains provide safe, reliable delivery services for coastal and offshore passages. Whether you're relocating, purchasing a new vessel, or need seasonal transport, we handle your boat with the care and professionalism it deserves.</p>
-            </section>
-
-            <!-- Services Grid -->
-            <div class="services-grid">
-                <!-- Local Deliveries -->
-                <div class="service-box">
-                    <h3>Local Deliveries</h3>
-                    <p>Bay Area and nearby coastal deliveries:</p>
-                    <ul>
-                        <li>Marina to marina transport</li>
-                        <li>Same-day service available</li>
-                        <li>Full systems check</li>
-                        <li>Detailed delivery report</li>
-                    </ul>
-                </div>
-
-                <!-- Coastal Passages -->
-                <div class="service-box">
-                    <h3>Coastal Passages</h3>
-                    <p>West Coast deliveries:</p>
-                    <ul>
-                        <li>California coast</li>
-                        <li>Pacific Northwest</li>
-                        <li>Baja Mexico</li>
-                        <li>Weather routing included</li>
-                    </ul>
-                </div>
-
-                <!-- Offshore Passages -->
-                <div class="service-box">
-                    <h3>Offshore Passages</h3>
-                    <p>Blue water deliveries:</p>
-                    <ul>
-                        <li>Hawaii crossings</li>
-                        <li>Pacific passages</li>
-                        <li>Multi-crew options</li>
-                        <li>Comprehensive planning</li>
-                    </ul>
-                </div>
-
-                <!-- Seasonal Relocations -->
-                <div class="service-box">
-                    <h3>Seasonal Relocations</h3>
-                    <p>Regular seasonal moves:</p>
-                    <ul>
-                        <li>North/South migrations</li>
-                        <li>Hurricane season repositioning</li>
-                        <li>Scheduled service</li>
-                        <li>Preferred customer rates</li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Experience Section -->
-            <section class="experience-section">
-                <h3>Why Choose Our Delivery Service</h3>
-                <div class="experience-grid">
-                    <div class="experience-item">
-                        <h4>Experienced Captains</h4>
-                        <p>USCG licensed captains with thousands of offshore miles and extensive local knowledge.</p>
-                    </div>
-                    <div class="experience-item">
-                        <h4>Comprehensive Insurance</h4>
-                        <p>Full insurance coverage and professional maritime certifications for your peace of mind.</p>
-                    </div>
-                    <div class="experience-item">
-                        <h4>Detailed Planning</h4>
-                        <p>Weather routing, provisioning, crew coordination, and comprehensive passage planning.</p>
-                    </div>
-                    <div class="experience-item">
-                        <h4>Regular Updates</h4>
-                        <p>Stay informed with daily position reports, photos, and direct communication throughout the passage.</p>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Popular Routes -->
-            <section class="routes-section">
-                <h3>Popular Routes</h3>
-                <div class="routes-list">
-                    <h4>West Coast</h4>
-                    <ul>
-                        <li>San Francisco Bay to San Diego</li>
-                        <li>San Diego to Ensenada</li>
-                        <li>Bay Area to Pacific Northwest</li>
-                        <li>San Francisco to Channel Islands</li>
-                        <li>Los Angeles to Cabo San Lucas</li>
-                    </ul>
-                    <br>
-                    <h4>Offshore</h4>
-                    <ul>
-                        <li>California to Hawaii</li>
-                        <li>Return passages from Mexico</li>
-                        <li>West Coast to French Polynesia</li>
-                        <li>Custom routes available</li>
-                    </ul>
-                </div>
-            </section>
-
-            <!-- What's Included -->
-            <section class="experience-section">
-                <h3>What's Included in Every Delivery</h3>
-                <div class="experience-grid">
-                    <div class="experience-item">
-                        <h4>Pre-Departure Survey</h4>
-                        <p>Complete systems check and safety inspection before departure.</p>
-                    </div>
-                    <div class="experience-item">
-                        <h4>Passage Planning</h4>
-                        <p>Route planning, weather analysis, and provisioning coordination.</p>
-                    </div>
-                    <div class="experience-item">
-                        <h4>Daily Reports</h4>
-                        <p>Position updates, weather conditions, and vessel status reports.</p>
-                    </div>
-                    <div class="experience-item">
-                        <h4>Delivery Documentation</h4>
-                        <p>Detailed log, photos, and post-delivery report of vessel condition.</p>
-                    </div>
-                </div>
-            </section>
-
-            <!-- CTA Section -->
-            <section class="cta-section">
-                <h3>Need a Boat Delivered?</h3>
-                <p style="margin-bottom: 30px; color: #666; font-size: 18px;">Contact us for a free quote and let's discuss your delivery needs.</p>
-                <a href="/schedule/schedule.html" class="cta-button">Request a Quote</a>
-            </section>
+        <div class="content-right">
+            <img src="/sailing-photo.jpg" alt="Professional Vessel Delivery">
         </div>
-    </main>
+    </section>
+    <footer class="footer">
+        <p>2025 SAILOR SKILLS, LLC</p>
+    </footer>
 </body>
 </html>

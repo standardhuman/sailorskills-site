@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Professional vessel detailing services in San Francisco Bay">
-    <title>Detailing | Sailor Skills</title>
+    <meta name="description" content="Professional underwater vessel care in San Francisco Bay">
+    <title>Diving | Sailor Skills</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -22,6 +22,7 @@
             line-height: 1.6;
         }
 
+        /* Navigation */
         .navigation-header {
             background-color: #ffffff;
             padding: 20px 0;
@@ -55,9 +56,11 @@
             color: #3b5368;
         }
 
+        /* Hero Section */
         .hero-section {
             text-align: center;
             padding: 60px 40px 40px;
+            background-color: #ffffff;
         }
 
         .brand-title {
@@ -81,9 +84,17 @@
             font-size: 14px;
             letter-spacing: 0.2em;
             color: #3b5368;
+            margin-bottom: 10px;
+        }
+
+        .former-name {
+            font-size: 12px;
+            font-style: italic;
+            color: #999;
             margin-bottom: 60px;
         }
 
+        /* Main Content */
         .main-content {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -98,7 +109,7 @@
         }
 
         .services-title {
-            font-size: 16px;
+            font-size: 18px;
             font-weight: 300;
             letter-spacing: 0.15em;
             color: #5a7fa6;
@@ -108,7 +119,7 @@
 
         .pricing {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 60px;
         }
 
         .price {
@@ -132,14 +143,6 @@
             margin: 40px auto;
         }
 
-        .location {
-            text-align: center;
-            font-size: 12px;
-            font-style: italic;
-            color: #666;
-            margin-bottom: 40px;
-        }
-
         .services-list {
             list-style: none;
             padding: 0;
@@ -151,14 +154,16 @@
             font-size: 13px;
             letter-spacing: 0.15em;
             color: #3b5368;
-            margin-bottom: 18px;
+            margin-bottom: 20px;
             text-transform: uppercase;
         }
 
-        .services-list .more {
-            font-style: italic;
-            text-transform: none;
+        .location {
+            text-align: center;
             font-size: 12px;
+            font-style: italic;
+            color: #666;
+            margin-bottom: 50px;
         }
 
         .guarantees {
@@ -205,12 +210,17 @@
             background-color: #2a3e4f;
         }
 
-        .content-right img {
+        .content-right {
+            position: relative;
+        }
+
+        .hero-image {
             width: 100%;
             height: auto;
             display: block;
         }
 
+        /* Footer */
         .footer {
             background-color: #ffffff;
             padding: 60px 40px;
@@ -224,6 +234,7 @@
             letter-spacing: 0.15em;
         }
 
+        /* Mobile */
         @media (max-width: 968px) {
             .main-content {
                 grid-template-columns: 1fr;
@@ -255,48 +266,47 @@
     </style>
 </head>
 <body>
+    <!-- Navigation -->
     <header class="navigation-header">
         <div class="nav-container">
             <nav class="nav-links">
                 <a href="/">HOME</a>
                 <a href="/training/training.html">TRAINING</a>
-                <a href="/diving/diving.html">DIVING</a>
-                <a href="/detailing/detailing.html" class="active">DETAILING</a>
+                <a href="/diving/diving.html" class="active">DIVING</a>
+                <a href="/detailing/detailing.html">DETAILING</a>
                 <a href="/deliveries/deliveries.html">DELIVERIES</a>
             </nav>
         </div>
     </header>
 
+    <!-- Hero Section -->
     <section class="hero-section">
         <p class="brand-title">SAILOR SKILLS</p>
-        <h1 class="page-title">DETAILING</h1>
-        <p class="page-subtitle">VESSEL CARE FROM THE WATERLINE UP</p>
+        <h1 class="page-title">DIVING</h1>
+        <p class="page-subtitle">UNDERWATER VESSEL CARE</p>
+        <p class="former-name">Formerly Bottom Service</p>
     </section>
 
+    <!-- Main Content -->
     <section class="main-content">
         <div class="content-left">
-            <h2 class="services-title">PROFESSIONAL<br>DETAILING SERVICES<br>FROM</h2>
+            <h2 class="services-title">PROFESSIONAL DIVER SERVICES FROM</h2>
 
             <div class="pricing">
-                <div class="price">$ 5.00</div>
+                <div class="price">$ 4.50</div>
                 <p class="price-unit">per foot</p>
             </div>
 
             <div class="divider"></div>
 
-            <p class="location">SERVING THE EAST BAY</p>
-
             <ul class="services-list">
-                <li>HULL POLISH AND WAX</li>
-                <li>WASHDOWN SERVICE</li>
-                <li>METAL POLISHING</li>
-                <li>DECAL REMOVAL</li>
-                <li>STAIN REMOVAL</li>
-                <li>VARNISH</li>
-                <li class="more">and much more</li>
+                <li>HULL CLEANING</li>
+                <li>ANODE SERVICE</li>
+                <li>ITEM RECOVERY</li>
+                <li>AND MORE</li>
             </ul>
 
-            <div class="divider"></div>
+            <p class="location">SERVING THE EAST BAY</p>
 
             <div class="guarantees">
                 <h3>ALL SERVICES INCLUDE</h3>
@@ -305,19 +315,20 @@
                     <li>DEPENDABLE COMMUNICATION</li>
                     <li>EASY ACCOUNT MANAGEMENT</li>
                     <li>PREDICTABLE SCHEDULING</li>
+                    <li>4K UNDERWATER VIDEO</li>
                     <li>ONLINE SERVICE LOGS</li>
-                    <li>PHOTOS AND VIDEO</li>
                 </ul>
             </div>
 
-            <a href="/booking.html" class="cta-button">REQUEST AN ESTIMATE</a>
+            <a href="/booking.html" class="cta-button">ORDER SERVICE NOW</a>
         </div>
 
         <div class="content-right">
-            <img src="/sailing-photo.jpg" alt="Professional Vessel Detailing">
+            <img src="/sailing-photo.jpg" alt="Professional Diving Services" class="hero-image">
         </div>
     </section>
 
+    <!-- Footer -->
     <footer class="footer">
         <p>2025 SAILOR SKILLS, LLC</p>
     </footer>

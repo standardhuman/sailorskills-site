@@ -3,160 +3,309 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Professional sailing instruction in San Francisco Bay - All skill levels welcome">
+    <meta name="description" content="Professional sailing instruction in San Francisco Bay">
     <title>Training | Sailor Skills</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/diving/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        .training-content {
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Montserrat', Arial, sans-serif;
+            background-color: #ffffff;
+            color: #3b5368;
+            line-height: 1.6;
+        }
+
+        /* Navigation */
+        .navigation-header {
+            background-color: #ffffff;
+            padding: 20px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .nav-container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 60px 20px;
+            padding: 0 40px;
+            display: flex;
+            justify-content: center;
+            gap: 40px;
         }
 
-        .intro-section {
-            text-align: center;
-            margin-bottom: 60px;
+        .nav-links {
+            display: flex;
+            gap: 40px;
         }
 
-        .intro-section h2 {
-            font-size: 28px;
-            color: #181818;
-            margin-bottom: 20px;
+        .nav-links a {
+            font-size: 14px;
+            color: #5a7fa6;
+            text-decoration: none;
+            letter-spacing: 0.05em;
+            transition: color 0.2s;
         }
 
-        .intro-section p {
-            font-size: 18px;
-            color: #666;
-            line-height: 1.8;
-            max-width: 800px;
-            margin: 0 auto;
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #3b5368;
         }
 
-        .services-grid {
+        /* Hero Section */
+        .hero-section {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 30px;
-            margin-bottom: 60px;
+            grid-template-columns: 350px 1fr;
+            max-width: 1200px;
+            margin: 0 auto;
+            min-height: 600px;
         }
 
-        .service-box {
-            background: #ffffff;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            padding: 30px;
-            transition: all 0.3s ease;
-        }
-
-        .service-box:hover {
-            border-color: #345475;
-            box-shadow: 0 4px 12px rgba(52, 84, 117, 0.1);
-        }
-
-        .service-box h3 {
-            font-size: 22px;
-            color: #345475;
-            margin-bottom: 15px;
-        }
-
-        .service-box .duration {
-            font-size: 16px;
-            color: #666;
-            font-style: italic;
-            margin-bottom: 15px;
-        }
-
-        .service-box p {
-            font-size: 16px;
-            color: #666;
-            line-height: 1.6;
-            margin-bottom: 20px;
-        }
-
-        .service-box .price {
-            font-size: 20px;
-            color: #345475;
-            font-weight: 600;
-            margin-bottom: 20px;
-        }
-
-        .what-to-expect {
+        .sidebar {
             background-color: #f8f9fa;
-            padding: 40px;
-            border-radius: 8px;
-            margin-bottom: 60px;
+            padding: 60px 40px;
         }
 
-        .what-to-expect h3 {
-            font-size: 24px;
-            color: #181818;
+        .page-title {
+            font-size: 32px;
+            font-weight: 300;
+            letter-spacing: 0.2em;
+            color: #3b5368;
+            margin-bottom: 10px;
+        }
+
+        .page-subtitle {
+            font-size: 12px;
+            letter-spacing: 0.15em;
+            color: #3b5368;
+            margin-bottom: 40px;
+        }
+
+        .pricing-box {
+            background: #ffffff;
+            padding: 30px;
+            margin-bottom: 40px;
+            text-align: center;
+            border: 1px solid #e0e0e0;
+        }
+
+        .price {
+            font-size: 48px;
+            font-weight: 300;
+            color: #3b5368;
+            margin-bottom: 10px;
+        }
+
+        .price-label {
+            font-size: 12px;
+            letter-spacing: 0.1em;
+            color: #666;
             margin-bottom: 20px;
         }
 
-        .what-to-expect ul {
+        .skills-list {
             list-style: none;
             padding: 0;
         }
 
-        .what-to-expect li {
-            font-size: 16px;
-            color: #666;
-            line-height: 1.8;
-            margin-bottom: 10px;
-            padding-left: 25px;
-            position: relative;
+        .skills-list li {
+            font-size: 11px;
+            letter-spacing: 0.1em;
+            color: #3b5368;
+            margin-bottom: 12px;
+            text-transform: uppercase;
         }
 
-        .what-to-expect li:before {
-            content: "✓";
-            position: absolute;
-            left: 0;
-            color: #345475;
-            font-weight: bold;
-        }
-
-        .cta-section {
+        .cta-button {
+            display: block;
+            width: 100%;
+            padding: 18px;
+            background-color: #3b5368;
+            color: #ffffff;
             text-align: center;
-            padding: 40px 20px;
-            background-color: #ffffff;
-            border: 2px solid #345475;
-            border-radius: 8px;
+            text-decoration: none;
+            font-size: 12px;
+            letter-spacing: 0.15em;
+            margin-top: 30px;
+            transition: background 0.3s;
         }
 
-        .cta-section h3 {
-            font-size: 24px;
+        .cta-button:hover {
+            background-color: #2a3e4f;
+        }
+
+        .hero-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Content Sections */
+        .content-section {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 80px 40px;
+            text-align: center;
+        }
+
+        .content-section h2 {
+            font-size: 28px;
+            font-weight: 300;
+            letter-spacing: 0.15em;
+            color: #3b5368;
+            margin-bottom: 30px;
+        }
+
+        .content-section h3 {
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 0.1em;
             color: #181818;
             margin-bottom: 20px;
         }
 
-        .cta-button {
-            display: inline-block;
-            padding: 16px 40px;
-            background-color: #345475;
+        .content-section p {
+            font-size: 14px;
+            color: #3b5368;
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        /* Blue Section */
+        .blue-section {
+            background-color: #3b5368;
             color: #ffffff;
-            text-decoration: none;
-            border-radius: 4px;
+            padding: 80px 40px;
+            text-align: center;
+        }
+
+        .blue-section h2 {
+            font-size: 24px;
+            font-weight: 300;
+            letter-spacing: 0.15em;
+            margin-bottom: 30px;
+        }
+
+        .blue-section p {
+            font-size: 14px;
+            line-height: 1.8;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Features Grid */
+        .features-section {
+            background-color: #3b5368;
+            padding: 60px 40px;
+        }
+
+        .features-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 60px;
+            color: #ffffff;
+        }
+
+        .feature-item {
+            text-align: center;
+        }
+
+        .feature-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .feature-item h3 {
+            font-size: 16px;
             font-weight: 600;
+            letter-spacing: 0.1em;
+            margin-bottom: 15px;
+        }
+
+        .feature-item p {
+            font-size: 12px;
+            line-height: 1.8;
+        }
+
+        /* Quote Section */
+        .quote-section {
+            padding: 80px 40px;
+            text-align: center;
+            background-color: #f8f9fa;
+        }
+
+        .quote-mark {
+            font-size: 48px;
+            color: #3b5368;
+            margin-bottom: 20px;
+        }
+
+        .quote-text {
             font-size: 18px;
-            transition: all 0.3s ease;
+            font-style: italic;
+            color: #3b5368;
+            max-width: 600px;
+            margin: 0 auto 20px;
         }
 
-        .cta-button:hover {
-            background-color: #2a4460;
-            transform: translateY(-2px);
+        .quote-author {
+            font-size: 12px;
+            color: #666;
+            letter-spacing: 0.1em;
         }
 
-        @media (max-width: 768px) {
-            .services-grid {
+        /* Footer */
+        .footer {
+            background-color: #ffffff;
+            padding: 40px;
+            text-align: center;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .footer p {
+            font-size: 12px;
+            color: #3b5368;
+            letter-spacing: 0.05em;
+        }
+
+        /* Mobile */
+        @media (max-width: 968px) {
+            .hero-section {
                 grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                padding: 40px 20px;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            .nav-container {
+                padding: 0 20px;
+                gap: 20px;
+            }
+
+            .nav-links {
+                gap: 20px;
+            }
+
+            .nav-links a {
+                font-size: 12px;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Navigation Header -->
+    <!-- Navigation -->
     <header class="navigation-header">
         <div class="nav-container">
             <nav class="nav-links">
@@ -169,82 +318,114 @@
         </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="main-content">
-        <!-- Hero Header -->
-        <div class="hero-header">
-            <div class="hero-content">
-                <div class="hero-brand">SAILOR SKILLS</div>
-                <h1 class="hero-service">TRAINING</h1>
-                <div class="hero-tagline">EXPERT SAILING INSTRUCTION</div>
-            </div>
-        </div>
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <aside class="sidebar">
+            <h1 class="page-title">TRAINING</h1>
+            <p class="page-subtitle">SAN FRANCISCO BAY</p>
 
-        <div class="training-content">
-            <!-- Intro Section -->
-            <section class="intro-section">
-                <h2>Learn to Sail with Confidence</h2>
-                <p>Whether you're taking your first steps in sailing or looking to refine advanced techniques, our experienced instructors provide personalized training tailored to your goals. Learn at your own pace in the beautiful San Francisco Bay.</p>
-            </section>
-
-            <!-- Services Grid -->
-            <div class="services-grid">
-                <!-- Free Consultation -->
-                <div class="service-box">
-                    <h3>Free Consultation</h3>
-                    <div class="duration">30 minutes</div>
-                    <p>Discuss your sailing goals, experience level, and create a personalized training plan. No obligation.</p>
-                    <div class="price">Free</div>
-                </div>
-
-                <!-- Half Day Training -->
-                <div class="service-box">
-                    <h3>Half Day Training</h3>
-                    <div class="duration">4 hours</div>
-                    <p>Perfect for focused skill development. Cover essential techniques including sail trim, tacking, jibing, and boat handling.</p>
-                    <div class="price">Contact for pricing</div>
-                </div>
-
-                <!-- Full Day Training -->
-                <div class="service-box">
-                    <h3>Full Day Training</h3>
-                    <div class="duration">8 hours</div>
-                    <p>Comprehensive instruction covering all aspects of sailing. Includes theory, hands-on practice, and real-world scenarios.</p>
-                    <div class="price">Contact for pricing</div>
-                </div>
-
-                <!-- Extended Session -->
-                <div class="service-box">
-                    <h3>Extended Session</h3>
-                    <div class="duration">Multiple days</div>
-                    <p>Intensive training programs for serious students. Multi-day sessions include overnight passages and advanced navigation.</p>
-                    <div class="price">Contact for pricing</div>
-                </div>
+            <div class="pricing-box">
+                <div class="price">$72</div>
+                <p class="price-label">MASTER THESE SKILLS</p>
             </div>
 
-            <!-- What to Expect -->
-            <section class="what-to-expect">
-                <h3>What to Expect</h3>
-                <ul>
-                    <li>Personalized instruction based on your skill level and goals</li>
-                    <li>Hands-on learning with experienced captain</li>
-                    <li>Safety procedures and emergency protocols</li>
-                    <li>Sail trim and boat handling techniques</li>
-                    <li>Navigation basics and chart reading</li>
-                    <li>Weather interpretation and passage planning</li>
-                    <li>Docking and anchoring practice</li>
-                    <li>All safety equipment provided</li>
-                    <li>Certificate of completion for multi-day programs</li>
-                </ul>
-            </section>
+            <ul class="skills-list">
+                <li>Docking and Departing</li>
+                <li>Sailboat Handling</li>
+                <li>Emergency Procedures</li>
+                <li>Visual Knowledge</li>
+                <li>Communication</li>
+                <li>Navigation</li>
+                <li>Anchoring</li>
+                <li>Sail Setting/Trim/Shape</li>
+                <li>100% Satisfaction Guarantee</li>
+                <li>Boat Equipment</li>
+                <li>Free Consultation</li>
+                <li>Metal & Composites</li>
+                <li>Rigging Awareness</li>
+            </ul>
 
-            <!-- CTA Section -->
-            <section class="cta-section">
-                <h3>Ready to Start Your Sailing Journey?</h3>
-                <p style="margin-bottom: 30px; color: #666; font-size: 18px;">Book a free consultation or schedule your first training session today.</p>
-                <a href="/schedule/schedule.html" class="cta-button">Book Now</a>
-            </section>
+            <a href="/booking.html" class="cta-button">BOOK A FREE CONSULTATION NOW</a>
+            <a href="#contact" class="cta-button" style="margin-top: 15px;">CONTACT</a>
+        </aside>
+
+        <div class="hero-image-container">
+            <img src="/sailing-photo.jpg" alt="Sailing Training" class="hero-image">
         </div>
-    </main>
+    </section>
+
+    <!-- Experience Section -->
+    <section class="content-section">
+        <h2>EXPERIENCE CALM CONFIDENCE</h2>
+        <h3>CUSTOM SAILING LESSONS ABOARD YOUR OWN BOAT</h3>
+        <p>Your training takes place aboard your boat at your marina. Personalized instruction means you learn at your own pace in a familiar environment.</p>
+    </section>
+
+    <!-- Blue CTA Section -->
+    <section class="blue-section">
+        <h2>BECOME THE SKILLED BOAT OWNER YOU DESERVE TO BE</h2>
+        <a href="/booking.html" class="cta-button" style="max-width: 300px; margin: 20px auto 0; background: #ffffff; color: #3b5368;">LEARN MORE</a>
+    </section>
+
+    <!-- Learn Your Way Section -->
+    <section class="content-section">
+        <h2>LEARN YOUR WAY</h2>
+        <p><strong>Structured Lessons</strong><br>Follow a comprehensive curriculum designed for your skill level</p>
+        <p><strong>Flexible Scheduling</strong><br>Choose times that fit your schedule</p>
+        <p><strong>Skill-Based Learning</strong><br>Focus on specific skills you want to develop</p>
+        <p><strong>On-Water Practice</strong><br>Real-world training on San Francisco Bay</p>
+    </section>
+
+    <!-- Quote Section -->
+    <section class="quote-section">
+        <div class="quote-mark">"</div>
+        <p class="quote-text">You just solved 9 months of pain in 18 seconds.</p>
+        <p class="quote-author">- ACTUAL TESTIMONIAL</p>
+    </section>
+
+    <!-- Sail Safely Section -->
+    <section class="content-section">
+        <h2>SAIL SAFELY WITH PERSONAL TRAINING</h2>
+        <p>Stay training starts with a free 1-hour planning session and complimentary water orientation aboard your vessel. We will set goals, review your training expectations, and begin building the confidence you need to enjoy your boat.</p>
+        <p>I'll be with you, guiding you through any situation you might face on San Francisco Bay, from fog to strong winds. You'll gain not just skills, but confidence.</p>
+    </section>
+
+    <!-- Final CTA -->
+    <section class="blue-section">
+        <h2>Go ahead and book a free consultation<br>for yourself. No expectations, no strings, and your satisfaction is guaranteed.</h2>
+        <a href="/booking.html" class="cta-button" style="max-width: 300px; margin: 20px auto 0; background: #ffffff; color: #3b5368;">SCHEDULE NOW</a>
+    </section>
+
+    <!-- Features Grid -->
+    <section class="features-section">
+        <div class="features-grid">
+            <div class="feature-item">
+                <div class="feature-icon">🏆</div>
+                <h3>Emily Richards<br>Ferry Boat Captain</h3>
+                <p>With years of experience navigating San Francisco Bay as a licensed ferry captain, I bring real-world expertise to every lesson. My background includes managing vessel operations and training crew members.</p>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">📚</div>
+                <h3>Learn to Become a Confident Boat Owner<br>ASA Certified Instructor</h3>
+                <p>As an American Sailing Association certified instructor, I provide structured, comprehensive training. Whether you're a complete beginner or looking to advance your skills, I tailor lessons to your goals and learning pace.</p>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">⚓</div>
+                <h3>Become A Skilled Boat Owner</h3>
+                <p>Gain not just sailing skills, but all the knowledge needed to be a confident boat owner. From maintenance basics to emergency procedures, weather interpretation to navigation, you'll develop comprehensive maritime competence.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA Section -->
+    <section class="blue-section">
+        <h2>Schedule a Free Consultation</h2>
+        <a href="/booking.html" class="cta-button" style="max-width: 300px; margin: 20px auto 0; background: #ffffff; color: #3b5368;">BOOK NOW</a>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>2025 SAILOR SKILLS, LLC</p>
+    </footer>
 </body>
 </html>
