@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/shared/src/ui/design-tokens.css">
     <style>
         * {
             box-sizing: border-box;
@@ -16,10 +17,10 @@
         }
 
         body {
-            font-family: 'Montserrat', Arial, sans-serif;
-            background-color: #ffffff;
-            color: #3b5368;
-            line-height: 1.6;
+            font-family: var(--ss-font-primary);
+            background-color: var(--ss-white);
+            color: var(--ss-primary);
+            line-height: var(--ss-leading-relaxed);
         }
 
         /* Navigation */
@@ -43,16 +44,16 @@
         }
 
         .nav-links a {
-            font-size: 20px;
-            color: rgb(0, 0, 238);
+            font-size: var(--ss-text-lg);
+            color: var(--ss-link-blue);
             text-decoration: none;
-            transition: color 0.2s;
+            transition: var(--ss-transition-fast);
             letter-spacing: normal;
         }
 
         .nav-links a:hover,
         .nav-links a.active {
-            color: rgb(0, 0, 238);
+            color: var(--ss-link-blue);
         }
 
         /* Hero Section */

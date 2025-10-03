@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/shared/src/ui/design-tokens.css">
     <style>
         * {
             box-sizing: border-box;
@@ -16,10 +17,10 @@
         }
 
         body {
-            font-family: 'Montserrat', Arial, sans-serif;
-            background-color: #ffffff;
-            color: #3b5368;
-            line-height: 1.6;
+            font-family: var(--ss-font-primary);
+            background-color: var(--ss-white);
+            color: var(--ss-text-dark);
+            line-height: var(--ss-leading-relaxed);
         }
 
         /* Navigation Header */
@@ -46,17 +47,17 @@
         }
 
         .nav-links a {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 20px;
-            color: rgb(0, 0, 238);
+            font-family: var(--ss-font-primary);
+            font-size: var(--ss-text-lg);
+            color: var(--ss-link-blue);
             text-decoration: none;
-            transition: color 0.2s ease;
-            font-weight: 400;
+            transition: var(--ss-transition-fast);
+            font-weight: var(--ss-weight-normal);
             letter-spacing: normal;
         }
 
         .nav-links a:hover {
-            color: rgb(0, 0, 238);
+            color: var(--ss-link-blue);
         }
 
         /* Hero Section - Two Column Layout */
@@ -75,22 +76,22 @@
         }
 
         .hero-title {
-            font-family: 'Montserrat', sans-serif;
+            font-family: var(--ss-font-primary);
             font-size: 72px;
             font-weight: 300;
-            color: #3b5368;
+            color: var(--ss-primary);
             letter-spacing: 0.15em;
             margin-bottom: 30px;
-            line-height: 1.2;
+            line-height: var(--ss-leading-tight);
         }
 
         .hero-subtitle {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 18px;
-            color: #3b5368;
-            letter-spacing: 0.2em;
+            font-family: var(--ss-font-primary);
+            font-size: var(--ss-text-lg);
+            color: var(--ss-primary);
+            letter-spacing: var(--ss-tracking-wider);
             margin-bottom: 80px;
-            font-weight: 400;
+            font-weight: var(--ss-weight-normal);
         }
 
         .expert-services {
