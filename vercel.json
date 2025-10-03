@@ -47,6 +47,6 @@
     { "source": "/training", "destination": "/training/training.html" },
     { "source": "/detailing", "destination": "/detailing/detailing.html" },
     { "source": "/deliveries", "destination": "/deliveries/deliveries.html" },
-    { "source": "/booking", "destination": "/booking.html" }
+    { "source": "/diving", "destination": "/diving/diving.html" }
   ]
 }
