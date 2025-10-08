@@ -1,11 +1,14 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import Stripe from 'https://esm.sh/stripe@12.18.0?target=deno'
+import { Resend } from 'https://esm.sh/resend@2.0.0'
 
 const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') ?? '', {
   apiVersion: '2023-10-16',
   httpClient: Stripe.createFetchHttpClient(),
 })
+
+const resend = new Resend(Deno.env.get('RESEND_API_KEY') ?? '')
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
@@ -46,6 +49,90 @@ function checkRateLimit(identifier: string): boolean {
 
   limit.count++
   return true
+}
+
+// Generate order confirmation email HTML
+function generateOrderConfirmationEmail(
+  orderNumber: string,
+  customerName: string,
+  serviceType: string,
+  estimatedAmount: number,
+  isRecurring: boolean
+): string {
+  const paymentMessage = isRecurring
+    ? `<p style="margin: 20px 0; padding: 15px; background-color: #e8f4f8; border-left: 4px solid #345475; color: #345475;">
+         <strong>Payment Method Saved!</strong><br>
+         Your card is securely saved and will be charged after each service completion.
+       </p>`
+    : `<p style="margin: 20px 0; padding: 15px; background-color: #e8f4f8; border-left: 4px solid #345475; color: #345475;">
+         <strong>Payment Processed!</strong><br>
+         Your card has been charged $${estimatedAmount.toFixed(2)} for this one-time service.
+       </p>`
+
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Order Confirmation</title>
+    </head>
+    <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
+      <table role="presentation" style="width: 100%; border-collapse: collapse;">
+        <tr>
+          <td style="padding: 40px 0; text-align: center; background-color: #ffffff;">
+            <h1 style="color: #4CAF50; margin: 0; font-size: 32px;">✅ Order Confirmed!</h1>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 40px 30px; background-color: #ffffff;">
+            <p style="font-size: 18px; margin: 0 0 20px 0;">Hi ${customerName},</p>
+            <p style="font-size: 16px; margin: 0 0 20px 0;">Thank you for your order with Sailor Skills!</p>
+
+            <table style="width: 100%; margin: 20px 0; border-collapse: collapse; border: 1px solid #ddd;">
+              <tr style="background-color: #f9f9f9;">
+                <td style="padding: 12px; border: 1px solid #ddd; font-weight: bold;">Order Number:</td>
+                <td style="padding: 12px; border: 1px solid #ddd;">${orderNumber}</td>
+              </tr>
+              <tr>
+                <td style="padding: 12px; border: 1px solid #ddd; font-weight: bold;">Service:</td>
+                <td style="padding: 12px; border: 1px solid #ddd;">${serviceType}</td>
+              </tr>
+              <tr style="background-color: #f9f9f9;">
+                <td style="padding: 12px; border: 1px solid #ddd; font-weight: bold;">Amount:</td>
+                <td style="padding: 12px; border: 1px solid #ddd;">$${estimatedAmount.toFixed(2)}</td>
+              </tr>
+            </table>
+
+            ${paymentMessage}
+
+            <p style="margin: 20px 0; font-size: 16px;">
+              <strong>What's Next?</strong><br>
+              We'll contact you within 24 hours to schedule your service.
+            </p>
+
+            <p style="margin: 20px 0; font-size: 14px; color: #666;">
+              If you have any questions, please contact us at:<br>
+              <a href="mailto:orders@sailorskills.com" style="color: #345475;">orders@sailorskills.com</a>
+            </p>
+
+            <hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;">
+
+            <p style="font-size: 12px; color: #999; margin: 0;">
+              This is an automated confirmation email from Sailor Skills.<br>
+              Please do not reply to this email.
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 20px; text-align: center; background-color: #345475; color: #ffffff;">
+            <p style="margin: 0; font-size: 14px;">© 2025 Sailor Skills. All rights reserved.</p>
+          </td>
+        </tr>
+      </table>
+    </body>
+    </html>
+  `
 }
 
 serve(async (req) => {
@@ -300,6 +387,31 @@ serve(async (req) => {
       })
       clientSecret = paymentIntent.client_secret
       intentType = 'payment'
+    }
+
+    // Send order confirmation email
+    try {
+      const isRecurring = formData.serviceInterval !== 'one-time'
+      const emailHtml = generateOrderConfirmationEmail(
+        orderNumber,
+        formData.customerName,
+        formData.service,
+        formData.estimate,
+        isRecurring
+      )
+
+      await resend.emails.send({
+        from: 'Sailor Skills <onboarding@resend.dev>',
+        to: [formData.customerEmail],
+        subject: `Order Confirmation - ${orderNumber}`,
+        html: emailHtml
+      })
+
+      console.log(`Confirmation email sent to ${formData.customerEmail} for order ${orderNumber}`)
+    } catch (emailError) {
+      // Log email error but don't fail the order
+      console.error('Failed to send confirmation email:', emailError)
+      // Continue processing - email failure shouldn't stop the order
     }
 
     return new Response(
