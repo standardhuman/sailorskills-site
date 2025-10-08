@@ -134,12 +134,13 @@ serve(async (req) => {
         phone: formData.customerPhone,
         birthday: formData.customerBirthday || null
       }, {
-        onConflict: 'email',
-        returning: true
+        onConflict: 'email'
       })
+      .select()
       .single()
 
     if (customerError) throw customerError
+    if (!customer) throw new Error('Failed to create or retrieve customer')
 
     // Create or get Stripe customer
     let stripeCustomer
@@ -193,6 +194,7 @@ serve(async (req) => {
         }, {
           onConflict: 'customer_id,name'
         })
+        .select()
         .single()
       boat = boatResult.data;
     }
@@ -207,6 +209,7 @@ serve(async (req) => {
         }, {
           onConflict: 'name'
         })
+        .select()
         .single()
       marina = marinaResult.data;
     }
@@ -237,10 +240,14 @@ serve(async (req) => {
       }
     }
 
-    const { data: order } = await supabase
+    const { data: order, error: orderError } = await supabase
       .from('service_orders')
       .insert(orderData)
+      .select()
       .single()
+
+    if (orderError) throw orderError
+    if (!order) throw new Error('Failed to create order')
 
     // Create recurring schedule if applicable
     if (formData.serviceInterval !== 'one-time') {
