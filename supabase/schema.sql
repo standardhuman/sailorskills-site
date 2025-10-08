@@ -63,6 +63,8 @@ CREATE TABLE service_orders (
   stripe_payment_intent_id TEXT,
   status TEXT CHECK (status IN ('pending', 'confirmed', 'in_progress', 'completed', 'cancelled')) DEFAULT 'pending',
   notes TEXT,
+  service_details JSONB, -- Calculator inputs: boat type, hull type, paint condition, growth, anodes
+  metadata JSONB, -- Service-specific data: item recovery location, description, lost date, etc.
   created_at TIMESTAMPTZ DEFAULT NOW(),
   scheduled_date DATE,
   completed_at TIMESTAMPTZ
@@ -99,6 +101,8 @@ CREATE TABLE service_schedules (
 CREATE INDEX idx_customers_email ON customers(email);
 CREATE INDEX idx_service_orders_customer ON service_orders(customer_id);
 CREATE INDEX idx_service_orders_status ON service_orders(status);
+CREATE INDEX idx_service_orders_service_details ON service_orders USING GIN (service_details);
+CREATE INDEX idx_service_orders_metadata ON service_orders USING GIN (metadata);
 CREATE INDEX idx_service_schedules_next_date ON service_schedules(next_service_date) WHERE is_active = TRUE;
 
 -- Create updated_at trigger function

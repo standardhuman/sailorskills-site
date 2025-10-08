@@ -255,35 +255,91 @@ serve(async (req) => {
     }
 
     // Create or update address
-    await supabase
+    // First, try to find existing address
+    const { data: existingAddress } = await supabase
       .from('addresses')
-      .upsert({
-        customer_id: customer.id,
-        type: 'billing',
-        street: formData.billingAddress,
-        city: formData.billingCity,
-        state: formData.billingState,
-        zip: formData.billingZip
-      })
+      .select('*')
+      .eq('customer_id', customer.id)
+      .eq('type', 'billing')
+      .single()
+
+    const addressData = {
+      customer_id: customer.id,
+      type: 'billing',
+      street: formData.billingAddress,
+      city: formData.billingCity,
+      state: formData.billingState,
+      zip: formData.billingZip
+    }
+
+    if (existingAddress) {
+      // Update existing
+      await supabase
+        .from('addresses')
+        .update(addressData)
+        .eq('id', existingAddress.id)
+    } else {
+      // Create new
+      await supabase
+        .from('addresses')
+        .insert(addressData)
+    }
 
     // Create or update boat (skip for item recovery)
     let boat = null;
     if (formData.service !== 'Item Recovery') {
-      const boatResult = await supabase
+      const boatData: any = {
+        customer_name: formData.customerName,
+        customer_email: formData.customerEmail,
+        customer_phone: formData.customerPhone,
+        boat_name: formData.boatName,
+        boat_make: formData.boatMake,
+        boat_model: formData.boatModel,
+        boat_length_ft: parseInt(formData.boatLength) || 0,
+        marina_location: formData.marinaName || null,
+        slip_number: formData.slipNumber || null,
+        is_active: true
+      }
+
+      // Add boat details from serviceDetails if available
+      if (formData.serviceDetails) {
+        if (formData.serviceDetails.boatType) {
+          boatData.type = formData.serviceDetails.boatType
+        }
+        if (formData.serviceDetails.hullType) {
+          boatData.hull_type = formData.serviceDetails.hullType
+        }
+        if (formData.serviceDetails.twinEngines !== undefined) {
+          boatData.twin_engines = formData.serviceDetails.twinEngines
+        }
+      }
+
+      // Try to find existing boat first
+      const { data: existingBoat } = await supabase
         .from('boats')
-        .upsert({
-          customer_id: customer.id,
-          name: formData.boatName,
-          make: formData.boatMake,
-          model: formData.boatModel,
-          length: parseInt(formData.boatLength) || 0,
-          // Add other boat details from formData.serviceDetails if available
-        }, {
-          onConflict: 'customer_id,name'
-        })
-        .select()
+        .select('*')
+        .eq('customer_email', formData.customerEmail)
+        .eq('boat_name', formData.boatName)
         .single()
-      boat = boatResult.data;
+
+      if (existingBoat) {
+        // Update existing boat
+        const { data: updatedBoat } = await supabase
+          .from('boats')
+          .update(boatData)
+          .eq('id', existingBoat.id)
+          .select()
+          .single()
+        boat = updatedBoat
+      } else {
+        // Create new boat
+        const { data: newBoat } = await supabase
+          .from('boats')
+          .insert(boatData)
+          .select()
+          .single()
+        boat = newBoat
+      }
     }
 
     // Create or get marina (skip for item recovery)
@@ -304,7 +360,7 @@ serve(async (req) => {
     // Generate order number
     const orderNumber = `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 5).toUpperCase()}`
 
-    // Create service order with metadata for item recovery
+    // Create service order with service_details and metadata
     const orderData: any = {
       order_number: orderNumber,
       customer_id: customer.id,
@@ -315,7 +371,9 @@ serve(async (req) => {
       service_type: formData.service,
       service_interval: formData.serviceInterval || 'one-time',
       estimated_amount: formData.estimate,
-      status: 'pending'
+      status: 'pending',
+      service_details: formData.serviceDetails || null, // Store full calculator context
+      notes: formData.customerNotes || null
     }
 
     // Add item recovery specific metadata if applicable
