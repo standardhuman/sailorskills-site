@@ -401,7 +401,7 @@ serve(async (req) => {
       )
 
       await resend.emails.send({
-        from: 'Sailor Skills <onboarding@resend.dev>',
+        from: 'Sailor Skills <orders@sailorskills.com>',
         to: [formData.customerEmail],
         subject: `Order Confirmation - ${orderNumber}`,
         html: emailHtml
