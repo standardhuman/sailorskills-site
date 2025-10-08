@@ -12,8 +12,11 @@ const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
 
 const allowedOrigins = [
   'https://cost-calculator-sigma.vercel.app',
+  'https://sailorskills-estimator.vercel.app',
+  'https://sailorskills-estimator-309d9lol8-brians-projects-bc2d3592.vercel.app',
   'http://localhost:3000',
-  'http://localhost:5173'
+  'http://localhost:5173',
+  'http://localhost:5175'
 ]
 
 function getCorsHeaders(origin: string | null) {
