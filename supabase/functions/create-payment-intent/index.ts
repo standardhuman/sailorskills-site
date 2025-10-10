@@ -3,7 +3,10 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import Stripe from 'https://esm.sh/stripe@12.18.0?target=deno'
 import { Resend } from 'https://esm.sh/resend@2.0.0'
 
-const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') ?? '', {
+const stripeKey = Deno.env.get('STRIPE_SECRET_KEY') ?? ''
+console.log('🔑 Using Stripe key (first 15 chars):', stripeKey.substring(0, 15))
+
+const stripe = new Stripe(stripeKey, {
   apiVersion: '2023-10-16',
   httpClient: Stripe.createFetchHttpClient(),
 })
@@ -99,7 +102,7 @@ function generateOrderConfirmationEmail(
                 <td style="padding: 12px; border: 1px solid #ddd;">${serviceType}</td>
               </tr>
               <tr style="background-color: #f9f9f9;">
-                <td style="padding: 12px; border: 1px solid #ddd; font-weight: bold;">Amount:</td>
+                <td style="padding: 12px; border: 1px solid #ddd; font-weight: bold;">Service estimate:</td>
                 <td style="padding: 12px; border: 1px solid #ddd;">$${estimatedAmount.toFixed(2)}</td>
               </tr>
             </table>
@@ -108,7 +111,7 @@ function generateOrderConfirmationEmail(
 
             <p style="margin: 20px 0; font-size: 16px;">
               <strong>What's Next?</strong><br>
-              We'll contact you within 24 hours to schedule your service.
+              We'll notify you as soon as your service is complete.
             </p>
 
             <p style="margin: 20px 0; font-size: 14px; color: #666;">
@@ -289,9 +292,10 @@ serve(async (req) => {
     let boat = null;
     if (formData.service !== 'Item Recovery') {
       const boatData: any = {
-        customer_name: formData.customerName,
-        customer_email: formData.customerEmail,
-        customer_phone: formData.customerPhone,
+        customer_id: customer.id, // Foreign key to customers table
+        customer_name: formData.customerName, // Kept for backward compatibility
+        customer_email: formData.customerEmail, // Kept for backward compatibility
+        customer_phone: formData.customerPhone, // Kept for backward compatibility
         boat_name: formData.boatName,
         boat_make: formData.boatMake,
         boat_model: formData.boatModel,
@@ -314,13 +318,13 @@ serve(async (req) => {
         }
       }
 
-      // Try to find existing boat first
+      // Try to find existing boat first (prefer customer_id, fallback to customer_email for backward compatibility)
       const { data: existingBoat } = await supabase
         .from('boats')
         .select('*')
-        .eq('customer_email', formData.customerEmail)
-        .eq('boat_name', formData.boatName)
-        .single()
+        .or(`and(customer_id.eq.${customer.id},boat_name.eq.${formData.boatName}),and(customer_email.eq.${formData.customerEmail},boat_name.eq.${formData.boatName})`)
+        .limit(1)
+        .maybeSingle()
 
       if (existingBoat) {
         // Update existing boat
@@ -458,18 +462,31 @@ serve(async (req) => {
         isRecurring
       )
 
-      await resend.emails.send({
-        from: 'Sailor Skills <orders@sailorskills.com>',
+      // Use environment variable for from address (allows using verified test address)
+      // Default: 'Sailor Skills <orders@sailorskills.com>'
+      // For testing with unverified domain, set to: 'onboarding@resend.dev'
+      const fromAddress = Deno.env.get('EMAIL_FROM_ADDRESS') || 'Sailor Skills <orders@sailorskills.com>'
+
+      const emailResult = await resend.emails.send({
+        from: fromAddress,
         to: [formData.customerEmail],
         subject: `Order Confirmation - ${orderNumber}`,
         html: emailHtml
       })
 
       console.log(`Confirmation email sent to ${formData.customerEmail} for order ${orderNumber}`)
+      console.log('Email send result:', JSON.stringify(emailResult))
     } catch (emailError) {
-      // Log email error but don't fail the order
-      console.error('Failed to send confirmation email:', emailError)
+      // Log detailed email error but don't fail the order
+      console.error('Failed to send confirmation email - DETAILED ERROR:')
+      console.error('Error message:', emailError?.message)
+      console.error('Error details:', JSON.stringify(emailError, null, 2))
+      console.error('Customer email:', formData.customerEmail)
+      console.error('Order number:', orderNumber)
+
       // Continue processing - email failure shouldn't stop the order
+      // Note: Check Resend dashboard to verify domain is configured
+      // For testing, set EMAIL_FROM_ADDRESS secret to 'onboarding@resend.dev'
     }
 
     return new Response(
