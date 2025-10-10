@@ -3,10 +3,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import Stripe from 'https://esm.sh/stripe@12.18.0?target=deno'
 import { Resend } from 'https://esm.sh/resend@2.0.0'
 
-const stripeKey = Deno.env.get('STRIPE_SECRET_KEY') ?? ''
-console.log('🔑 Using Stripe key (first 15 chars):', stripeKey.substring(0, 15))
-
-const stripe = new Stripe(stripeKey, {
+const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') ?? '', {
   apiVersion: '2023-10-16',
   httpClient: Stripe.createFetchHttpClient(),
 })
