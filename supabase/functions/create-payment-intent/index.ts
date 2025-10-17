@@ -51,6 +51,113 @@ function checkRateLimit(identifier: string): boolean {
   return true
 }
 
+// Generate admin notification email HTML
+function generateAdminNotificationEmail(
+  orderNumber: string,
+  customerName: string,
+  customerEmail: string,
+  customerPhone: string,
+  serviceType: string,
+  estimatedAmount: number,
+  boatName: string,
+  marinaName: string,
+  slipNumber: string,
+  isRecurring: boolean
+): string {
+  const paymentStatus = isRecurring ? '💳 Payment Method Saved' : '✅ Payment Processed'
+
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>New Order - ${orderNumber}</title>
+    </head>
+    <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
+      <table role="presentation" style="width: 100%; border-collapse: collapse;">
+        <tr>
+          <td style="padding: 40px 0; text-align: center; background-color: #345475;">
+            <h1 style="color: #ffffff; margin: 0; font-size: 28px;">🔔 New Order Received</h1>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 40px 30px; background-color: #ffffff;">
+            <h2 style="color: #345475; margin: 0 0 20px 0;">Order Details</h2>
+
+            <table style="width: 100%; margin: 20px 0; border-collapse: collapse; border: 1px solid #ddd;">
+              <tr style="background-color: #f9f9f9;">
+                <td style="padding: 12px; border: 1px solid #ddd; font-weight: bold; width: 40%;">Order Number:</td>
+                <td style="padding: 12px; border: 1px solid #ddd;">${orderNumber}</td>
+              </tr>
+              <tr>
+                <td style="padding: 12px; border: 1px solid #ddd; font-weight: bold;">Service:</td>
+                <td style="padding: 12px; border: 1px solid #ddd;">${serviceType}</td>
+              </tr>
+              <tr style="background-color: #f9f9f9;">
+                <td style="padding: 12px; border: 1px solid #ddd; font-weight: bold;">Amount:</td>
+                <td style="padding: 12px; border: 1px solid #ddd; color: #16a34a; font-weight: bold;">$${estimatedAmount.toFixed(2)}</td>
+              </tr>
+              <tr>
+                <td style="padding: 12px; border: 1px solid #ddd; font-weight: bold;">Payment Status:</td>
+                <td style="padding: 12px; border: 1px solid #ddd;">${paymentStatus}</td>
+              </tr>
+              <tr style="background-color: #f9f9f9;">
+                <td style="padding: 12px; border: 1px solid #ddd; font-weight: bold;">Service Type:</td>
+                <td style="padding: 12px; border: 1px solid #ddd;">${isRecurring ? 'Recurring' : 'One-time'}</td>
+              </tr>
+            </table>
+
+            <h2 style="color: #345475; margin: 30px 0 20px 0;">Customer Information</h2>
+
+            <table style="width: 100%; margin: 20px 0; border-collapse: collapse; border: 1px solid #ddd;">
+              <tr style="background-color: #f9f9f9;">
+                <td style="padding: 12px; border: 1px solid #ddd; font-weight: bold; width: 40%;">Name:</td>
+                <td style="padding: 12px; border: 1px solid #ddd;">${customerName}</td>
+              </tr>
+              <tr>
+                <td style="padding: 12px; border: 1px solid #ddd; font-weight: bold;">Email:</td>
+                <td style="padding: 12px; border: 1px solid #ddd;"><a href="mailto:${customerEmail}">${customerEmail}</a></td>
+              </tr>
+              <tr style="background-color: #f9f9f9;">
+                <td style="padding: 12px; border: 1px solid #ddd; font-weight: bold;">Phone:</td>
+                <td style="padding: 12px; border: 1px solid #ddd;"><a href="tel:${customerPhone}">${customerPhone}</a></td>
+              </tr>
+            </table>
+
+            <h2 style="color: #345475; margin: 30px 0 20px 0;">Boat & Location</h2>
+
+            <table style="width: 100%; margin: 20px 0; border-collapse: collapse; border: 1px solid #ddd;">
+              <tr style="background-color: #f9f9f9;">
+                <td style="padding: 12px; border: 1px solid #ddd; font-weight: bold; width: 40%;">Boat Name:</td>
+                <td style="padding: 12px; border: 1px solid #ddd;">${boatName || 'N/A'}</td>
+              </tr>
+              <tr>
+                <td style="padding: 12px; border: 1px solid #ddd; font-weight: bold;">Marina:</td>
+                <td style="padding: 12px; border: 1px solid #ddd;">${marinaName || 'N/A'}</td>
+              </tr>
+              <tr style="background-color: #f9f9f9;">
+                <td style="padding: 12px; border: 1px solid #ddd; font-weight: bold;">Slip Number:</td>
+                <td style="padding: 12px; border: 1px solid #ddd;">${slipNumber || 'N/A'}</td>
+              </tr>
+            </table>
+
+            <p style="margin: 30px 0 0 0; padding: 15px; background-color: #fef3c7; border-left: 4px solid #f59e0b; color: #92400e;">
+              <strong>Action Required:</strong> Review this order and schedule the service.
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 20px; text-align: center; background-color: #345475; color: #ffffff;">
+            <p style="margin: 0; font-size: 14px;">© 2025 Sailor Skills. All rights reserved.</p>
+          </td>
+        </tr>
+      </table>
+    </body>
+    </html>
+  `
+}
+
 // Generate order confirmation email HTML
 function generateOrderConfirmationEmail(
   orderNumber: string,
@@ -473,6 +580,31 @@ serve(async (req) => {
 
       console.log(`Confirmation email sent to ${formData.customerEmail} for order ${orderNumber}`)
       console.log('Email send result:', JSON.stringify(emailResult))
+
+      // Send admin notification email
+      const adminEmail = Deno.env.get('ADMIN_EMAILS') || 'standardhuman@gmail.com'
+      const adminEmailHtml = generateAdminNotificationEmail(
+        orderNumber,
+        formData.customerName,
+        formData.customerEmail,
+        formData.customerPhone,
+        formData.service,
+        formData.estimate,
+        formData.boatName || 'N/A',
+        formData.marinaName || 'N/A',
+        formData.slipNumber || 'N/A',
+        isRecurring
+      )
+
+      const adminEmailResult = await resend.emails.send({
+        from: fromAddress,
+        to: [adminEmail],
+        subject: `🔔 New Order: ${orderNumber} - ${formData.service}`,
+        html: adminEmailHtml
+      })
+
+      console.log(`Admin notification sent to ${adminEmail} for order ${orderNumber}`)
+      console.log('Admin email send result:', JSON.stringify(adminEmailResult))
     } catch (emailError) {
       // Log detailed email error but don't fail the order
       console.error('Failed to send confirmation email - DETAILED ERROR:')
