@@ -239,6 +239,9 @@ serve(async (req) => {
         if (formData.serviceDetails.twinEngines !== undefined) {
           boatData.twin_engines = formData.serviceDetails.twinEngines
         }
+        if (formData.serviceDetails.propellerCount !== undefined) {
+          boatData.propeller_count = formData.serviceDetails.propellerCount
+        }
       }
 
       // Try to find existing boat first (prefer customer_id, fallback to customer_email for backward compatibility)
