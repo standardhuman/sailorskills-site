@@ -5,48 +5,6 @@
       "runtime": "edge"
     }
   },
-  "builds": [
-    {
-      "src": "**/*.html",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "**/*.css",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "**/*.js",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "**/*.mjs",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "*.json",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "training/**",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "detailing/**",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "deliveries/**",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "public/**",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "server.js",
-      "use": "@vercel/node"
-    }
-  ],
   "rewrites": [
     { "source": "/training", "destination": "/training/training.html" },
     { "source": "/detailing", "destination": "/detailing/detailing.html" },
