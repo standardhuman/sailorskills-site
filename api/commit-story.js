@@ -99,6 +99,10 @@ async function translateCommitsWithGemini(commits, apiKey) {
   });
 
   if (!response.ok) {
+    // Handle rate limiting specifically
+    if (response.status === 429) {
+      throw new Error('Gemini API rate limit exceeded. Please try again later.');
+    }
     throw new Error(`Gemini API error: ${response.status}`);
   }
 
@@ -113,7 +117,15 @@ async function translateCommitsWithGemini(commits, apiKey) {
   const jsonMatch = text.match(/```json\n([\s\S]*?)\n```/) || text.match(/\[[\s\S]*\]/);
   const jsonText = jsonMatch ? (jsonMatch[1] || jsonMatch[0]) : text;
 
-  return JSON.parse(jsonText);
+  // Parse JSON with better error context
+  try {
+    return JSON.parse(jsonText);
+  } catch (parseError) {
+    const excerpt = text.substring(0, 200);
+    throw new Error(
+      `Failed to parse Gemini response as JSON. Response excerpt: "${excerpt}...". Parse error: ${parseError.message}`
+    );
+  }
 }
 
 function categorizeTranslations(translations) {
