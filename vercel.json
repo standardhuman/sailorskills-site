@@ -3,6 +3,7 @@
     { "source": "/training", "destination": "/training/training.html" },
     { "source": "/detailing", "destination": "/detailing/detailing.html" },
     { "source": "/deliveries", "destination": "/deliveries/deliveries.html" },
-    { "source": "/diving", "destination": "/diving/diving.html" }
+    { "source": "/diving", "destination": "/diving/diving.html" },
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
