@@ -42,3 +42,4 @@ node_modules/
 
 # Temporary files
 run-migration.js.worktrees/
+.env*.local
