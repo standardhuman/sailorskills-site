@@ -28,6 +28,14 @@ export default defineConfig({
     screenshot: 'only-on-failure',
   },
 
+  /* Start dev server before tests */
+  webServer: {
+    command: 'npm run dev',
+    url: 'http://localhost:3000',
+    reuseExistingServer: !process.env.CI,
+    timeout: 120000,
+  },
+
   /* Configure projects for major browsers */
   projects: [
     {

@@ -18,6 +18,7 @@ function App() {
               <a href="https://www.sailorskills.com/training">TRAINING</a>
               <Link to="/booking" className="nav-link">BOOK LESSONS</Link>
               <a href="/index.html" className="nav-link">DIVING CALCULATOR</a>
+              <Link to="/story" className="nav-link">OUR STORY</Link>
               <Link to="/admin" className="nav-link">ADMIN</Link>
             </nav>
           </div>
