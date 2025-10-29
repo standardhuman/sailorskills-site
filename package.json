@@ -37,6 +37,7 @@
     "@notionhq/client": "^5.1.0",
     "@sendgrid/mail": "^8.1.5",
     "@stripe/stripe-js": "^7.8.0",
+    "@vercel/kv": "^3.0.0",
     "@vitejs/plugin-react": "^4.7.0",
     "cors": "^2.8.5",
     "date-fns": "^4.1.0",

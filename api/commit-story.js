@@ -1,4 +1,6 @@
 // api/commit-story.js
+import { getCachedStory, setCachedStory } from '../lib/kv-cache.js';
+
 export const config = {
   runtime: 'edge',
 };
@@ -148,6 +150,21 @@ function categorizeTranslations(translations) {
 
 export default async function handler(request) {
   try {
+    // Check cache first
+    const cached = await getCachedStory();
+    if (cached) {
+      return new Response(
+        JSON.stringify(cached),
+        {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Cache': 'HIT',
+          },
+        }
+      );
+    }
+
     const githubToken = process.env.GITHUB_TOKEN;
     const geminiKey = process.env.GEMINI_API_KEY;
     const org = process.env.GITHUB_ORG || 'standardhuman';
@@ -168,15 +185,22 @@ export default async function handler(request) {
     const translations = await translateCommitsWithGemini(milestones, geminiKey);
     const categorized = categorizeTranslations(translations);
 
+    // Prepare result
+    const result = {
+      categories: categorized,
+      lastUpdated: new Date().toISOString(),
+    };
+
+    // Cache the result
+    await setCachedStory(result);
+
     return new Response(
-      JSON.stringify({
-        categories: categorized,
-        lastUpdated: new Date().toISOString(),
-      }),
+      JSON.stringify(result),
       {
         status: 200,
         headers: {
           'Content-Type': 'application/json',
+          'X-Cache': 'MISS',
           'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=7200',
         },
       }
