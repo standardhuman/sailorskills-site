@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import BookingPage from './pages/BookingPage';
 import AdminDashboard from './pages/AdminDashboard';
+import CommitStoryPage from './pages/CommitStoryPage';
 import './App.css';
 
 function App() {
@@ -27,6 +28,7 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/booking" element={<BookingPage />} />
           <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/story" element={<CommitStoryPage />} />
         </Routes>
       </div>
     </Router>

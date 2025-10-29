@@ -152,3 +152,98 @@
 .service-link:hover {
   color: #2980b9;
 }
+
+/* Commit Story Page Styles */
+.story-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  padding: 2rem 1rem;
+}
+
+.story-header h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  color: #1a365d;
+}
+
+.subtitle {
+  font-size: 1.25rem;
+  color: #4a5568;
+  margin-bottom: 0.5rem;
+}
+
+.last-updated {
+  font-size: 0.9rem;
+  color: #718096;
+}
+
+.category-section {
+  margin-bottom: 2rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1.5rem;
+  background: white;
+}
+
+.category-section h2 {
+  color: #2d3748;
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.feature-cards {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.feature-card {
+  border: 1px solid #cbd5e0;
+  border-radius: 6px;
+  padding: 1rem;
+  background: #f7fafc;
+}
+
+.business-impact {
+  color: #2d3748;
+  font-size: 1rem;
+  line-height: 1.5;
+  margin-bottom: 0.75rem;
+}
+
+.feature-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.875rem;
+}
+
+.date-badge {
+  color: #4a5568;
+  background: #edf2f7;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+.commit-link {
+  color: #3182ce;
+  text-decoration: none;
+}
+
+.commit-link:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .story-header h1 {
+    font-size: 1.75rem;
+  }
+
+  .feature-meta {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-start;
+  }
+}
