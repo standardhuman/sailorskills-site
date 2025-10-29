@@ -41,4 +41,4 @@ node_modules/
 .vercel
 
 # Temporary files
-run-migration.js
+run-migration.js.worktrees/
