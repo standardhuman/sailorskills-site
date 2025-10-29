@@ -1,5 +1,10 @@
 {
   "version": 2,
+  "functions": {
+    "api/commit-story.js": {
+      "runtime": "edge"
+    }
+  },
   "builds": [
     {
       "src": "**/*.html",
@@ -43,10 +48,10 @@
     }
   ],
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/server.js" },
     { "source": "/training", "destination": "/training/training.html" },
     { "source": "/detailing", "destination": "/detailing/detailing.html" },
     { "source": "/deliveries", "destination": "/deliveries/deliveries.html" },
-    { "source": "/diving", "destination": "/diving/diving.html" }
+    { "source": "/diving", "destination": "/diving/diving.html" },
+    { "source": "/api/(.*)", "destination": "/server.js" }
   ]
 }
