@@ -23,7 +23,8 @@ test.describe('Commit Story Page', () => {
 
     // Check that at least one category is present
     const categories = page.locator('.category-section');
-    await expect(categories).toHaveCount({ greaterThan: 0 });
+    const count = await categories.count();
+    expect(count).toBeGreaterThan(0);
   });
 
   test('should expand and collapse categories', async ({ page }) => {
@@ -32,20 +33,23 @@ test.describe('Commit Story Page', () => {
     // Wait for page load
     await page.waitForSelector('.category-section h2', { timeout: 10000 });
 
-    // Find first category header
+    // Find first category header and feature cards
     const firstCategory = page.locator('.category-section h2').first();
-    await firstCategory.click();
-
-    // Check if feature cards are visible or hidden
     const featureCards = page.locator('.feature-cards').first();
-    const isVisible = await featureCards.isVisible();
 
-    // Click again to toggle
+    // Verify initial state (should be visible by default)
+    const initiallyVisible = await featureCards.isVisible();
+    expect(initiallyVisible).toBe(true);
+
+    // Click to collapse
     await firstCategory.click();
-    const isVisibleAfter = await featureCards.isVisible();
+    const collapsedState = await featureCards.isVisible();
+    expect(collapsedState).toBe(false);
 
-    // State should have changed
-    expect(isVisible).not.toBe(isVisibleAfter);
+    // Click to expand again
+    await firstCategory.click();
+    const expandedState = await featureCards.isVisible();
+    expect(expandedState).toBe(true);
   });
 
   test('should display feature cards with metadata', async ({ page }) => {
