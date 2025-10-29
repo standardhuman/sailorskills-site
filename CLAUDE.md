@@ -1,2 +1,0 @@
-- Always test all changes with Playwright MCP.
-- push all changes to git
