@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Professional maritime services in San Francisco Bay - Diving, Training, Detailing, and Deliveries">
+    <title>Sailor Skills | Premier Vessel & Owner Services</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/shared/src/ui/design-tokens.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--ss-font-primary);
+            background-color: var(--ss-white);
+            color: var(--ss-text-dark);
+            line-height: var(--ss-leading-relaxed);
+        }
+
+        /* Navigation Header */
+        .navigation-header {
+            background-color: transparent;
+            padding: 0;
+            border-bottom: none;
+        }
+
+        .nav-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 60px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            font-family: var(--ss-font-primary);
+            font-size: var(--ss-text-lg);
+            color: var(--ss-link-blue);
+            text-decoration: none;
+            transition: var(--ss-transition-fast);
+            font-weight: var(--ss-weight-normal);
+            letter-spacing: normal;
+        }
+
+        .nav-links a:hover {
+            color: var(--ss-link-blue);
+        }
+
+        /* Hero Section - Two Column Layout */
+        .hero-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 80px 60px;
+            gap: 80px;
+            align-items: start;
+        }
+
+        .hero-left {
+            padding-top: 60px;
+        }
+
+        .hero-title {
+            font-family: var(--ss-font-primary);
+            font-size: 72px;
+            font-weight: 300;
+            color: var(--ss-primary);
+            letter-spacing: 0.15em;
+            margin-bottom: 30px;
+            line-height: var(--ss-leading-tight);
+        }
+
+        .hero-subtitle {
+            font-family: var(--ss-font-primary);
+            font-size: var(--ss-text-lg);
+            color: var(--ss-primary);
+            letter-spacing: var(--ss-tracking-wider);
+            margin-bottom: 80px;
+            font-weight: var(--ss-weight-normal);
+        }
+
+        .expert-services {
+            margin-bottom: 60px;
+        }
+
+        .expert-services h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 24px;
+            font-weight: 600;
+            color: #3b5368;
+            letter-spacing: 0.1em;
+            margin-bottom: 40px;
+        }
+
+        .expert-services p {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 18px;
+            color: #3b5368;
+            line-height: 1.8;
+            margin-bottom: 30px;
+        }
+
+        .services-include {
+            margin-bottom: 50px;
+        }
+
+        .services-include h3 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: #181818;
+            letter-spacing: 0.1em;
+            margin-bottom: 35px;
+            text-align: center;
+        }
+
+        .guarantees-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .guarantees-list li {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 16px;
+            color: #3b5368;
+            letter-spacing: 0.15em;
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: 400;
+        }
+
+        .service-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .service-button {
+            display: block;
+            padding: 28px;
+            background-color: #3b5368;
+            color: #ffffff;
+            text-align: center;
+            text-decoration: none;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 18px;
+            letter-spacing: 0.15em;
+            font-weight: 400;
+            transition: background-color 0.3s ease;
+        }
+
+        .service-button:hover {
+            background-color: #2a3e4f;
+        }
+
+        .hero-right {
+            position: relative;
+        }
+
+        .hero-image {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: #ffffff;
+            padding: 40px;
+            text-align: center;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .footer p {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 16px;
+            color: #3b5368;
+            letter-spacing: 0.05em;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 968px) {
+            .hero-section {
+                grid-template-columns: 1fr;
+                gap: 40px;
+                padding: 40px 20px;
+            }
+
+            .hero-title {
+                font-size: 36px;
+            }
+
+            .nav-container {
+                padding: 0 20px;
+                gap: 20px;
+            }
+
+            .nav-links {
+                gap: 20px;
+            }
+
+            .nav-links a {
+                font-size: 12px;
+            }
+        }
+    </style>
+  <script type="module" crossorigin src="/assets/index-DEfHyiMV.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-t9usqwS4.css">
+</head>
+<body>
+    <div id="root"></div>
+</body>
+</html>
